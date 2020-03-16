@@ -1,9 +1,6 @@
 package es.upm.miw.betca_tpv_spring.business_services;
 
-import es.upm.miw.betca_tpv_spring.documents.Shopping;
-import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
-import es.upm.miw.betca_tpv_spring.documents.Ticket;
-import es.upm.miw.betca_tpv_spring.documents.Voucher;
+import es.upm.miw.betca_tpv_spring.documents.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -16,6 +13,7 @@ public class PdfService {
 
     private static final String[] TABLE_COLUMNS_HEADERS = {" ", "Desc.", "Ud.", "Dto.%", "€", "E."};
     private static final float[] TABLE_COLUMNS_SIZES_TICKETS = {15, 90, 15, 25, 35, 15};
+    private static final float[] TABLE_COLUMNS_SIZES_BUDGETS = {15, 90, 15, 25, 35, 15};
 
     @Value("${miw.company.logo}")
     private String logo;
@@ -107,6 +105,31 @@ public class PdfService {
             pdf.paragraph(ticket.getNote());
             this.addBookingDetails(pdf, notCommitted, ticket);
             this.addFoot(pdf);
+            return pdf.build();
+        });
+    }
+
+    public Mono<byte[]> generateBudget(Mono<Budget> budgetReact) {
+        return budgetReact.map(budget -> {
+            final String path = "/tpv-pdfs/budgets/budget-" + budget.getId();
+            PdfBuilder pdf = new PdfBuilder(path);
+            this.addHead(pdf);
+            pdf.barCode(budget.getId());
+            pdf.paragraphEmphasized(budget.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            double total = 0;
+            String state = "";
+            PdfTableBuilder table = pdf.table(TABLE_COLUMNS_SIZES_BUDGETS).tableColumnsHeader(TABLE_COLUMNS_HEADERS);
+            for (int i = 0; i < budget.getShoppingList().length; i++) {
+                Shopping shopping = budget.getShoppingList()[i];
+                String discount = "" + shopping.getDiscount().setScale(2, RoundingMode.HALF_UP);
+                if (shopping.getShoppingState() != ShoppingState.COMMITTED && shopping.getAmount() > 0) {
+                    state = "N";
+                }
+                total = total + shopping.getShoppingTotal().doubleValue();
+                table.tableCell(String.valueOf(i + 1), shopping.getDescription(), "" + shopping.getAmount(), discount,
+                        shopping.getShoppingTotal().setScale(2, RoundingMode.HALF_UP) + "€",state);
+            }
+            table.tableColspanRight(total + "€").build();
             return pdf.build();
         });
     }

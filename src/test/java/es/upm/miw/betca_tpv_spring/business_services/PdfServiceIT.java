@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.business_services;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
+import es.upm.miw.betca_tpv_spring.repositories.BudgetReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketReactRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ class PdfServiceIT {
     @Autowired
     private TicketReactRepository ticketReactRepository;
 
+    @Autowired
+    private BudgetReactRepository budgetReactRepository;
+
     @Test
     void testPdfGenerateTicket() {
         StepVerifier
@@ -23,4 +27,11 @@ class PdfServiceIT {
                 .verify();
     }
 
+    @Test
+    void testPdfGenerateBudget() {
+        StepVerifier
+                .create(this.pdfService.generateBudget(this.budgetReactRepository.findById("test")))
+                .thenCancel()
+                .verify();
+    }
 }
