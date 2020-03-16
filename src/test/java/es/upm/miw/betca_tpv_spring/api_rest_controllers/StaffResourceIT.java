@@ -43,7 +43,7 @@ public class StaffResourceIT {
                         "3",
                         "13",
                         4.00f,
-                        LocalDateTime.of(2020,03,13,9,0,0)
+                        LocalDateTime.of(2020,3,13,9,0,0)
                     ));
         listStaff.add( new Staff(
                 "6669",
@@ -51,7 +51,7 @@ public class StaffResourceIT {
                 "3",
                 "14",
                 4.00f,
-                LocalDateTime.of(2020,03,14,9,0,0)
+                LocalDateTime.of(2020,3,14,9,0,0)
         ));
         this.staffReactRepository.saveAll(listStaff);
 
@@ -94,7 +94,7 @@ public class StaffResourceIT {
                         "3",
                         "14",
                         4.00f,
-                        LocalDateTime.of(2020,03,14,9,0,0))))
+                        LocalDateTime.of(2020,3,14,9,0,0))))
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -166,8 +166,6 @@ public class StaffResourceIT {
                 .returnResult().getResponseBody();
         System.out.println(newStaffList.toString());
 
-//        assertNotNull(newStaffList);
-//        assertEquals("6661" , newStaffList.get(0).getMobile());
     }
 
 
@@ -261,7 +259,7 @@ public class StaffResourceIT {
                         "3",
                         "13",
                         100.00f,
-                        LocalDateTime.of(2020,03,13,9,0,0)
+                        LocalDateTime.of(2020,3,13,9,0,0)
                 )))
                 .exchange()
                 .expectStatus().isOk();
@@ -283,8 +281,7 @@ public class StaffResourceIT {
 
 
         assertNotNull(newStaffList);
-//        assertEquals(100.00f, lastStaffList.get(0).getWorkHours().floatValue());
-        assertEquals(LocalDateTime.of(2020,03,13,9,0,0), lastStaffList.get(0).getLastLoginTime());
+        assertEquals(LocalDateTime.of(2020,3,13,9,0,0), lastStaffList.get(0).getLastLoginTime());
     }
 
 }

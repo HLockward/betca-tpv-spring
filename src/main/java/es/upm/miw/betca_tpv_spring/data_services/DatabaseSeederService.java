@@ -180,7 +180,7 @@ public class DatabaseSeederService {
         Staff[] staff = {
                 new Staff("6661","2020", "3", "13", 4.00f, LocalDateTime.of(2020,3,13,9,0,0)),
                 new Staff("6662", "2020","3", "13", 2.00f, LocalDateTime.of(2020,3,13,8,0,0)),
-                new Staff("6663", "2020","3", "13", 0.00f, LocalDateTime.of(2020,3,13,7,0,0))
+                new Staff("666666001", "2020","2", "28", 0.00f, LocalDateTime.of(2020,2,28,7,0,0))
         };
         this.staffRepository.saveAll(Arrays.asList(staff));
         LogManager.getLogger(this.getClass()).warn("        ------- staffs");

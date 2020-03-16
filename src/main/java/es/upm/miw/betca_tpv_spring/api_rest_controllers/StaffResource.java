@@ -26,7 +26,7 @@ public class StaffResource {
     }
 
     @GetMapping
-    public Flux<Staff> findByMobileAndYearAndMonthAndDay(@RequestParam  String mobile,
+    public Flux<Staff> search(@RequestParam  String mobile,
                                                  @RequestParam String year,
                                                  @RequestParam String month,
                                                  @RequestParam String day) {
@@ -86,7 +86,7 @@ public class StaffResource {
     }
 
     @PostMapping(produces = {"application/json"})
-    public Mono<Staff> createStaffRecord(@Valid @RequestBody StaffDto staffDto){
+    public Mono<Staff> createStaffRecord(@RequestBody StaffDto staffDto){
         return this.staffController.createStaffRecord(staffDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }

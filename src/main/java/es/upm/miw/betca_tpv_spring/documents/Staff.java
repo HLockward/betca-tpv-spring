@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 public class Staff {
     @Id
     private String id;
-
     private String mobile;
     private String year;
     private String month;
