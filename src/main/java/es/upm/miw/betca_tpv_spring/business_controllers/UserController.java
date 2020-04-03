@@ -135,4 +135,13 @@ public class UserController {
         return Mono.when(user).then(this.userReactRepository.saveAll(user).next()).map(UserDto::new);
     }
 
+    public Mono<UserDto> updateRoles(String mobile, UserMinimumDto userMinimumDto) {
+        Mono<User> user = this.userReactRepository.findByMobile(mobile)
+                .switchIfEmpty(Mono.error(new NotFoundException("User mobile:" + mobile)))
+                .map(user1 -> {
+                    user1.setRoles(userMinimumDto.getRoles());
+                    return user1;
+                });
+        return Mono.when(user).then(this.userReactRepository.saveAll(user).next()).map(UserDto::new);
+    }
 }
