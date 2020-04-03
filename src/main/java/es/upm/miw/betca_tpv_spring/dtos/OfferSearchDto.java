@@ -8,7 +8,7 @@ public class OfferSearchDto {
     private LocalDateTime expirationDate;
 
     public OfferSearchDto() {
-
+        // empty
     }
 
     public OfferSearchDto(LocalDateTime registrationDate, LocalDateTime expirationDate) {

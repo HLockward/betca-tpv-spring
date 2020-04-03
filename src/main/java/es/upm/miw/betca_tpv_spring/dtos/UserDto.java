@@ -2,7 +2,6 @@ package es.upm.miw.betca_tpv_spring.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import es.upm.miw.betca_tpv_spring.documents.Role;
 import es.upm.miw.betca_tpv_spring.documents.User;
 
 import java.time.LocalDateTime;
@@ -63,6 +62,7 @@ public class UserDto extends UserMinimumDto {
                 ", dni='" + dni + '\'' +
                 ", address='" + address + '\'' +
                 ", active=" + active +
+                ", roles=" + Arrays.toString(this.getRoles()) +
                 ", registrationDate=" + registrationDate +
                 '}';
     }

@@ -48,7 +48,9 @@ public class OfferDto {
         List<Article> articlesList = new ArrayList<>();
         Collections.addAll(articlesList, offer.getArticleList());
 
-        Stream<Object> stream = articlesList.stream().map(articleDto -> new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock()));
+        Stream<Object> stream = articlesList.stream().map(articleDto -> {
+            return new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock());
+        });
 
         return Arrays.asList(stream.toArray(ArticleDto[]::new));
     }
@@ -81,6 +83,10 @@ public class OfferDto {
         this.description = description;
     }
 
+    public List<ArticleDto> getArticles() {
+        return articles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,7 +108,7 @@ public class OfferDto {
                 ", registrationDate=" + registrationDate +
                 ", discount=" + discount +
                 ", description='" + description + '\'' +
-                ", articles=" + articles.toString() +
+                ", articles=" + articles +
                 '}';
     }
 
