@@ -163,7 +163,7 @@ public class TicketController {
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
 
-   public Flux<Ticket> searchNotCommittedByOrder(String orderId) {
+   public Flux<TicketOutputDto> searchNotCommittedByOrder(String orderId) {
        List<Flux<Ticket>> fluxes = new ArrayList<>();
        this.orderRepository.findById(orderId).map(order -> Arrays.asList(order.getOrderLines())).ifPresent(orderLines -> {
            orderLines.forEach(orderLine ->  {
@@ -172,6 +172,6 @@ public class TicketController {
                fluxes.add(tickets);
            });
        });
-       return Flux.merge(fluxes);
+       return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
 }

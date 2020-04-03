@@ -25,6 +25,7 @@ public class TicketResource {
     public static final String TICKET_ID = "/{id}";
     public static final String SEARCH = "/search";
     public static final String SEARCH_BY_ARTICLE = "/search/article/{articleId}";
+    public static final String SEARCH_BY_ORDER = "/search/order/{orderId}";
 
     private TicketController ticketController;
 
@@ -68,6 +69,12 @@ public class TicketResource {
     @GetMapping(value = SEARCH_BY_ARTICLE)
     public Flux<TicketOutputDto> searchNotCommittedByArticle(@PathVariable String articleId) {
         return this.ticketController.searchNotCommittedByArticle(articleId)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH_BY_ORDER)
+    public Flux<TicketOutputDto> searchNotCommittedByOrder(@PathVariable String orderId) {
+        return this.ticketController.searchNotCommittedByOrder(orderId)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
