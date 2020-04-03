@@ -8,7 +8,6 @@ import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.exceptions.PdfException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
-import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ public class TicketController {
     private CashierClosureReactRepository cashierClosureReactRepository;
     private PdfService pdfService;
     private CustomerPointsReactRepository customerPointsReactRepository;
-    private static Integer EACH_TWO_UNIT_ONE_POINT = 2;
+    private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
     private OrderRepository orderRepository;
 
     @Autowired
@@ -101,11 +100,10 @@ public class TicketController {
         Mono<Void> cashierClosureUpdate = this.cashierClosureReactRepository.saveAll(cashierClosureReact).then();
 
         Mono<CustomerPoints> customerPoints = this.customerPointsReactRepository.findByUser(user).map(customerPoints1 -> {
-            customerPoints1.setPoints((customerPoints1.getPoints() + (ticket.getTotal().intValue() / EACH_TWO_UNIT_ONE_POINT)));
+            int points = (customerPoints1.getPoints() + (ticket.getTotal().intValue() / EACH_TWO_UNIT_ONE_POINT));
+            customerPoints1.setPoints(points < 0 ? 0 : points);
             return customerPoints1;
-        }).doOnNext(cp -> {
-            ticket.setCustomerPoints(cp);
-        });
+        }).doOnNext(cp -> ticket.setCustomerPoints(cp));
 
         Mono<Void> customerPointsUpdate = this.customerPointsReactRepository.saveAll(customerPoints).then();
 

@@ -8,6 +8,7 @@ import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
 import es.upm.miw.betca_tpv_spring.dtos.BudgetCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.BudgetDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
+import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.BudgetReactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,22 +39,23 @@ public class BudgetController {
         List<ShoppingDto> shoppingListDto = new ArrayList<>();
 
         Mono<BudgetDto> budgetDtoMono = this.budgetReactRepository.findById(code).
+                switchIfEmpty(Mono.error(new NotFoundException("Not found" + code))).
                 map(BudgetDto::new);
 
-        Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.flatMapIterable(budgetIterable -> budgetIterable.getShoppingCart());
+        Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.flatMapIterable(BudgetDto::getShoppingCart);
 
         shoppingDtoFlux.toStream().forEach(shDto -> {
             Mono<Article> article = this.articleReactRepository.findById(shDto.getCode());
             Flux<Article> concat = Flux.concat(article);
             concat.toStream().forEach(articleFor -> {
-                if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) == -1) {
+                if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) < 0) {
                     shDto.setRetailPrice(articleFor.getRetailPrice());
                     shDto.setDiscount(BigDecimal.ZERO);
                     shDto.setTotal(articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount())));
-                } else if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) == 1) {
+                } else if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) > 0) {
                     BigDecimal percent = new BigDecimal("100").subtract((shDto.getTotal().divide((articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount()))), MathContext.DECIMAL128).multiply(new BigDecimal("100"))));
                     BigDecimal newTotal = shDto.getTotal().subtract(shDto.getTotal().multiply(percent.divide(new BigDecimal("100"))));
-                    if (shDto.getTotal().compareTo(newTotal) == 1) {
+                    if (shDto.getTotal().compareTo(newTotal) >0) {
                         shDto.setDiscount(percent);
                         shDto.setRetailPrice(articleFor.getRetailPrice());
                     }
@@ -62,9 +64,9 @@ public class BudgetController {
             });
         });
 
-        return Mono.when(budgetDtoMono).then(budgetDtoMono.doOnNext(bb -> {
-            bb.setShoppingCart(shoppingListDto);
-        }));
+        return Mono.when(budgetDtoMono).then(budgetDtoMono.doOnNext(bb ->
+                bb.setShoppingCart(shoppingListDto)
+        ));
     }
 
     public Mono<Budget> createBudget(BudgetCreationInputDto budgetCreationInputDto) {

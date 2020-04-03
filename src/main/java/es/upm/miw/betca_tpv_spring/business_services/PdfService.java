@@ -152,11 +152,12 @@ public class PdfService {
             PdfBuilder pdf = new PdfBuilder(path);
             this.addHead(pdf);
             pdf.barCode(budget.getId());
+            pdf.paragraphEmphasized("BUDGET");
             pdf.paragraphEmphasized(budget.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             double total = 0;
-            String state = "";
             PdfTableBuilder table = pdf.table(TABLE_COLUMNS_SIZES_BUDGETS).tableColumnsHeader(TABLE_COLUMNS_HEADERS);
             for (int i = 0; i < budget.getShoppingList().length; i++) {
+                String state = "";
                 Shopping shopping = budget.getShoppingList()[i];
                 String discount = "" + shopping.getDiscount().setScale(2, RoundingMode.HALF_UP);
                 if (shopping.getShoppingState() != ShoppingState.COMMITTED && shopping.getAmount() > 0) {
@@ -164,7 +165,7 @@ public class PdfService {
                 }
                 total = total + shopping.getShoppingTotal().doubleValue();
                 table.tableCell(String.valueOf(i + 1), shopping.getDescription(), "" + shopping.getAmount(), discount,
-                        shopping.getShoppingTotal().setScale(2, RoundingMode.HALF_UP) + "€", state);
+                        shopping.getShoppingTotal().setScale(2, RoundingMode.HALF_UP) + "€",state);
             }
             table.tableColspanRight(total + "€").build();
             return pdf.build();
