@@ -3,11 +3,13 @@ import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleFamilyCompleteDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
+import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilySearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -112,6 +114,25 @@ public class ArticlesFamilyController {
 
         return this.articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new);
     }
+
+    public Flux<ArticlesFamilyDto> readAllArticlesFamily(){
+        return this.articlesFamilyReactRepository.findAll()
+                .map(ArticlesFamilyDto::new);
+    }
+
+    public Mono<ArticlesFamilyDto> searchArticlesFamilyById(String id){
+        return this.articlesFamilyReactRepository.findById(id)
+                .map(ArticlesFamilyDto::new);
+    }
+
+    public Flux<ArticlesFamilyDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto){
+        return this.articlesFamilyReactRepository
+                .findByReferenceLikeOrFamilyType(
+                        articlesFamilySearchDto.getReference(),
+                        articlesFamilySearchDto.getArticleFamily())
+                .map(ArticlesFamilyDto::new);
+    }
+
 
 
 }
