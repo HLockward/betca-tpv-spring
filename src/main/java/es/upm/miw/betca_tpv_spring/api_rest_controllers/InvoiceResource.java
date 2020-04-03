@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.InvoiceController;
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +12,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('OPERATOR')")
 @RestController
@@ -21,6 +24,8 @@ public class InvoiceResource {
     public static final String INVOICE_ID = "/{id}";
     public static final String PRINT = "/print";
     public static final String NEGATIVE = "/negative";
+    public static final String SEARCH = "/search";
+
     private InvoiceController invoiceController;
 
     @Autowired
@@ -49,6 +54,12 @@ public class InvoiceResource {
     @GetMapping()
     public Flux<InvoiceOutputDto> cget() {
         return this.invoiceController.readAll()
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH)
+    public Flux<InvoiceOutputDto> search(InvoiceFilterDto invoiceFilterDto) {
+        return this.invoiceController.readAllByFilters(invoiceFilterDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

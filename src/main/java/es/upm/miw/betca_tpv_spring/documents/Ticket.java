@@ -27,6 +27,8 @@ public class Ticket {
     private String note;
     @DBRef
     private User user;
+    @DBRef
+    private CustomerPoints customerPoints;
 
     public Ticket() {
         this.creationDate = LocalDateTime.now();
@@ -38,13 +40,15 @@ public class Ticket {
     }
 
     public Ticket(int idOfDay, BigDecimal card, BigDecimal cash, BigDecimal voucher, Shopping[] shoppingList,
-                  User user, String note) {
+                  User user, String note, CustomerPoints customerPoints) {
         this();
         this.setId(idOfDay);
         this.shoppingList = shoppingList;
         this.user = user;
         this.addPay(card, cash, voucher);
         this.note = note;
+        this.customerPoints = customerPoints;
+
     }
 
     public void addPay(BigDecimal card, BigDecimal cash, BigDecimal voucher) {
@@ -125,6 +129,14 @@ public class Ticket {
         this.note = note;
     }
 
+    public CustomerPoints getCustomerPoints() {
+        return customerPoints;
+    }
+
+    public void setCustomerPoints(CustomerPoints customerPoints) {
+        this.customerPoints = customerPoints;
+    }
+
     public BigDecimal getTotal() {
         return Stream.of(this.shoppingList)
                 .map(Shopping::getShoppingTotal)
@@ -160,6 +172,7 @@ public class Ticket {
                 ", voucher=" + voucher +
                 ", note='" + note + '\'' +
                 ", user=" + user +
+                ", customerPoints=" + customerPoints +
                 '}';
     }
 }

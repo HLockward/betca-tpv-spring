@@ -21,7 +21,7 @@ class TicketTest {
                         new BigDecimal("11"))
         };
         Ticket ticket = new Ticket(1, BigDecimal.TEN, new BigDecimal("26.0"), BigDecimal.ZERO,
-                shoppingList, null, "note");
+                shoppingList, null, "note", null);
         assertEquals(0, new BigDecimal("26.0").compareTo(ticket.getTotal()));
     }
 
@@ -38,7 +38,7 @@ class TicketTest {
                         new BigDecimal("11"))
         };
         Ticket ticket = new Ticket(1, BigDecimal.TEN, new BigDecimal("26.0"), BigDecimal.ZERO,
-                shoppings, null, "note");
+                shoppings, null, "note", null);
         assertEquals(0, new BigDecimal("23.0").compareTo(ticket.getTotalCommitted()));
     }
 }

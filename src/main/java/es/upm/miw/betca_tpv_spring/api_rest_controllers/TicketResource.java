@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.TicketController;
+import es.upm.miw.betca_tpv_spring.documents.Ticket;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
@@ -23,6 +24,8 @@ public class TicketResource {
     public static final String TICKETS = "/tickets";
     public static final String TICKET_ID = "/{id}";
     public static final String SEARCH = "/search";
+    public static final String SEARCH_BY_ARTICLE = "/search/article/{articleId}";
+    public static final String SEARCH_BY_ORDER = "/search/order/{orderId}";
 
     private TicketController ticketController;
 
@@ -43,9 +46,14 @@ public class TicketResource {
                 .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @GetMapping(value = TICKET_ID)
+    @GetMapping(value = TICKET_ID + "/pdf")
     public byte[] getPdf(@PathVariable String id) {
         return this.ticketController.getPdf(id);
+    }
+
+    @GetMapping(value = TICKET_ID )
+    public Mono<Ticket> getTicket(@PathVariable String id) {
+        return this.ticketController.getTicket(id);
     }
 
     @GetMapping(value = SEARCH)
@@ -55,6 +63,18 @@ public class TicketResource {
         LocalDateTime day = date == null ? null : LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME);
         TicketSearchDto ticketSearchDto = new TicketSearchDto(mobile, day, amount);
         return this.ticketController.searchByMobileDateOrAmount(ticketSearchDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH_BY_ARTICLE)
+    public Flux<TicketOutputDto> searchNotCommittedByArticle(@PathVariable String articleId) {
+        return this.ticketController.searchNotCommittedByArticle(articleId)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH_BY_ORDER)
+    public Flux<TicketOutputDto> searchNotCommittedByOrder(@PathVariable String orderId) {
+        return this.ticketController.searchNotCommittedByOrder(orderId)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

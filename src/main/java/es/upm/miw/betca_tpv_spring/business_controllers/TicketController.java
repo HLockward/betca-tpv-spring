@@ -7,11 +7,7 @@ import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.exceptions.PdfException;
-import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
-import es.upm.miw.betca_tpv_spring.repositories.CashierClosureReactRepository;
-import es.upm.miw.betca_tpv_spring.repositories.TicketReactRepository;
-import es.upm.miw.betca_tpv_spring.repositories.UserReactRepository;
-import org.apache.logging.log4j.LogManager;
+import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +20,7 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,16 +34,22 @@ public class TicketController {
     private UserReactRepository userReactRepository;
     private CashierClosureReactRepository cashierClosureReactRepository;
     private PdfService pdfService;
+    private CustomerPointsReactRepository customerPointsReactRepository;
+    private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
+    private OrderRepository orderRepository;
 
     @Autowired
     public TicketController(TicketReactRepository ticketReactRepository, UserReactRepository userReactRepository,
                             ArticleReactRepository articleReactRepository, CashierClosureReactRepository cashierClosureReactRepository,
-                            PdfService pdfService) {
+                            PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository,
+                            OrderRepository orderRepository) {
         this.ticketReactRepository = ticketReactRepository;
         this.userReactRepository = userReactRepository;
         this.articleReactRepository = articleReactRepository;
         this.cashierClosureReactRepository = cashierClosureReactRepository;
         this.pdfService = pdfService;
+        this.customerPointsReactRepository = customerPointsReactRepository;
+        this.orderRepository = orderRepository;
     }
 
     private Mono<Integer> nextIdStartingDaily() {
@@ -82,7 +85,7 @@ public class TicketController {
                 .toArray(Shopping[]::new);
         Ticket ticket = new Ticket(0, ticketCreationDto.getCard(), ticketCreationDto.getCash(),
                 ticketCreationDto.getVoucher(), shoppingArray, null,
-                ticketCreationDto.getNote());
+                ticketCreationDto.getNote(), null);
         Mono<User> user = this.userReactRepository.findByMobile(ticketCreationDto.getUserMobile())
                 .doOnNext(ticket::setUser);
         Mono<Integer> nextId = this.nextIdStartingDaily()
@@ -96,7 +99,15 @@ public class TicketController {
                 });
         Mono<Void> cashierClosureUpdate = this.cashierClosureReactRepository.saveAll(cashierClosureReact).then();
 
-        return Mono.when(user, nextId, updateArticlesStockAssured(ticketCreationDto), cashierClosureUpdate)
+        Mono<CustomerPoints> customerPoints = this.customerPointsReactRepository.findByUser(user).map(customerPoints1 -> {
+            int points = (customerPoints1.getPoints() + (ticket.getTotal().intValue() / EACH_TWO_UNIT_ONE_POINT));
+            customerPoints1.setPoints(points < 0 ? 0 : points);
+            return customerPoints1;
+        }).doOnNext(cp -> ticket.setCustomerPoints(cp));
+
+        Mono<Void> customerPointsUpdate = this.customerPointsReactRepository.saveAll(customerPoints).then();
+
+        return Mono.when(user, nextId, updateArticlesStockAssured(ticketCreationDto), customerPointsUpdate, cashierClosureUpdate)
                 .then(this.ticketReactRepository.save(ticket));
     }
 
@@ -121,17 +132,21 @@ public class TicketController {
         }
     }
 
+    public Mono<Ticket> getTicket(String id) {
+        return this.ticketReactRepository.findById(id);
+    }
+
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(TicketSearchDto ticketSearchDto) {
         Flux<Ticket> ticketFlux = ticketSearchDto.getDate() == null ?
                 ticketReactRepository.findAll() :
                 ticketReactRepository.findByCreationDateBetween(ticketSearchDto.getDate(), ticketSearchDto.getDate().plusDays(1));
-        if(ticketSearchDto.getMobile() != null) {
+        if (ticketSearchDto.getMobile() != null) {
             ticketFlux = ticketFlux.filter(ticket -> {
                 User user = ticket.getUser();
                 return user != null && user.getMobile().equals(ticketSearchDto.getMobile());
             });
         }
-        if(ticketSearchDto.getAmount() != null) {
+        if (ticketSearchDto.getAmount() != null) {
             ticketFlux = ticketFlux.filter(ticket -> {
                 AtomicReference<Integer> numberOfItems = new AtomicReference<>(0);
                 Arrays.stream(ticket.getShoppingList()).forEach(item -> {
@@ -143,4 +158,20 @@ public class TicketController {
         return ticketFlux.map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
 
+    public Flux<TicketOutputDto> searchNotCommittedByArticle(String articleId) {
+        return this.ticketReactRepository.findNotCommittedByArticleId(articleId)
+                .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+    }
+
+   public Flux<TicketOutputDto> searchNotCommittedByOrder(String orderId) {
+       List<Flux<Ticket>> fluxes = new ArrayList<>();
+       this.orderRepository.findById(orderId).map(order -> Arrays.asList(order.getOrderLines())).ifPresent(orderLines -> {
+           orderLines.forEach(orderLine ->  {
+               String articleId = orderLine.getArticle().getCode();
+               Flux<Ticket> tickets = this.ticketReactRepository.findNotCommittedByArticleId(articleId);
+               fluxes.add(tickets);
+           });
+       });
+       return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+   }
 }

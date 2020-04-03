@@ -3,6 +3,7 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.data_services.DatabaseSeederService;
 import es.upm.miw.betca_tpv_spring.documents.*;
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
 import es.upm.miw.betca_tpv_spring.repositories.InvoiceReactRepository;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +56,7 @@ public class InvoiceControllerIT {
                 .verify();
 
         StepVerifier
-                .create(this.invoiceReactRepository.findById("20203"))
+                .create(this.invoiceReactRepository.findById("20204"))
                 .expectNextMatches(invoice -> {
                     assertNotNull(invoice.getCreationDate());
                     assertNotNull(invoice.getTicket());
@@ -190,7 +194,7 @@ public class InvoiceControllerIT {
                 .verify();
 
         StepVerifier
-                .create(this.invoiceReactRepository.findById("20203"))
+                .create(this.invoiceReactRepository.findById("20204"))
                 .expectNextMatches(invoice -> {
                     assertNotNull(invoice.getCreationDate());
                     assertNotNull(invoice.getTicket());
@@ -258,6 +262,35 @@ public class InvoiceControllerIT {
                 })
                 .expectNextCount(1)
                 .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void readAllByFilters(){
+        InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto("666666005",
+                LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE),
+                LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
+        StepVerifier
+                .create(this.invoiceController.readAllByFilters(invoiceFilterDto))
+                .expectNextMatches(invoice -> {
+                    assertEquals("20202", invoice.getInvoice());
+                    assertEquals("201901126", invoice.getTicket());
+                    assertEquals("666666005", invoice.getMobile());
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void readAllByFiltersNullMobile(){
+        InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto(null,
+                LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE)
+                , LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
+        StepVerifier
+                .create(this.invoiceController.readAllByFilters(invoiceFilterDto))
+                .expectNextCount(3)
+                .expectComplete()
                 .verify();
     }
 

@@ -17,7 +17,14 @@ public class OfferCreationDto {
     private List<ArticleDto> articleList;
 
     public OfferCreationDto() {
+        // empty for framework
+    }
 
+    public OfferCreationDto(LocalDateTime expirationDate, BigDecimal discount, String description, List<ArticleDto> articleList) {
+        this.expirationDate = expirationDate;
+        this.discount = discount;
+        this.description = description;
+        this.articleList = articleList;
     }
 
     public LocalDateTime getExpirationDate() {

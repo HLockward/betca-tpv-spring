@@ -26,7 +26,7 @@ public class CustomerPointsResource {
 
     @GetMapping(value = MOBILE_ID)
     public Mono<Integer> readCustomerPointsByUserMobile(@PathVariable String mobile) {
-        return this.customerPointsController.sendCustomerPointsByUserMobile(mobile)
+        return this.customerPointsController.getCustomerPointsByUserMobile(mobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

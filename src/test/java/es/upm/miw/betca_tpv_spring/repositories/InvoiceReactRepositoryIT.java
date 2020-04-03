@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +35,7 @@ class InvoiceReactRepositoryIT {
                     assertFalse(invoice.toString().matches("@"));
                     return true;
                 })
-                .expectNextCount(1)
+                .expectNextCount(2)
                 .expectComplete()
                 .verify();
     }
@@ -43,8 +45,8 @@ class InvoiceReactRepositoryIT {
         StepVerifier
                 .create(this.invoiceReactRepository.findFirstByOrderByCreationDateDescIdDesc())
                 .expectNextMatches(invoice -> {
-                    assertEquals(2, invoice.simpleId());
-                    assertEquals("20202", invoice.getId());
+                    assertEquals(3, invoice.simpleId());
+                    assertEquals("20203", invoice.getId());
                     assertNotNull(invoice.getCreationDate());
                     assertNotNull(invoice.getUser());
                     assertNotNull(invoice.getTicket());
@@ -61,8 +63,8 @@ class InvoiceReactRepositoryIT {
         StepVerifier
                 .create(this.invoiceReactRepository.findFirstByTicketAndTaxGreaterThanEqual(ticketMono, BigDecimal.ZERO))
                 .expectNextMatches(invoice -> {
-                    assertEquals(2, invoice.simpleId());
-                    assertEquals("20202", invoice.getId());
+                    assertEquals(3, invoice.simpleId());
+                    assertEquals("20203", invoice.getId());
                     assertNotNull(invoice.getCreationDate());
                     assertNotNull(invoice.getUser());
                     assertNotNull(invoice.getTicket());

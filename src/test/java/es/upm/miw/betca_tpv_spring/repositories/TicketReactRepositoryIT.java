@@ -65,7 +65,7 @@ class TicketReactRepositoryIT {
                 .create(this.ticketReactRepository.findByCreationDateBetween(initDate, endDate))
                 .expectNextMatches(ticket -> ticket.getCreationDate().isAfter(initDate) && ticket.getCreationDate().isBefore(endDate))
                 .expectNextCount(5)
-                .expectComplete().verify();
+                .thenCancel().verify();
     }
 
     @Test
@@ -93,7 +93,16 @@ class TicketReactRepositoryIT {
         StepVerifier
                 .create(this.ticketReactRepository.findByCreationDateLessThanEqual(endDate))
                 .expectNextCount(6)
-                .expectComplete().verify();
+                .thenCancel().verify();
+    }
+
+    @Test
+    void testFindNotCommittedByArticleId() {
+        String articleId = "8400000000024";
+        StepVerifier
+                .create(this.ticketReactRepository.findNotCommittedByArticleId(articleId))
+                .expectNextCount(1)
+                .thenCancel().verify();
     }
 }
 

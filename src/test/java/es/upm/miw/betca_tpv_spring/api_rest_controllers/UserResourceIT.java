@@ -1,6 +1,8 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
+import es.upm.miw.betca_tpv_spring.documents.Role;
 import es.upm.miw.betca_tpv_spring.documents.User;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
 import es.upm.miw.betca_tpv_spring.dtos.UserCredentialDto;
 import es.upm.miw.betca_tpv_spring.dtos.UserDto;
 import es.upm.miw.betca_tpv_spring.dtos.UserMinimumDto;
@@ -12,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.time.LocalDateTime;
+
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.USERS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 @ApiTestConfig
@@ -177,6 +181,27 @@ class UserResourceIT {
     }
 
     @Test
+    void testSendMessageToUser() {
+        LocalDateTime ldt = LocalDateTime.now();
+        MessagesDto messagesDto = new MessagesDto("666666006", "666666007", "FROM 6 to 7", ldt, null);
+        this.restService.loginAdmin(this.webTestClient)
+                .put().uri(contextPath + USERS + MESSAGES)
+                .body(BodyInserters.fromObject(messagesDto)).exchange().expectStatus().isOk()
+                .expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testSendMessageToUserWihNoOtherMessages() {
+        LocalDateTime ldt = LocalDateTime.now();
+        MessagesDto messagesDto = new MessagesDto("666666002", "666666003", "FROM 2 to 3", ldt, null);
+        this.restService.loginAdmin(this.webTestClient)
+                .put().uri(contextPath + USERS + MESSAGES)
+                .body(BodyInserters.fromObject(messagesDto)).exchange().expectStatus().isOk().expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
     void updatePassword() {
         this.restService.loginAdmin(this.webTestClient)
                 .patch().uri(contextPath + USERS + "/password" + UserResource.MOBILE_ID, "6")
@@ -202,5 +227,38 @@ class UserResourceIT {
                 .body(BodyInserters.fromObject(
                         new UserCredentialDto("6", "5")
                 )).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testUpdateRoles() {
+        Role[] rolCustomer = new Role[]{Role.CUSTOMER};
+        Role[] rolOperatorAndAdmin = new Role[]{Role.OPERATOR, Role.ADMIN};
+        UserDto userDto = this.restService.loginAdmin(this.webTestClient)
+                .post().uri(contextPath + USERS)
+                .body(BodyInserters.fromObject(
+                        new UserDto(User.builder().mobile("687144426").username("m001").dni("51714988V").address("C/M, 14").email("m001@gmail.com").roles(rolCustomer).build()))
+                ).exchange().expectStatus().isOk().expectBody(UserDto.class)
+                .returnResult().getResponseBody();
+
+        this.restService.loginAdmin(this.webTestClient)
+                .patch().uri(contextPath + USERS + UserResource.MOBILE_ID, "687144426")
+                .body(BodyInserters.fromObject(
+                        new UserMinimumDto("687144426", "m001", rolOperatorAndAdmin)
+                )).exchange().expectStatus().isOk().expectBody(UserDto.class)
+                .value(Assertions::assertNotNull)
+                .value(user -> assertTrue(user.getRoles().length > 1))
+                .value(user -> assertArrayEquals(user.getRoles(), rolOperatorAndAdmin));
+
+    }
+
+    @Test
+    void testUpdateRolesNotFound() {
+        Role[] rolCustomer = new Role[]{Role.CUSTOMER};
+        this.restService.loginAdmin(this.webTestClient)
+                .patch().uri(contextPath + USERS + UserResource.MOBILE_ID, "a")
+                .body(BodyInserters.fromObject(
+                        new UserMinimumDto("687144426", "m001", rolCustomer)
+                )).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+
     }
 }

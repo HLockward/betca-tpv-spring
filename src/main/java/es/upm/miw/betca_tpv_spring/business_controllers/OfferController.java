@@ -35,7 +35,8 @@ public class OfferController {
     }
 
     public Mono<Offer> createOffer(OfferCreationDto offerCreationDto) {
-        Article[] articles = offerCreationDto.getArticleList().stream().map(articleDto -> new Article().builder(articleDto.getCode())
+        Article[] articles;
+        articles = offerCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .retailPrice(articleDto.getRetailPrice())
                 .build()).toArray(Article[]::new);
@@ -49,9 +50,9 @@ public class OfferController {
         return offerReactRepository.save(offer);
     }
 
-    public Mono<Void> deleteOrder(String orderId) {
-        Mono<Offer> offer = this.offerReactRepository.findById(orderId);
-        return Mono.when(offer).then(this.offerReactRepository.deleteById(orderId));
+    public Mono<Void> deleteOffer(String offerId) {
+        Mono<Offer> offer = this.offerReactRepository.findById(offerId);
+        return Mono.when(offer).then(this.offerReactRepository.deleteById(offerId));
     }
 
     @Transactional

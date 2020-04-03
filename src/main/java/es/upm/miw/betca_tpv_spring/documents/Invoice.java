@@ -24,6 +24,10 @@ public class Invoice {
     @DBRef
     private User user;
 
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public Invoice() {
         creationDate = LocalDateTime.now();
     }

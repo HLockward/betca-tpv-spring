@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,7 @@ public class User {
     public User() {
         this.registrationDate = LocalDateTime.now();
         this.active = true;
+        this.messagesList =  new ArrayList<>();
     }
 
     public static Builder builder() {

@@ -58,4 +58,15 @@ class ArticleReactRepositoryIT {
                 .verify();
     }
 
+    @Test
+    void testFindByDescriptionLikeOrReferenceLikeOrStockOrProviderOrRetailPriceOrDiscontinued() {
+        StepVerifier
+                .create(this.articleReactRepository.findByDescriptionLikeOrReferenceLikeOrStockOrProviderOrRetailPrice(
+                        "null", "null", 0, "null", null))
+                .expectNextCount(2)
+                // .expectNextMatches(article -> article.getDescription().equals("descrip-a6"))
+                .expectComplete()
+                .verify();
+    }
+
 }

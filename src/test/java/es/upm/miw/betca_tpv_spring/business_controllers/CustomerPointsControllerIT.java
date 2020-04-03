@@ -36,7 +36,7 @@ public class CustomerPointsControllerIT {
     @Test
     void sendCustomerPointsByUserMobileTest() {
         StepVerifier
-                .create(this.customerPointsController.sendCustomerPointsByUserMobile("666666003"))
+                .create(this.customerPointsController.getCustomerPointsByUserMobile("666666003"))
                 .expectNextMatches(cp -> {
                     assertNotNull(cp);
                     assertEquals(40, cp.intValue());
@@ -49,7 +49,7 @@ public class CustomerPointsControllerIT {
     @Test
     void sendCustomerPointsByUserMobileNotFoundTest() {
         StepVerifier
-                .create(this.customerPointsController.sendCustomerPointsByUserMobile("666666e003"))
+                .create(this.customerPointsController.getCustomerPointsByUserMobile("666666e003"))
                 .expectError()
                 .verify();
     }

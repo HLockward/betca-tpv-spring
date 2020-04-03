@@ -7,6 +7,7 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 
@@ -20,7 +21,7 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.readAll(null, null, null))
                 .expectNextCount(10)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -29,7 +30,7 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.readAll(5, LocalDateTime.now().minusMonths(1), LocalDateTime.now()))
                 .expectNextCount(2)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -38,7 +39,7 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.getArticleInfo(null))
                 .expectNextCount(10)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -47,14 +48,14 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.getArticleInfo(10))
                 .expectNextCount(9)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
     @Test
     void testArticleInfoWithMinimumStockNoResult() {
         StepVerifier
-                .create(this.stockController.getArticleInfo(-10))
+                .create(this.stockController.getArticleInfo(-100000))
                 .expectComplete()
                 .verify();
     }
@@ -72,7 +73,7 @@ class StockControllerIT {
                 .expectNextMatches(articleStockDto -> articleStockDto.getSoldUnits().equals(unitsMap.get(articleStockDto.getCode())))
                 .expectNextMatches(articleStockDto -> articleStockDto.getSoldUnits().equals(unitsMap.get(articleStockDto.getCode())))
                 .expectNextMatches(articleStockDto -> articleStockDto.getSoldUnits().equals(unitsMap.get(articleStockDto.getCode())))
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -81,7 +82,7 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.getShopping(null, null))
                 .expectNextCount(11)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -90,7 +91,7 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.getShopping(LocalDateTime.now().with(LocalTime.of(0, 0)), null))
                 .expectNextCount(11)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -99,6 +100,40 @@ class StockControllerIT {
         StepVerifier
                 .create(this.stockController.getShopping(null, LocalDateTime.now().minusMonths(1)))
                 .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testGetShoppingArticlePerYearEmpty() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime endDate = LocalDateTime.parse("2010-12-31 00:00", formatter);
+        LocalDateTime initDate = LocalDateTime.parse("2010-01-01 00:00", formatter);
+
+        StepVerifier
+                .create(this.stockController.getShoppingArticlePerYear(initDate, endDate, "8400000000017"))
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testGetShoppingArticlePerYear() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime initDate = LocalDateTime.parse("2020-01-01 00:00", formatter);
+        LocalDateTime endDate = LocalDateTime.parse("2020-12-31 00:00", formatter);
+
+        StepVerifier
+                .create(this.stockController.getShoppingArticlePerYear(initDate, endDate, "8400000000017"))
+                .expectNextMatches(articleStockDto -> articleStockDto.getYear().equals(initDate.getYear()))
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void readArticleSalesInfo() {
+        StepVerifier
+                .create(this.stockController.readArticleSalesInfo("8400000000017"))
+                .expectNextMatches(articleStockDto -> articleStockDto.getYear().equals(LocalDateTime.now().getYear()))
+                .thenCancel()
                 .verify();
     }
 }

@@ -2,6 +2,7 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
@@ -15,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.swing.text.DefaultEditorKit;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,7 +161,7 @@ public class InvoiceController {
         Flux<Shopping> shoppingFlux = Flux.fromArray(returnedShoppings)
                 .handle((shopping, shoppingSynchronousSink) -> {
                     if (shopping.getAmount() >= 0)
-                        shoppingSynchronousSink.error(new BadRequestException("Shopping Amount not allowed (" + shopping.getAmount()  + ")"));
+                        shoppingSynchronousSink.error(new BadRequestException("Shopping Amount not allowed (" + shopping.getAmount() + ")"));
                 });
         Mono<Invoice> calculateBaseAndTaxPublisher = this.calculateBaseAndTax(invoice, returnedShoppings);
         return Mono.when(calculateBaseAndTaxPublisher, nextId, invoiceMono, shoppingFlux)
@@ -168,6 +171,16 @@ public class InvoiceController {
 
     public Flux<InvoiceOutputDto> readAll() {
         return invoiceReactRepository.findAll()
+                .map(InvoiceOutputDto::new);
+    }
+
+    public Flux<InvoiceOutputDto> readAllByFilters(InvoiceFilterDto invoiceFilterDto) {
+        LocalDate fromDate = invoiceFilterDto.getFromDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getFromDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate toDate = invoiceFilterDto.getToDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getToDate(), DateTimeFormatter.ISO_DATE);
+        return invoiceReactRepository.findAll()
+                .filter(invoice -> (invoiceFilterDto.getMobile() == null || invoiceFilterDto.getMobile() == "" || invoice.getUser().getMobile().equals(invoiceFilterDto.getMobile()))
+                && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
+                && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
                 .map(InvoiceOutputDto::new);
     }
 }

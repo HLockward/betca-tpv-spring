@@ -1,5 +1,6 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
@@ -11,7 +12,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -95,7 +99,7 @@ public class InvoiceResourceIT {
     }
 
     @Test
-    void readAll() {
+    void cget() {
         this.restService.loginAdmin(this.webTestClient)
         .get().uri(contextPath + InvoiceResource.INVOICES)
                 .exchange()
@@ -105,4 +109,19 @@ public class InvoiceResourceIT {
                 .value(list -> assertTrue(list.size() > 1));
     }
 
+    @Test
+    void search() {
+        this.restService.loginAdmin(this.webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                        .path(contextPath + InvoiceResource.INVOICES + InvoiceResource.SEARCH)
+                .queryParam("mobile", null)
+                .queryParam("fromDate", LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
+                .queryParam("toDate", LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
+                .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(InvoiceOutputDto.class)
+                .value(Assertions::assertNotNull)
+                .value(list -> assertTrue(list.size() > 1));
+    }
 }

@@ -26,8 +26,6 @@ public class OfferResource {
 
     private static final String PRINT = "/print";
 
-    public static final String SEARCH = "/search";
-
     private OfferController offerController;
 
     @Autowired
@@ -45,8 +43,8 @@ public class OfferResource {
     }
 
     @DeleteMapping(value = OFFER_ID)
-    public Mono<Void> deleteOrder(@PathVariable String id){
-        return this.offerController.deleteOrder(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    public Mono<Void> deleteOffer(@PathVariable String id){
+        return this.offerController.deleteOffer(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping(value = OFFER_ID)

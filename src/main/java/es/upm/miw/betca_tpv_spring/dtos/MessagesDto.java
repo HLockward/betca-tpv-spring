@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 public class MessagesDto {
 
-    private String fromUserName;
+    private String fromUserMobile;
+    private String toUserMobile;
     private String messageContent;
     private LocalDateTime sentDate;
     private LocalDateTime readDate;
@@ -15,26 +16,36 @@ public class MessagesDto {
         // Empty for framework
     }
 
-    public MessagesDto(String fromUserName, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
-        this.fromUserName = fromUserName;
+    public MessagesDto(String fromUserMobile, String toUserMobile, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+        this.fromUserMobile = fromUserMobile;
+        this.toUserMobile = toUserMobile;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
         this.readDate = readDate;
     }
 
+    public String getFromUserMobile() {
+        return fromUserMobile;
+    }
+
+    public void setFromUserMobile(String fromUserMobile) {
+        this.fromUserMobile = fromUserMobile;
+    }
+
     public MessagesDto(Messages messages) {
-        this.fromUserName = messages.getFromUserName();
+        this.fromUserMobile = messages.getFromUserMobile();
+        this.toUserMobile = messages.getToUserMobile();
         this.messageContent = messages.getMessageContent();
         this.sentDate = messages.getSentDate();
         this.readDate = messages.getReadDate();
     }
 
-    public String getFromUserName() {
-        return fromUserName;
+    public String getToUserMobile() {
+        return toUserMobile;
     }
 
-    public void setFromUserName(String fromUserName) {
-        this.fromUserName = fromUserName;
+    public void setToUserMobile(String toUserMobile) {
+        this.toUserMobile = toUserMobile;
     }
 
     public String getMessageContent() {
@@ -64,7 +75,8 @@ public class MessagesDto {
     @Override
     public String toString() {
         return "MessagesDto [" +
-                "fromUserName=" + fromUserName  +
+                "fromUserMobile=" + fromUserMobile +
+                ", toUserMobile=" + toUserMobile +
                 ", messageContent=" + messageContent +
                 ", sentDate=" + sentDate +
                 ", readDate=" + readDate +

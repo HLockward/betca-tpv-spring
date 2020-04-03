@@ -21,4 +21,9 @@ public interface TicketReactRepository extends ReactiveSortingRepository<Ticket,
     Flux<Ticket> findByCreationDateBetween(LocalDateTime init, LocalDateTime end);
 
     Flux<Ticket> findByCreationDateLessThanEqual(LocalDateTime end);
+
+    Mono<Ticket> findById(String id);
+
+    @Query(value = "{ 'shoppingList.shoppingState': 'NOT_COMMITTED', 'shoppingList.articleId': ?0 }")
+    Flux<Ticket> findNotCommittedByArticleId(String articleId);
 }

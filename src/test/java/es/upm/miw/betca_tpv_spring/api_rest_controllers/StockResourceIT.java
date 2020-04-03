@@ -8,6 +8,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDateTime;
 
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.StockResource.CODE_ID;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.StockResource.STOCK;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,5 +53,21 @@ class StockResourceIT {
                 .build())
                 .exchange().expectBody(ArticleStockDto[].class)
                 .value(articleStockDto -> assertTrue(articleStockDto.length <= 0 || articleStockDto[0].getStock() <= 1));
+    }
+
+    @Test
+    void testReadArticleSalesInfoNotFound() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + STOCK + CODE_ID, "notFoundException")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testReadArticleSalesInfo() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + STOCK + CODE_ID, "8400000000017")
+                .exchange()
+                .expectStatus().isOk();
     }
 }
