@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -268,8 +266,8 @@ public class InvoiceControllerIT {
     @Test
     void readAllByFilters(){
         InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto("666666005",
-                LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE),
-                LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
+                LocalDateTime.now().minusDays(1).toLocalDate(),
+                LocalDateTime.now().plusDays(1).toLocalDate());
         StepVerifier
                 .create(this.invoiceController.readAllByFilters(invoiceFilterDto))
                 .expectNextMatches(invoice -> {
@@ -285,8 +283,8 @@ public class InvoiceControllerIT {
     @Test
     void readAllByFiltersNullMobile(){
         InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto(null,
-                LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE)
-                , LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
+                LocalDateTime.now().minusDays(1).toLocalDate()
+                , LocalDateTime.now().plusDays(1).toLocalDate());
         StepVerifier
                 .create(this.invoiceController.readAllByFilters(invoiceFilterDto))
                 .expectNextCount(3)

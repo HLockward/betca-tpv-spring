@@ -175,12 +175,10 @@ public class InvoiceController {
     }
 
     public Flux<InvoiceOutputDto> readAllByFilters(InvoiceFilterDto invoiceFilterDto) {
-        LocalDate fromDate = invoiceFilterDto.getFromDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getFromDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate toDate = invoiceFilterDto.getToDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getToDate(), DateTimeFormatter.ISO_DATE);
-        return invoiceReactRepository.findAll()
-                .filter(invoice -> (invoiceFilterDto.getMobile() == null || invoiceFilterDto.getMobile() == "" || invoice.getUser().getMobile().equals(invoiceFilterDto.getMobile()))
-                && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
-                && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
+       return invoiceReactRepository.findAll()
+                .filter(invoice -> ((invoiceFilterDto.getMobile() == null || invoiceFilterDto.getMobile().equals("")) || invoice.getUser().getMobile().equals(invoiceFilterDto.getMobile()))
+                        && (invoiceFilterDto.getFromDate() == null || invoice.getCreationDate().toLocalDate().compareTo(invoiceFilterDto.getFromDate()) >= 0)
+                        && (invoiceFilterDto.getFromDate() == null || invoice.getCreationDate().toLocalDate().compareTo(invoiceFilterDto.getToDate()) < 0))
                 .map(InvoiceOutputDto::new);
     }
 }
