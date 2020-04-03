@@ -177,11 +177,14 @@ public class TicketController {
        return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
 
-   public Flux<Ticket> searchNotCommittedByTag(String tagDescription) {
+   public Flux<TicketOutputDto> searchNotCommittedByTag(String tagDescription) {
         List<Flux<Ticket>> tickets = new ArrayList<>();
         return this.tagReactRepository.findByDescription(tagDescription)
-                .doOnSuccess(tag -> tag.getArticleList()
-                .forEach(article -> tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode()))))
-                .thenMany(Flux.merge(tickets));
+                .map(tag -> {
+                    tag.getArticleList().forEach(article -> tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode())));
+                    return tag;
+                })
+                .thenMany(Flux.merge(tickets))
+                .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
 }
