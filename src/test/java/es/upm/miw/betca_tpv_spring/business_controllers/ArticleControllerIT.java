@@ -2,6 +2,7 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.documents.Tax;
+import es.upm.miw.betca_tpv_spring.dtos.ArticleAdvancedSearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.ConflictException;
@@ -138,6 +139,17 @@ class ArticleControllerIT {
         StepVerifier
                 .create(this.articleController.searchArticleByDescriptionOrProvider(articleSearchDto))
                 .expectNextCount(1)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testSearchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued() {
+        ArticleAdvancedSearchDto articleAdvancedSearchDto = new ArticleAdvancedSearchDto(null, null, null, null, null, true);
+        StepVerifier
+                .create(this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto))
+                .expectNextCount(1)
+                // .expectNextMatches(articleDto1 -> "descrip-a6".equals(articleDto1.getDescription()))
                 .expectComplete()
                 .verify();
     }

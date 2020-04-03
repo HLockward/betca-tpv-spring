@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.ArticleController;
+import es.upm.miw.betca_tpv_spring.dtos.ArticleAdvancedSearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleSearchDto;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('OPERATOR')")
 @RestController
@@ -20,7 +22,7 @@ public class ArticleResource {
     public static final String ARTICLES = "/articles";
     public static final String CODE_ID = "/{code}";
     public static final String SEARCH = "/search";
-
+    public static final String ADVANCEDSEARCH = "/advancedSearch";
     private ArticleController articleController;
 
     @Autowired
@@ -57,6 +59,22 @@ public class ArticleResource {
                                                                  @RequestParam(required = false) String provider) {
         ArticleSearchDto articleSearchDto = new ArticleSearchDto(description, provider);
         return this.articleController.searchArticleByDescriptionOrProvider(articleSearchDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = ADVANCEDSEARCH)
+    public Flux<ArticleDto> searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(
+            @RequestParam(required = false) String description, @RequestParam(required = false) String reference,
+            @RequestParam(required = false) Integer stock, @RequestParam(required = false) String provider,
+            @RequestParam(required = false) String retailPrice, @RequestParam(required = false) String discontinued) {
+        BigDecimal price;
+        if (retailPrice == null)
+            price = null;
+        else
+            price = new BigDecimal(retailPrice);
+        ArticleAdvancedSearchDto articleAdvancedSearchDto = new ArticleAdvancedSearchDto(description, reference, stock,
+                provider, price, Boolean.valueOf(discontinued));
+        return this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

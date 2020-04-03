@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,17 +36,20 @@ public class TicketController {
     private PdfService pdfService;
     private CustomerPointsReactRepository customerPointsReactRepository;
     private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
+    private OrderRepository orderRepository;
 
     @Autowired
     public TicketController(TicketReactRepository ticketReactRepository, UserReactRepository userReactRepository,
                             ArticleReactRepository articleReactRepository, CashierClosureReactRepository cashierClosureReactRepository,
-                            PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository) {
+                            PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository,
+                            OrderRepository orderRepository) {
         this.ticketReactRepository = ticketReactRepository;
         this.userReactRepository = userReactRepository;
         this.articleReactRepository = articleReactRepository;
         this.cashierClosureReactRepository = cashierClosureReactRepository;
         this.pdfService = pdfService;
         this.customerPointsReactRepository = customerPointsReactRepository;
+        this.orderRepository = orderRepository;
     }
 
     private Mono<Integer> nextIdStartingDaily() {
@@ -158,4 +162,16 @@ public class TicketController {
         return this.ticketReactRepository.findNotCommittedByArticleId(articleId)
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
+
+   public Flux<TicketOutputDto> searchNotCommittedByOrder(String orderId) {
+       List<Flux<Ticket>> fluxes = new ArrayList<>();
+       this.orderRepository.findById(orderId).map(order -> Arrays.asList(order.getOrderLines())).ifPresent(orderLines -> {
+           orderLines.forEach(orderLine ->  {
+               String articleId = orderLine.getArticle().getCode();
+               Flux<Ticket> tickets = this.ticketReactRepository.findNotCommittedByArticleId(articleId);
+               fluxes.add(tickets);
+           });
+       });
+       return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+   }
 }
