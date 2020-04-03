@@ -12,8 +12,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('OPERATOR')")
 @RestController
@@ -40,13 +38,13 @@ public class InvoiceResource {
     }
 
     @PatchMapping(value = INVOICE_ID + PRINT)
-    public Mono<byte[]> generate(@PathVariable String id){
+    public Mono<byte[]> generate(@PathVariable String id) {
         return this.invoiceController.updateAndPdf(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @PostMapping(value = NEGATIVE)
-    public Mono<byte[]> generateNegative(@RequestBody @Valid InvoiceNegativeCreationInputDto invoiceNegativeCreationInputDto){
+    public Mono<byte[]> generateNegative(@RequestBody @Valid InvoiceNegativeCreationInputDto invoiceNegativeCreationInputDto) {
         return this.invoiceController.createNegativeAndPdf(invoiceNegativeCreationInputDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }

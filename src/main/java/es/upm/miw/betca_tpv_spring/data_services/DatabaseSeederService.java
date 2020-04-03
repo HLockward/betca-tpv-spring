@@ -255,6 +255,8 @@ public class DatabaseSeederService {
                         articles[4].getDescription(), articles[4].getRetailPrice()),
                 new Shopping(2, BigDecimal.ZERO, ShoppingState.COMMITTED, articles[4].getCode(),
                         articles[4].getDescription(), articles[4].getRetailPrice()),
+                new Shopping(2, BigDecimal.ZERO, ShoppingState.COMMITTED, articles[3].getCode(),
+                        articles[3].getDescription(), articles[3].getRetailPrice()),
         };
         Ticket[] tickets = {
                 new Ticket(1, BigDecimal.TEN, new BigDecimal("25.0"), BigDecimal.ZERO,
@@ -269,6 +271,8 @@ public class DatabaseSeederService {
                         new Shopping[]{shoppingList[3], shoppingList[4]}, users[5], "note",null),
                 new Ticket(6, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
                         new Shopping[]{shoppingList[3], shoppingList[4]}, users[4], "note",null),
+                new Ticket(7, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
+                        new Shopping[]{shoppingList[6]}, users[4], "note",null),
         };
         tickets[0].setId("201901121");
         tickets[1].setId("201901122");
@@ -276,12 +280,15 @@ public class DatabaseSeederService {
         tickets[3].setId("201901124");
         tickets[4].setId("201901125");
         tickets[5].setId("201901126");
+        tickets[6].setId("201901127");
         this.ticketRepository.saveAll(Arrays.asList(tickets));
         LogManager.getLogger(this.getClass()).warn("        ------- tickets");
         Invoice[] invoices = {
                 new Invoice(1, users[4], tickets[1]),
                 new Invoice(2, users[5], tickets[5]),
-                new Invoice(3, users[4], tickets[4])
+                new Invoice(3, users[4], tickets[4]),
+                new Invoice(4, users[4], tickets[6]),
+                new Invoice(5, users[4], tickets[6])
         };
         invoices[1].setTax(new BigDecimal("0.0368"));
         invoices[1].setBaseTax(new BigDecimal("0.6624"));

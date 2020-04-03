@@ -30,7 +30,7 @@ public class ArticlesFamilyResource {
     }
 
     @GetMapping(value = SIZES)
-    public  List<String>  readSizes() throws IOException {
+    public List<String> readSizes() throws IOException {
         return articlesFamilyController.readSizes();
     }
 

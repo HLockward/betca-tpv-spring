@@ -29,7 +29,9 @@ public class OfferResource {
     private OfferController offerController;
 
     @Autowired
-    public OfferResource(OfferController offerController) { this.offerController = offerController; }
+    public OfferResource(OfferController offerController) {
+        this.offerController = offerController;
+    }
 
     @GetMapping
     public Flux<Offer> search(@RequestParam String registrationDate, @RequestParam String expirationDate) {
@@ -38,17 +40,17 @@ public class OfferResource {
     }
 
     @PostMapping(produces = {"application/json"})
-    public Mono<Offer> createOffer(@Valid @RequestBody OfferCreationDto offerCreationDto){
+    public Mono<Offer> createOffer(@Valid @RequestBody OfferCreationDto offerCreationDto) {
         return this.offerController.createOffer(offerCreationDto).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @DeleteMapping(value = OFFER_ID)
-    public Mono<Void> deleteOffer(@PathVariable String id){
+    public Mono<Void> deleteOffer(@PathVariable String id) {
         return this.offerController.deleteOffer(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping(value = OFFER_ID)
-    public Mono<OfferDto> getOrder(@PathVariable String id){
+    public Mono<OfferDto> getOrder(@PathVariable String id) {
         return this.offerController.getOffer(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

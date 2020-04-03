@@ -2,7 +2,10 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.data_services.DatabaseSeederService;
-import es.upm.miw.betca_tpv_spring.documents.*;
+import es.upm.miw.betca_tpv_spring.documents.Quarter;
+import es.upm.miw.betca_tpv_spring.documents.Shopping;
+import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
+import es.upm.miw.betca_tpv_spring.documents.Ticket;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
@@ -14,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -181,7 +183,7 @@ public class InvoiceControllerIT {
     void testCreateNegativeInvoice() {
         List<ShoppingDto> shoppings = new ArrayList<>();
         shoppings.add(new ShoppingDto("8400000000055", "descrip-a5", new BigDecimal("0.23"),
-                        -2, new BigDecimal("50"), new BigDecimal("0.23"), true));
+                -2, new BigDecimal("50"), new BigDecimal("0.23"), true));
         InvoiceNegativeCreationInputDto invoiceNegativeCreationInputDto = new InvoiceNegativeCreationInputDto("201901125", shoppings);
         StepVerifier
                 .create(this.invoiceController.createNegativeAndPdf(invoiceNegativeCreationInputDto))
@@ -266,8 +268,8 @@ public class InvoiceControllerIT {
     }
 
     @Test
-    void readAllByFilters(){
-        InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto("666666005",
+    void readAllByFilters() {
+        InvoiceFilterDto invoiceFilterDto = new InvoiceFilterDto("666666005",
                 LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE),
                 LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
         StepVerifier
@@ -283,13 +285,49 @@ public class InvoiceControllerIT {
     }
 
     @Test
-    void readAllByFiltersNullMobile(){
-        InvoiceFilterDto invoiceFilterDto  = new InvoiceFilterDto(null,
+    void readAllByFiltersNullMobile() {
+        InvoiceFilterDto invoiceFilterDto = new InvoiceFilterDto(null,
                 LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE)
                 , LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE));
         StepVerifier
                 .create(this.invoiceController.readAllByFilters(invoiceFilterDto))
                 .expectNextCount(3)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testReadQuarterlyVatFoundInvoices() {
+        StepVerifier
+                .create(this.invoiceController.readQuarterlyVat(Quarter.Q2))
+                .expectNextMatches(quarterVATDto -> {
+                    assertNotEquals(quarterVATDto.getTaxes().size(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(0).getVat(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(0).getTaxableAmount(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(1).getVat(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(1).getTaxableAmount(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(2).getVat(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(2).getTaxableAmount(), BigDecimal.ZERO);
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testReadQuarterlyVatNoInvoices() {
+        StepVerifier
+                .create(this.invoiceController.readQuarterlyVat(Quarter.Q4))
+                .expectNextMatches(quarterVATDto -> {
+                    assertNotEquals(quarterVATDto.getTaxes().size(), 0);
+                    assertEquals(quarterVATDto.getTaxes().get(0).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(0).getTaxableAmount(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(1).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(1).getTaxableAmount(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(2).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(2).getTaxableAmount(), BigDecimal.ZERO);
+                    return true;
+                })
                 .expectComplete()
                 .verify();
     }
