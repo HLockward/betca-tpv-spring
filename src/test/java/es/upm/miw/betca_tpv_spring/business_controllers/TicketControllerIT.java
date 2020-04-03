@@ -6,6 +6,7 @@ import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
+import es.upm.miw.betca_tpv_spring.repositories.OrderRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class TicketControllerIT {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private CashierClosureController cashierClosureController;
@@ -115,6 +119,26 @@ public class TicketControllerIT {
                 .create(this.ticketController.searchNotCommittedByArticle(articleId))
                 .expectNextCount(1)
                 .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testSearchNotCommittedByOrder() {
+        String id = this.orderRepository.findAll().get(0).getId();
+        StepVerifier
+                .create(this.ticketController.searchNotCommittedByOrder(id))
+                .expectNextCount(2)
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testSearchNotCommittedByOrderNotFound() {
+        String id = "555";
+        StepVerifier
+                .create(this.ticketController.searchNotCommittedByOrder(id))
+                .expectNextCount(0)
+                .thenCancel()
                 .verify();
     }
 }
