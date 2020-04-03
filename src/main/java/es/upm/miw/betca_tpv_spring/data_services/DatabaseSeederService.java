@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +31,7 @@ public class DatabaseSeederService {
     private String password;
 
     private TicketRepository ticketRepository;
+    private GiftTicketRepository giftTicketRepository;
     private InvoiceRepository invoiceRepository;
     private CashierClosureRepository cashierClosureRepository;
     private Environment environment;
@@ -54,6 +54,7 @@ public class DatabaseSeederService {
     @Autowired
     public DatabaseSeederService(
             TicketRepository ticketRepository,
+            GiftTicketRepository giftTicketRepository,
             InvoiceRepository invoiceRepository,
             CashierClosureRepository cashierClosureRepository,
             Environment environment,
@@ -74,6 +75,7 @@ public class DatabaseSeederService {
             StockAlarmRepository stockAlarmRepository
     ) {
         this.ticketRepository = ticketRepository;
+        this.giftTicketRepository = giftTicketRepository;
         this.invoiceRepository = invoiceRepository;
         this.cashierClosureRepository = cashierClosureRepository;
         this.environment = environment;
@@ -144,6 +146,7 @@ public class DatabaseSeederService {
         this.orderRepository.deleteAll();
         this.tagRepository.deleteAll();
         this.ticketRepository.deleteAll();
+        this.giftTicketRepository.deleteAll();
         this.articleRepository.deleteAll();
 
         this.cashierClosureRepository.deleteAll();
@@ -278,6 +281,13 @@ public class DatabaseSeederService {
         tickets[5].setId("201901126");
         this.ticketRepository.saveAll(Arrays.asList(tickets));
         LogManager.getLogger(this.getClass()).warn("        ------- tickets");
+        GiftTicket[] giftTickets = {
+                new GiftTicket("Este regalo es para ti", tickets[0]),
+                new GiftTicket("Felicidades, esto es para ti", tickets[1]),
+                new GiftTicket("", tickets[2]),
+        };
+        this.giftTicketRepository.saveAll(Arrays.asList(giftTickets));
+        LogManager.getLogger(this.getClass()).warn("        ------- gift-tickets");
         Invoice[] invoices = {
                 new Invoice(1, users[4], tickets[1]),
                 new Invoice(2, users[5], tickets[5]),
