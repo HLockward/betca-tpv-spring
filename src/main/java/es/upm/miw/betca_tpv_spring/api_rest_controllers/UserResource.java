@@ -78,4 +78,10 @@ public class UserResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
+    @PatchMapping(value = MOBILE_ID)
+    public Mono<UserDto> updateRoles(@PathVariable String mobile, @Valid @RequestBody UserMinimumDto userMinimumDto) {
+        return this.userController.updateRoles(mobile, userMinimumDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
 }

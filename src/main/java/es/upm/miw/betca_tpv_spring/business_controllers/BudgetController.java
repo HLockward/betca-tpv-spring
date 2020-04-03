@@ -8,6 +8,7 @@ import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
 import es.upm.miw.betca_tpv_spring.dtos.BudgetCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.BudgetDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
+import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.BudgetReactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class BudgetController {
         List<ShoppingDto> shoppingListDto = new ArrayList<>();
 
         Mono<BudgetDto> budgetDtoMono = this.budgetReactRepository.findById(code).
+                switchIfEmpty(Mono.error(new NotFoundException("Not found" + code))).
                 map(BudgetDto::new);
 
         Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.flatMapIterable(BudgetDto::getShoppingCart);
