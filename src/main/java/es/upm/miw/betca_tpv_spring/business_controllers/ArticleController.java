@@ -3,6 +3,7 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.Article;
 import es.upm.miw.betca_tpv_spring.documents.Provider;
+import es.upm.miw.betca_tpv_spring.dtos.ArticleAdvancedSearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
@@ -116,5 +117,24 @@ public class ArticleController {
         return this.articleReactRepository.findByDescriptionLikeOrProvider(articleSearchDto.getDescription(), articleSearchDto.getProvider())
                 .switchIfEmpty(Flux.error(new BadRequestException("Params not found")))
                 .map(ArticleDto::new);
+    }
+
+    public Flux<ArticleDto> searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(ArticleAdvancedSearchDto articleAdvancedSearchDto) {
+        System.out.println(articleAdvancedSearchDto);
+        Flux<ArticleDto> articleDtoFlux;
+        if (articleAdvancedSearchDto.getDescription() == "null" && articleAdvancedSearchDto.getProvider() == "null" && articleAdvancedSearchDto.getReference() == "null" && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == false) {
+            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued() == articleDto.getDiscontinued());
+
+        }
+        if (articleAdvancedSearchDto.getDescription() == "null" && articleAdvancedSearchDto.getProvider() == "null" && articleAdvancedSearchDto.getReference() == "null" && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == true) {
+            System.out.println(articleAdvancedSearchDto);
+            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued() == articleDto.getDiscontinued());
+        } else {
+            return this.articleReactRepository.findByDescriptionLikeOrReferenceLikeOrStockOrProviderOrRetailPrice(articleAdvancedSearchDto.getDescription(),
+                    articleAdvancedSearchDto.getReference(), articleAdvancedSearchDto.getStock(),
+                    articleAdvancedSearchDto.getProvider(), articleAdvancedSearchDto.getRetailPrice())
+                    .switchIfEmpty(Flux.error(new BadRequestException("Params not found")))
+                    .map(ArticleDto::new).filter(articleDto -> articleDto.getDiscontinued() == articleAdvancedSearchDto.getDiscontinued());
+        }
     }
 }
