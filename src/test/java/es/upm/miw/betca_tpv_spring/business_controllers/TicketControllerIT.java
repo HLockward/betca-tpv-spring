@@ -70,7 +70,7 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchByMobileDateOrAmount(ticketSearchDto))
                 .expectNextCount(3)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -84,7 +84,7 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchByMobileDateOrAmount(ticketSearchDto))
                 .expectNextCount(expected)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -95,7 +95,7 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchByMobileDateOrAmount(ticketSearchDto))
                 .expectNextCount(4)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -108,7 +108,7 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchByMobileDateOrAmount(ticketSearchDto))
                 .expectNextCount(1)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
@@ -118,7 +118,7 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchNotCommittedByArticle(articleId))
                 .expectNextCount(1)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
