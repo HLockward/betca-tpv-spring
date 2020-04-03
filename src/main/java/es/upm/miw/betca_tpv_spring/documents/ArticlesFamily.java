@@ -33,13 +33,21 @@ public abstract class ArticlesFamily {
         return familyType;
     }
 
+    public void setFamilyType(FamilyType familyType){this.familyType = familyType; }
+
     public String getReference() {
         return this.reference;
     }
 
+    public void setReference(String reference){ this.reference = reference; }
+
     public abstract String getDescription();
 
+    public abstract void setDescription(String description);
+
     public abstract List<ArticlesFamily> getArticlesFamilyList();
+
+    public abstract void setArticlesFamilyList(List<ArticlesFamily> articlesFamilyList);
 
     public abstract List<String> getArticleIdList();
 
@@ -48,6 +56,10 @@ public abstract class ArticlesFamily {
     public abstract void remove(ArticlesFamily articlesFamily);
 
     public abstract Article getArticle();
+
+    public abstract void setArticle(Article article);
+
+    public abstract void clearArticleFamilyList();
 
 
     @Override

@@ -24,8 +24,23 @@ public class FamilyArticle extends ArticlesFamily {
     }
 
     @Override
+    public void setDescription(String description){
+        // Do nothing
+    }
+
+    @Override
     public Article getArticle() {
         return this.article;
+    }
+
+    @Override
+    public void setArticle(Article article){
+        this.article = article;
+    }
+
+    @Override
+    public void clearArticleFamilyList() {
+        // Do nothing
     }
 
     @Override
@@ -37,7 +52,6 @@ public class FamilyArticle extends ArticlesFamily {
     public void remove(ArticlesFamily familyComponent) {
         // Do nothing
     }
-
     @Override
     public List<String> getArticleIdList() {
         return Arrays.asList(this.article.getCode());
@@ -46,6 +60,11 @@ public class FamilyArticle extends ArticlesFamily {
     @Override
     public List<ArticlesFamily> getArticlesFamilyList() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public void setArticlesFamilyList(List<ArticlesFamily> articlesFamilyList) {
+        // Do nothing
     }
 
     @Override
