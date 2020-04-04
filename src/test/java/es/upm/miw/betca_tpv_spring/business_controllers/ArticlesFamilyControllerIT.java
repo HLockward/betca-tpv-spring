@@ -191,4 +191,5 @@ class ArticlesFamilyControllerIT {
                 .verify();
         assertEquals(totalArticlesFamily - 1, this.articlesFamilyRepository.count());
     }
+
 }
