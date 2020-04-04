@@ -1,6 +1,5 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
-import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
@@ -12,10 +11,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -115,8 +113,8 @@ public class InvoiceResourceIT {
                 .get().uri(uriBuilder -> uriBuilder
                         .path(contextPath + InvoiceResource.INVOICES + InvoiceResource.SEARCH)
                 .queryParam("mobile", null)
-                .queryParam("fromDate", LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
-                .queryParam("toDate", LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
+                .queryParam("fromDate", LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE))
+                .queryParam("toDate", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE))
                 .build())
                 .exchange()
                 .expectStatus().isOk()

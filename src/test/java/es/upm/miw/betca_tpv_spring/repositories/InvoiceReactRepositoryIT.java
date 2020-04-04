@@ -8,8 +8,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,7 +34,7 @@ class InvoiceReactRepositoryIT {
                     return true;
                 })
                 .expectNextCount(2)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
