@@ -180,4 +180,15 @@ class ArticlesFamilyControllerIT {
                 .expectComplete()
                 .verify();
     }
+
+    @Test
+    void testDeleteArticleFamilyById(){
+        long totalArticlesFamily = this.articlesFamilyRepository.count();
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+        StepVerifier
+                .create(this.articlesFamilyController.deleteArticlesFamily(id))
+                .expectComplete()
+                .verify();
+        assertEquals(totalArticlesFamily - 1, this.articlesFamilyRepository.count());
+    }
 }
