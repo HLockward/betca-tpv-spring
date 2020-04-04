@@ -159,4 +159,11 @@ public class ArticlesFamilyController {
 
     }
 
+    public Mono<Void> deleteArticlesFamily(String articleFamilyId){
+        Mono<ArticlesFamily> articlesFamily = this.articlesFamilyReactRepository.findById(articleFamilyId);
+        return Mono
+                .when(articlesFamily)
+                .then(this.articlesFamilyReactRepository.deleteById(articleFamilyId));
+    }
+
 }
