@@ -1,38 +1,26 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
-import es.upm.miw.betca_tpv_spring.documents.Messages;
 import es.upm.miw.betca_tpv_spring.documents.User;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
-public class MessagesDto {
+public class MessagesCreationDto {
 
-    private String id;
     private User fromUser;
     private User toUser;
     private String messageContent;
     private LocalDateTime sentDate;
-    private LocalDateTime readDate;
 
-    public MessagesDto() {
+    public MessagesCreationDto() {
         // Empty for framework
     }
 
-    public MessagesDto(String id, User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
-        this.id = id;
+    public MessagesCreationDto(User fromUser, User toUser, String messageContent, LocalDateTime sentDate) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
-        this.readDate = readDate;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public User getFromUser() {
@@ -41,14 +29,6 @@ public class MessagesDto {
 
     public void setFromUser(User fromUser) {
         this.fromUser = fromUser;
-    }
-
-    public MessagesDto(Messages messages) {
-        this.fromUser = messages.getFromUser();
-        this.toUser = messages.getToUser();
-        this.messageContent = messages.getMessageContent();
-        this.sentDate = messages.getSentDate();
-        this.readDate = messages.getReadDate();
     }
 
     public User getToUser() {
@@ -75,23 +55,13 @@ public class MessagesDto {
         this.sentDate = sentDate;
     }
 
-    public LocalDateTime getReadDate() {
-        return readDate;
-    }
-
-    public void setReadDate(LocalDateTime readDate) {
-        this.readDate = readDate;
-    }
-
     @Override
     public String toString() {
-        return "MessagesDto [" +
-                "id=" + id +
-                ", fromUser=" + fromUser +
+        return "MessagesCreationDto{" +
+                "fromUser=" + fromUser +
                 ", toUser=" + toUser +
-                ", messageContent=" + messageContent +
+                ", messageContent='" + messageContent + '\'' +
                 ", sentDate=" + sentDate +
-                ", readDate=" + readDate +
-                ']';
+                '}';
     }
 }
