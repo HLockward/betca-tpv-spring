@@ -7,6 +7,7 @@ import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
 import es.upm.miw.betca_tpv_spring.repositories.MessagesReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.UserReactRepository;
 import org.apache.logging.log4j.LogManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +17,14 @@ public class MessagesController {
 
     private MessagesReactRepository messagesReactRepository;
     private UserReactRepository userReactRepository;
+
+    @Autowired
+    public MessagesController(MessagesReactRepository messagesReactRepository,
+                              UserReactRepository userReactRepository) {
+        this.messagesReactRepository = messagesReactRepository;
+        this.userReactRepository = userReactRepository;
+
+    }
 
     public Mono<MessagesDto> createMessage(MessagesCreationDto messagesCreationDto) {
         Messages messages = new Messages(
