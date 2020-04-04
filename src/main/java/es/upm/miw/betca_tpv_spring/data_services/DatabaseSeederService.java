@@ -5,7 +5,6 @@ import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class DatabaseSeederService {
@@ -50,6 +48,7 @@ public class DatabaseSeederService {
     private SendingsRepository sendingsRepository;
     private StaffRepository staffRepository;
     private StockAlarmRepository stockAlarmRepository;
+    private MessagesRepository messagesRepository;
 
     @Autowired
     public DatabaseSeederService(
@@ -72,7 +71,8 @@ public class DatabaseSeederService {
             CustomerPointsRepository customerPointsRepository,
             SendingsRepository sendingsRepository,
             StaffRepository staffRepository,
-            StockAlarmRepository stockAlarmRepository
+            StockAlarmRepository stockAlarmRepository,
+            MessagesRepository messagesRepository
     ) {
         this.ticketRepository = ticketRepository;
         this.giftTicketRepository = giftTicketRepository;
@@ -94,6 +94,7 @@ public class DatabaseSeederService {
         this.sendingsRepository = sendingsRepository;
         this.staffRepository = staffRepository;
         this.stockAlarmRepository = stockAlarmRepository;
+        this.messagesRepository = messagesRepository;
     }
 
     @PostConstruct
@@ -148,6 +149,7 @@ public class DatabaseSeederService {
         this.ticketRepository.deleteAll();
         this.giftTicketRepository.deleteAll();
         this.articleRepository.deleteAll();
+        this.messagesRepository.deleteAll();
 
         this.cashierClosureRepository.deleteAll();
         this.providerRepository.deleteAll();
@@ -282,6 +284,14 @@ public class DatabaseSeederService {
         };
         this.giftTicketRepository.saveAll(Arrays.asList(giftTickets));
         LogManager.getLogger(this.getClass()).warn("        ------- gift-tickets");
+        LocalDateTime fixedLdt = LocalDateTime.of(2020, 4, 1, 1, 1, 1);
+        Messages[] messagesArray = {
+                new Messages("1", users[1], users[7], "Msg from 1 to 7", fixedLdt, fixedLdt.plusDays(1)),
+                new Messages("2", users[2], users[7], "Msg from 2 to 7", fixedLdt.plusDays(2), fixedLdt.plusDays(3)),
+                new Messages("3", users[3], users[7], "Msg from 3 to 7", fixedLdt.plusDays(4), null),
+        };
+        this.messagesRepository.saveAll(Arrays.asList(messagesArray));
+        LogManager.getLogger(this.getClass()).warn("        ------- messages");
         Invoice[] invoices = {
                 new Invoice(1, users[4], tickets[1]),
                 new Invoice(2, users[5], tickets[5]),
