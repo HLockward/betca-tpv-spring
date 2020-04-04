@@ -185,7 +185,7 @@ public class InvoiceController {
         return invoiceReactRepository.findAll()
                 .filter(invoice -> ((mobile == null || mobile.equals("")) || invoice.getUser().getMobile().equals(mobile))
                         && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
-                        && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
+                        && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) <= 0))
                 .map(InvoiceOutputDto::new);
     }
 
