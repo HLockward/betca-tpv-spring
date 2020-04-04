@@ -120,11 +120,11 @@ public class ArticleController {
     }
 
     public Flux<ArticleDto> searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(ArticleAdvancedSearchDto articleAdvancedSearchDto) {
-        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == false) {
+        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && !articleAdvancedSearchDto.getDiscontinued()) {
             return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued().equals(articleDto.getDiscontinued()));
 
         }
-        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == true) {
+        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued()) {
             return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued().equals(articleDto.getDiscontinued()));
         } else {
             return this.articleReactRepository.findByDescriptionLikeOrReferenceLikeOrStockOrProviderOrRetailPrice(articleAdvancedSearchDto.getDescription(),
