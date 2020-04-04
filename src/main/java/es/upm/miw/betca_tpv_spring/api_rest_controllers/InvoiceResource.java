@@ -1,17 +1,18 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.InvoiceController;
-import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('OPERATOR')")
 @RestController
@@ -56,8 +57,13 @@ public class InvoiceResource {
     }
 
     @GetMapping(value = SEARCH)
-    public Flux<InvoiceOutputDto> search(InvoiceFilterDto invoiceFilterDto) {
-        return this.invoiceController.readAllByFilters(invoiceFilterDto)
+    public Flux<InvoiceOutputDto> search(@RequestParam(required = false)
+                                                 String mobile,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                 LocalDate fromDate,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                 LocalDate toDate) {
+        return this.invoiceController.readAllByFilters(mobile, fromDate, toDate)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

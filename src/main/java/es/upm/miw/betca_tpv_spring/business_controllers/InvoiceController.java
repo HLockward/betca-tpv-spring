@@ -2,7 +2,10 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
-import es.upm.miw.betca_tpv_spring.dtos.*;
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
+import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.QuarterVATDto;
+import es.upm.miw.betca_tpv_spring.dtos.TaxDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
@@ -19,7 +22,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -180,11 +182,9 @@ public class InvoiceController {
                 .map(InvoiceOutputDto::new);
     }
 
-    public Flux<InvoiceOutputDto> readAllByFilters(InvoiceFilterDto invoiceFilterDto) {
-        LocalDate fromDate = invoiceFilterDto.getFromDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getFromDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate toDate = invoiceFilterDto.getToDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getToDate(), DateTimeFormatter.ISO_DATE);
-        return invoiceReactRepository.findAll()
-                .filter(invoice -> (invoiceFilterDto.getMobile() == null || invoiceFilterDto.getMobile() == "" || invoice.getUser().getMobile().equals(invoiceFilterDto.getMobile()))
+    public Flux<InvoiceOutputDto> readAllByFilters(String mobile, LocalDate fromDate, LocalDate toDate) {
+       return invoiceReactRepository.findAll()
+                .filter(invoice -> ((mobile == null || mobile.equals("")) || invoice.getUser().getMobile().equals(mobile))
                         && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
                         && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
                 .map(InvoiceOutputDto::new);
