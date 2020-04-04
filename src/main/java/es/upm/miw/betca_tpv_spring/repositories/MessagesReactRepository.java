@@ -7,4 +7,6 @@ import reactor.core.publisher.Mono;
 public interface MessagesReactRepository extends ReactiveSortingRepository<Messages, String> {
 
     Mono<Messages> findById(String id);
+
+    Mono<Messages> findFirstByOrderBySentDateDescIdDesc();
 }
