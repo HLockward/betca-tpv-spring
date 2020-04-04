@@ -74,4 +74,10 @@ public class ArticlesFamilyResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
+    @DeleteMapping(value = ARTICLES_FAMILY_ID)
+    public Mono<Void> deleteArticlesFamily(@PathVariable String id){
+        return this.articlesFamilyController.deleteArticlesFamily(id)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
 }
