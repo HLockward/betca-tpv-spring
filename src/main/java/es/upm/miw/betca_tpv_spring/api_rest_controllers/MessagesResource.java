@@ -11,6 +11,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('OPERATOR')")
 @RestController
@@ -42,6 +44,13 @@ public class MessagesResource {
     @GetMapping(value = MESSAGES_ID)
     public Mono<MessagesDto> readById(@PathVariable String id) {
         return this.messagesController.readById(id)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PutMapping(value = MESSAGES_ID)
+    public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
+        LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
+        return this.messagesController.markMessageAsRead(id, ldtReadDate)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
