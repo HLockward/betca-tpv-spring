@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
+import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -159,4 +160,34 @@ public class ArticlesFamilyController {
 
     }
 
+    public Mono<ArticlesFamilyCrudDto> updateArticlesFamily(String id, ArticlesFamilyCreationDto articlesFamilyCreationDto) {
+        Mono<ArticlesFamily> articlesFamily = this.articlesFamilyReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("ArticlesFamily id " + articlesFamilyCreationDto.getId())))
+                .map(articlesFamily1 -> {
+                    articlesFamily1.setFamilyType(articlesFamilyCreationDto.getFamilyType());
+                    articlesFamily1.setReference(articlesFamilyCreationDto.getReference());
+                    articlesFamily1.setDescription(articlesFamilyCreationDto.getDescription());
+                    if (articlesFamilyCreationDto.getFamilyType() != FamilyType.ARTICLE) {
+                        if (articlesFamilyCreationDto.getArticlesFamilyListId() != null && articlesFamilyCreationDto.getArticlesFamilyListId().length > 0) {
+                            articlesFamily1.clearArticleFamilyList();
+
+                            for (int i = 0; i < articlesFamilyCreationDto.getArticlesFamilyListId().length; i++) {
+                                String articleFamilyId = articlesFamilyCreationDto.getArticlesFamilyListId()[i];
+                                if (this.articlesFamilyRepository.findById(articleFamilyId).isPresent()) {
+                                    articlesFamily1.add(this.articlesFamilyRepository.findById(articleFamilyId).get());
+                                }
+                            }
+                        }
+                    } else {
+                        if (this.articleRepository.findById(articlesFamilyCreationDto.getArticle()).isPresent()) {
+                            articlesFamily1.setArticle(this.articleRepository.findById(articlesFamilyCreationDto.getArticle()).get());
+                        }
+
+                    }
+                    return articlesFamily1;
+                });
+        return Mono
+                .when(articlesFamily)
+                .then(this.articlesFamilyReactRepository.saveAll(articlesFamily).next().map(ArticlesFamilyCrudDto::new));
+    }
 }
