@@ -226,5 +226,50 @@ public class ArticlesFamilyResourceIT {
                 .value(Assertions::assertNotNull);
     }
 
+    @Test
+    void testUpdateArticlesFamilyTypeArticle(){
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+
+        ArticlesFamilyCrudDto articlesFamilyCrudDto = this.restService.loginAdmin(webTestClient)
+                .put().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .body(BodyInserters.fromObject(
+                        new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa vieja", null, null, "8400000000024")
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCrudDto.class)
+                .returnResult().getResponseBody();
+
+        ArticlesFamily articlesFamily = this.articlesFamilyRepository.findById(id).get();
+        assertEquals(articlesFamily.getId(), articlesFamilyCrudDto.getId());
+        assertEquals(articlesFamily.getReference(), articlesFamilyCrudDto.getReference());
+        assertEquals(articlesFamily.getArticle(), articlesFamilyCrudDto.getArticle());
+    }
+
+    @Test
+    void testUpdateArticlesFamilyTypeArticles(){
+        String id = this.familyComposite.getArticlesFamilyList().get(2).getId();
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId()
+        };
+        ArticlesFamilyCreationDto articlesFamilyCreationDto = this.restService.loginAdmin(webTestClient)
+                .put().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .body(BodyInserters.fromObject(
+                        new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa vieja", "description", articlesFamilyListId, null)
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCreationDto.class)
+                .returnResult().getResponseBody();
+
+        ArticlesFamily articlesFamily = this.articlesFamilyRepository.findById(id).get();
+        assertEquals(articlesFamily.getId(), articlesFamilyCreationDto.getId());
+        assertEquals(articlesFamily.getReference(), articlesFamilyCreationDto.getReference());
+        assertEquals(articlesFamily.getArticlesFamilyList().size(), articlesFamilyListId.length);
+        assertEquals(articlesFamily.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
+        assertEquals(articlesFamily.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
+    }
+
 
 }
