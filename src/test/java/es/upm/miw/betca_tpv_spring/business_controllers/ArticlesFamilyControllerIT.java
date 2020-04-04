@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.documents.ArticlesFamily;
 import es.upm.miw.betca_tpv_spring.documents.FamilyComposite;
 import es.upm.miw.betca_tpv_spring.documents.FamilyType;
+import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilySearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
 import es.upm.miw.betca_tpv_spring.dtos.ProviderDto;
@@ -93,6 +94,48 @@ class ArticlesFamilyControllerIT {
                 .expectNextCount(3)
                 .thenCancel()
                 .verify();
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticle(){
+        ArticlesFamilyCreationDto articlesFamilyCreationDto =
+                new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa vieja", null, null, "8400000000024");
+        StepVerifier
+                .create(this.articlesFamilyController.createArticlesFamily(articlesFamilyCreationDto))
+                .expectNextMatches(articlesFamilyCrudDto -> {
+                    assertEquals(articlesFamilyCrudDto.getArticle().getCode(), articlesFamilyCreationDto.getArticle());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(),articlesFamilyCreationDto.getFamilyType());
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticles(){
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId(),
+                this.familyComposite.getArticlesFamilyList().get(2).getId()
+        };
+        ArticlesFamilyCreationDto articlesFamilyCreationDto =
+                new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa vieja", "description", articlesFamilyListId, null);
+
+        StepVerifier
+                .create(this.articlesFamilyController.createArticlesFamily(articlesFamilyCreationDto))
+                .expectNextMatches(articlesFamilyCrudDto -> {
+                    assertEquals(articlesFamilyCrudDto.getReference(), articlesFamilyCreationDto.getReference());
+                    assertEquals(articlesFamilyCrudDto.getDescription(), articlesFamilyCreationDto.getDescription());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(),articlesFamilyCreationDto.getFamilyType());
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().size(), articlesFamilyListId.length);
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(2).getId(), articlesFamilyListId[2]);
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+
     }
 
 
