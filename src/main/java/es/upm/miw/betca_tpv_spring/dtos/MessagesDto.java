@@ -44,6 +44,7 @@ public class MessagesDto {
     }
 
     public MessagesDto(Messages messages) {
+        this.id = messages.getId();
         this.fromUser = messages.getFromUser();
         this.toUser = messages.getToUser();
         this.messageContent = messages.getMessageContent();
