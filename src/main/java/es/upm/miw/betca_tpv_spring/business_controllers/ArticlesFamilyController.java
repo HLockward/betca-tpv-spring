@@ -1,4 +1,5 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
+
 import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.*;
@@ -67,7 +68,7 @@ public class ArticlesFamilyController {
 
     }
 
-    public List<String>  readSizes() throws IOException {
+    public List<String> readSizes() throws IOException {
         return getSizes();
     }
 
@@ -81,48 +82,48 @@ public class ArticlesFamilyController {
         Optional<Provider> provider = this.providerRepository.findById(articlesFamilyDto.getProvider());
 
         int increment = 1;
-        if(articlesFamilyDto.getIncrement()>0 && !articlesFamilyDto.getSizeType())
+        if (articlesFamilyDto.getIncrement() > 0 && !articlesFamilyDto.getSizeType())
             increment = articlesFamilyDto.getIncrement();
 
 
-        for (int index = lowerLimit; index <= upperLimit;index += increment) {
+        for (int index = lowerLimit; index <= upperLimit; index += increment) {
             String code = new Barcode().generateEan13code(Long.parseLong(this.articleRepository.findFirstByOrderByCodeDesc().getCode().substring(0, 12)) + 1);
             if (code.length() == 13 && Long.parseLong(code.substring(7, 12)) > 99999L) {
                 return Mono.error(new BadRequestException("Index out of range"));
             }
 
             String description;
-            if(articlesFamilyDto.getSizeType())
+            if (articlesFamilyDto.getSizeType())
                 description = sizes.get(index);
             else
                 description = String.valueOf(index);
 
-            Article article = Article.builder(code).description(articlesFamilyDto.getReference()+ " - " + articlesFamilyDto.getDescription() + " T" + description)
-            .reference(articlesFamilyDto.getReference()+ " T" + description).provider(provider.get()).build();
+            Article article = Article.builder(code).description(articlesFamilyDto.getReference() + " - " + articlesFamilyDto.getDescription() + " T" + description)
+                    .reference(articlesFamilyDto.getReference() + " T" + description).provider(provider.get()).build();
             this.articleRepository.save(article);
             familyArticleList.add(new FamilyArticle(article));
         }
         this.articlesFamilyRepository.saveAll(familyArticleList);
         ArticlesFamily familyCompositeSizesList = new FamilyComposite(FamilyType.SIZES, articlesFamilyDto.getReference(), articlesFamilyDto.getDescription());
 
-       for (ArticlesFamily articlesFamily : familyArticleList) {
+        for (ArticlesFamily articlesFamily : familyArticleList) {
             familyCompositeSizesList.add(articlesFamily);
         }
 
         return this.articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new);
     }
 
-    public Flux<ArticlesFamilyCrudDto> readAllArticlesFamily(){
+    public Flux<ArticlesFamilyCrudDto> readAllArticlesFamily() {
         return this.articlesFamilyReactRepository.findAll()
                 .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Mono<ArticlesFamilyCrudDto> searchArticlesFamilyById(String id){
+    public Mono<ArticlesFamilyCrudDto> searchArticlesFamilyById(String id) {
         return this.articlesFamilyReactRepository.findById(id)
                 .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto){
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto) {
         return this.articlesFamilyReactRepository
                 .findByReferenceLikeOrFamilyType(
                         articlesFamilySearchDto.getReference(),
@@ -130,6 +131,32 @@ public class ArticlesFamilyController {
                 .map(ArticlesFamilyCrudDto::new);
     }
 
+    public Mono<ArticlesFamilyDto> createArticlesFamily(ArticlesFamilyCreationDto articlesFamilyCreationDto) {
+        ArticlesFamily articlesFamily;
 
+        if (articlesFamilyCreationDto.getFamilyType() == FamilyType.ARTICLE) {
+
+            Article article = this.articleRepository.findById(articlesFamilyCreationDto.getArticle()).get();
+            articlesFamily = new FamilyArticle(article);
+
+        } else {
+            FamilyComposite familyComposite = new FamilyComposite(articlesFamilyCreationDto.getFamilyType(),
+                    articlesFamilyCreationDto.getReference(),
+                    articlesFamilyCreationDto.getDescription());
+            if (articlesFamilyCreationDto.getArticlesFamilyListId() != null && articlesFamilyCreationDto.getArticlesFamilyListId().length > 0) {
+                for (int i = 0; i < articlesFamilyCreationDto.getArticlesFamilyListId().length; i++) {
+                    String articleFamilyId = articlesFamilyCreationDto.getArticlesFamilyListId()[i];
+                    if (this.articlesFamilyRepository.findById(articleFamilyId).isPresent()) {
+                        familyComposite.add(this.articlesFamilyRepository.findById(articleFamilyId).get());
+                    }
+                }
+            }
+            articlesFamily = familyComposite;
+        }
+
+        return this.articlesFamilyReactRepository.save(articlesFamily)
+                .map(ArticlesFamilyDto::new);
+
+    }
 
 }
