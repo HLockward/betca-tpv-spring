@@ -76,7 +76,7 @@ public class CustomerDiscountDto {
     public User getUser() {
         return user;
     }
-    
+
     public void setUser(User user) { this.user = user; }
 
     public void setMobile(String mobile) {
@@ -90,7 +90,7 @@ public class CustomerDiscountDto {
     @Override
     public String toString() {
         return "CustomerDiscountDto [description=" + description + ", registrationDate=" + registrationDate +
-                ", discount=" + discount + ", minimumPurchase=" + minimumPurchase + ", user=" + user + 
+                ", discount=" + discount + ", minimumPurchase=" + minimumPurchase + ", user=" + user +
                 ", mobile=" + mobile + "]";
     }
 }

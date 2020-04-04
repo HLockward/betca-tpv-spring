@@ -52,15 +52,15 @@ public class TicketResource {
         return this.ticketController.getPdf(id);
     }
 
-    @GetMapping(value = TICKET_ID )
+    @GetMapping(value = TICKET_ID)
     public Mono<Ticket> getTicket(@PathVariable String id) {
         return this.ticketController.getTicket(id);
     }
 
     @GetMapping(value = SEARCH)
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(@RequestParam(required = false) String mobile,
-                                                         @RequestParam(required = false) String date,
-                                                         @RequestParam(required = false) Integer amount) {
+                                                            @RequestParam(required = false) String date,
+                                                            @RequestParam(required = false) Integer amount) {
         LocalDateTime day = date == null ? null : LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME);
         TicketSearchDto ticketSearchDto = new TicketSearchDto(mobile, day, amount);
         return this.ticketController.searchByMobileDateOrAmount(ticketSearchDto)
