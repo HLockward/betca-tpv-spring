@@ -1,5 +1,6 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
+import es.upm.miw.betca_tpv_spring.business_services.FileService;
 import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
@@ -36,18 +37,21 @@ public class InvoiceController {
     private Double reducedTax;
     @Value("${miw.tax.super.reduced}")
     private Double superReducedTax;
-
+    @Value("${miw.invoices.filepath}")
+    private String invoiceFilePath;
 
     private PdfService pdfService;
     private InvoiceReactRepository invoiceReactRepository;
     private TicketReactRepository ticketReactRepository;
     private ArticleReactRepository articleReactRepository;
 
+
     @Autowired
     public InvoiceController(PdfService pdfService,
                              InvoiceReactRepository invoiceReactRepository,
                              TicketReactRepository ticketReactRepository,
-                             ArticleReactRepository articleReactRepository) {
+                             ArticleReactRepository articleReactRepository,
+                             FileService fileService) {
         this.pdfService = pdfService;
         this.invoiceReactRepository = invoiceReactRepository;
         this.ticketReactRepository = ticketReactRepository;
@@ -111,15 +115,10 @@ public class InvoiceController {
     }
 
     @Transactional
-    public Mono<byte[]> updateAndPdf(String id) {
-        return pdfService.generateInvoice(this.updateInvoice(id));
-    }
-
-    private Mono<Invoice> updateInvoice(String id) {
+    public Mono<byte[]> getPdf(String id) {
         return invoiceReactRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Invoice(" + id + ")")))
-                .flatMap(invoice -> this.calculateBaseAndTax(invoice, invoice.getTicket().getShoppingList()))
-                .flatMap(invoice -> invoiceReactRepository.save(invoice));
+                .map(invoice -> pdfService.readPdf(invoiceFilePath + "invoice-" + id));
     }
 
     private Mono<Invoice> calculateBaseAndTax(Invoice invoice, Shopping[] shoppingList) {
@@ -177,13 +176,13 @@ public class InvoiceController {
 
     }
 
-    public Flux<InvoiceOutputDto> readAll() {
+    public Flux<InvoiceOutputDto> getAll() {
         return invoiceReactRepository.findAll()
                 .map(InvoiceOutputDto::new);
     }
 
     public Flux<InvoiceOutputDto> readAllByFilters(String mobile, LocalDate fromDate, LocalDate toDate) {
-       return invoiceReactRepository.findAll()
+        return invoiceReactRepository.findAll()
                 .filter(invoice -> ((mobile == null || mobile.equals("")) || invoice.getUser().getMobile().equals(mobile))
                         && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
                         && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
