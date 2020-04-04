@@ -3,10 +3,7 @@ package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 import es.upm.miw.betca_tpv_spring.documents.ArticlesFamily;
 import es.upm.miw.betca_tpv_spring.documents.FamilyComposite;
 import es.upm.miw.betca_tpv_spring.documents.FamilyType;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
-import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderDto;
+import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
 import es.upm.miw.betca_tpv_spring.repositories.ArticlesFamilyRepository;
 import org.junit.jupiter.api.Assertions;
@@ -189,7 +186,7 @@ public class ArticlesFamilyResourceIT {
                 .get().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(ArticlesFamilyDto.class)
+                .expectBody(ArticlesFamilyCrudDto.class)
                 .value(Assertions::assertNotNull);
     }
 

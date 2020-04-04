@@ -1,10 +1,7 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.*;
-import es.upm.miw.betca_tpv_spring.dtos.ArticleFamilyCompleteDto;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilySearchDto;
-import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
+import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,22 +112,22 @@ public class ArticlesFamilyController {
         return this.articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new);
     }
 
-    public Flux<ArticlesFamilyDto> readAllArticlesFamily(){
+    public Flux<ArticlesFamilyCrudDto> readAllArticlesFamily(){
         return this.articlesFamilyReactRepository.findAll()
-                .map(ArticlesFamilyDto::new);
+                .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Mono<ArticlesFamilyDto> searchArticlesFamilyById(String id){
+    public Mono<ArticlesFamilyCrudDto> searchArticlesFamilyById(String id){
         return this.articlesFamilyReactRepository.findById(id)
-                .map(ArticlesFamilyDto::new);
+                .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Flux<ArticlesFamilyDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto){
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto){
         return this.articlesFamilyReactRepository
                 .findByReferenceLikeOrFamilyType(
                         articlesFamilySearchDto.getReference(),
                         articlesFamilySearchDto.getArticleFamily())
-                .map(ArticlesFamilyDto::new);
+                .map(ArticlesFamilyCrudDto::new);
     }
 
 

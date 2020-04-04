@@ -1,10 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.ArticlesFamilyController;
-import es.upm.miw.betca_tpv_spring.dtos.ArticleFamilyCompleteDto;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilySearchDto;
-import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
+import es.upm.miw.betca_tpv_spring.dtos.*;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,13 +41,13 @@ public class ArticlesFamilyResource {
     }
 
     @GetMapping(value = ARTICLES_FAMILY_ID)
-    public Mono<ArticlesFamilyDto> searchArticlesFamilyById(@PathVariable String id){
+    public Mono<ArticlesFamilyCrudDto> searchArticlesFamilyById(@PathVariable String id){
         return this.articlesFamilyController.searchArticlesFamilyById(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping
-    public Flux<ArticlesFamilyDto> searchArticlesFamily(@RequestParam(required = false) String reference,
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamily(@RequestParam(required = false) String reference,
                                                         @RequestParam(required = false) String familyType){
         ArticlesFamilySearchDto articlesFamilySearchDto = new ArticlesFamilySearchDto(reference,familyType);
         if(reference == null && familyType == null){
