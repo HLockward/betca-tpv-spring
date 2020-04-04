@@ -105,5 +105,13 @@ class ArticleResourceIT {
         this.articleRepository.deleteById("8400000000093");
     }
 
+    @Test
+    void testSearchArticleByReference() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                .path(contextPath + ARTICLES + ADVANCEDSEARCH)
+                .queryParam("reference", "Zz").build()
+        ).exchange().expectStatus().isOk();
+    }
 
 }
