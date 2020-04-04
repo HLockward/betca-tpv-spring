@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Controller
 public class MessagesController {
 
@@ -58,7 +60,15 @@ public class MessagesController {
         return this.messagesReactRepository.findAllMessages();
     }
 
-    public Mono<MessagesDto> readById(String messagesId){
+    public Mono<MessagesDto> readById(String messagesId) {
         return this.messagesReactRepository.findById(messagesId).map(MessagesDto::new);
+    }
+
+    public Mono<MessagesDto> markMessageAsRead(String id, LocalDateTime ldtReadDate) {
+        Mono<Messages> messagesMono = this.messagesReactRepository.findById(id).map(messages1 -> {
+            messages1.setReadDate(ldtReadDate);
+            return messages1;
+        });
+        return Mono.when(messagesMono).then(this.messagesReactRepository.saveAll(messagesMono).next()).map(MessagesDto::new);
     }
 }

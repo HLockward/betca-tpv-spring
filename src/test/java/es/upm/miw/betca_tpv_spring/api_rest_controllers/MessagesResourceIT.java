@@ -86,4 +86,29 @@ public class MessagesResourceIT {
         assertEquals(fixedLdt, messagesDtoResponse.getSentDate());
         assertEquals(fixedLdt.plusDays(1), messagesDtoResponse.getReadDate());
     }
+
+    @Test
+    void testMarkMessageAsRead() {
+        String idToLookFor = "3";
+        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+                .put()
+                //.uri(contextPath + MESSAGES + MESSAGES_ID, idToLookFor)
+                .uri(uriBuilder -> uriBuilder
+                        .path(contextPath + MESSAGES + MESSAGES_ID)
+                        .queryParam("readDate", fixedLdt.plusDays(6).toString())
+                        .build(idToLookFor))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .returnResult().getResponseBody();
+        assertEquals(idToLookFor, messagesDtoResponse.getId());
+        assertNotNull(messagesDtoResponse.getFromUser());
+        assertEquals("666666003", messagesDtoResponse.getFromUser().getMobile());
+        assertNotNull(messagesDtoResponse.getToUser());
+        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("Msg from 3 to 7", messagesDtoResponse.getMessageContent());
+        assertEquals(fixedLdt.plusDays(4), messagesDtoResponse.getSentDate());
+        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getReadDate());
+    }
 }
