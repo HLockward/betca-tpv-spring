@@ -22,6 +22,8 @@ public class ArticlesFamilyResource {
     public static final String FAMILY_COMPOSITE = "/familydescription";
     public static final String SIZES = "/sizes";
     public static final String ARTICLES_FAMILY_ID = "/{id}";
+    public static final String CREATE_ARTICLES_FAMILY = "/create-articles-family";
+
     @Autowired
     private ArticlesFamilyController articlesFamilyController;
 
@@ -58,6 +60,12 @@ public class ArticlesFamilyResource {
                     .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
         }
 
+    }
+
+    @PostMapping(produces = {"application/json"}, value = CREATE_ARTICLES_FAMILY)
+    public Mono<ArticlesFamilyCrudDto> createArticlesFamily(@RequestBody ArticlesFamilyCreationDto articlesFamilyCreationDto){
+        return this.articlesFamilyController.createArticlesFamily(articlesFamilyCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
 
