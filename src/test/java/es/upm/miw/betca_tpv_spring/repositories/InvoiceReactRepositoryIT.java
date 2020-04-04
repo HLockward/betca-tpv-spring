@@ -34,7 +34,7 @@ class InvoiceReactRepositoryIT {
                     return true;
                 })
                 .expectNextCount(2)
-                .expectComplete()
+                .thenCancel()
                 .verify();
     }
 
