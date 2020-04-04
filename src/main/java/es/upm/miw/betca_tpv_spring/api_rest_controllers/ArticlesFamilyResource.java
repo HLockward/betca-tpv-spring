@@ -22,6 +22,8 @@ public class ArticlesFamilyResource {
     public static final String FAMILY_COMPOSITE = "/familydescription";
     public static final String SIZES = "/sizes";
     public static final String ARTICLES_FAMILY_ID = "/{id}";
+    public static final String CREATE_ARTICLES_FAMILY = "/create-articles-family";
+
     @Autowired
     private ArticlesFamilyController articlesFamilyController;
 
@@ -60,5 +62,22 @@ public class ArticlesFamilyResource {
 
     }
 
+    @PostMapping(produces = {"application/json"}, value = CREATE_ARTICLES_FAMILY)
+    public Mono<ArticlesFamilyCrudDto> createArticlesFamily(@RequestBody ArticlesFamilyCreationDto articlesFamilyCreationDto){
+        return this.articlesFamilyController.createArticlesFamily(articlesFamilyCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PutMapping(value = ARTICLES_FAMILY_ID)
+    public Mono<ArticlesFamilyCrudDto> updateArticlesFamily(@PathVariable String id, @Valid @RequestBody ArticlesFamilyCreationDto articlesFamilyCreationDto){
+        return this.articlesFamilyController.updateArticlesFamily(id, articlesFamilyCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @DeleteMapping(value = ARTICLES_FAMILY_ID)
+    public Mono<Void> deleteArticlesFamily(@PathVariable String id){
+        return this.articlesFamilyController.deleteArticlesFamily(id)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 
 }
