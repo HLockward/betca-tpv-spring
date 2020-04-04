@@ -15,6 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.List;
+import java.util.Optional;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.*;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ProviderResource.PROVIDERS;
@@ -269,6 +270,16 @@ public class ArticlesFamilyResourceIT {
         assertEquals(articlesFamily.getArticlesFamilyList().size(), articlesFamilyListId.length);
         assertEquals(articlesFamily.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
         assertEquals(articlesFamily.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
+    }
+
+    @Test
+    void testDeleteArticleFamilyById(){
+        String id = this.familyComposite.getArticlesFamilyList().get(2).getId();
+        this.restService.loginAdmin(webTestClient)
+                .delete().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .exchange()
+                .expectStatus().isOk();
+        assertEquals(Optional.empty(), this.articlesFamilyRepository.findById(id));
     }
 
 
