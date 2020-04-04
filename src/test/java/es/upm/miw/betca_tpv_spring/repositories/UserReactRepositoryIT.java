@@ -1,14 +1,9 @@
 package es.upm.miw.betca_tpv_spring.repositories;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
-import es.upm.miw.betca_tpv_spring.documents.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.ManagedList;
 import reactor.test.StepVerifier;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
