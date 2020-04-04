@@ -44,7 +44,7 @@ public class MessagesController {
                 .doOnNext(messages::setToUser)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
         return Mono.when(userFrom, userTo, nextId)
-                .then(this.messagesReactRepository.save(messages).map(messages1 -> new MessagesDto(messages1)))
+                .then(this.messagesReactRepository.save(messages).map(MessagesDto::new))
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
@@ -56,5 +56,9 @@ public class MessagesController {
 
     public Flux<MessagesDto> readAll() {
         return this.messagesReactRepository.findAllMessages();
+    }
+
+    public Mono<MessagesDto> readById(String messagesId){
+        return this.messagesReactRepository.findById(messagesId).map(MessagesDto::new);
     }
 }
