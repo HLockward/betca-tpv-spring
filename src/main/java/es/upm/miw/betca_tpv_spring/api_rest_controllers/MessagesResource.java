@@ -18,6 +18,7 @@ import javax.validation.Valid;
 public class MessagesResource {
 
     public static final String MESSAGES = "/messages";
+    public static final String MESSAGES_ID = "/{id}";
 
     private MessagesController messagesController;
 
@@ -36,5 +37,11 @@ public class MessagesResource {
     public Flux<MessagesDto> readAll() {
         return this.messagesController.readAll()
                 .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = MESSAGES_ID)
+    public Mono<MessagesDto> readById(@PathVariable String id) {
+        return this.messagesController.readById(id)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
