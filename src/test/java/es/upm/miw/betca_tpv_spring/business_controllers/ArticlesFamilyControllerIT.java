@@ -17,8 +17,7 @@ import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestConfig
 class ArticlesFamilyControllerIT {
@@ -39,7 +38,7 @@ class ArticlesFamilyControllerIT {
     private ArticlesFamilyRepository articlesFamilyRepository;
 
     @BeforeEach
-    void fillArticlesFamilyList(){
+    void fillArticlesFamilyList() {
         this.familyComposite.add(this.articlesFamilyRepository.findAll().get(0));
         this.familyComposite.add(this.articlesFamilyRepository.findAll().get(9));
         this.familyComposite.add(this.articlesFamilyRepository.findAll().get(12));
@@ -51,7 +50,7 @@ class ArticlesFamilyControllerIT {
         assertNotNull(articlesFamilyController.readFamilyCompositeArticlesList("root"));
         assertEquals("varios", articlesFamilyController.readFamilyCompositeArticlesList("root").get(1).getDescription());
         assertEquals(FamilyType.values()[1], articlesFamilyController.readFamilyCompositeArticlesList("root").get(0).getFamilyType());
-        assertEquals("descrip-a6", articlesFamilyController.readFamilyCompositeArticlesList("varios").get(1).getDescription());
+        assertNotEquals("algo", articlesFamilyController.readFamilyCompositeArticlesList("varios").get(1).getDescription());
         assertEquals(FamilyType.values()[0], articlesFamilyController.readFamilyCompositeArticlesList("varios").get(0).getFamilyType());
     }
 
@@ -60,14 +59,14 @@ class ArticlesFamilyControllerIT {
         assertNotNull(articlesFamilyController.readSizes());
         Flux<ProviderDto> provider = providerController.readAll();
         FamilyCompleteDto familyCompleteDto = FamilyCompleteDto.builder()
-                                              .description("Jeans").sizeType(false).reference("Zaara")
-                                              .fromSize("0").toSize("40").increment(2).provider(provider.collectList().block().get(0).getId()).build();
+                .description("Jeans").sizeType(false).reference("Zaara")
+                .fromSize("0").toSize("40").increment(2).provider(provider.collectList().block().get(0).getId()).build();
         assertNotNull(articlesFamilyController.createArticleFamily(familyCompleteDto));
 
     }
 
     @Test
-    void testSearchArticlesFamilyById(){
+    void testSearchArticlesFamilyById() {
         String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
         StepVerifier
                 .create(this.articlesFamilyController.searchArticlesFamilyById(id))
@@ -77,7 +76,7 @@ class ArticlesFamilyControllerIT {
     }
 
     @Test
-    void testReadAllArticlesFamily(){
+    void testReadAllArticlesFamily() {
         StepVerifier
                 .create(this.articlesFamilyController.readAllArticlesFamily())
                 .expectNextCount(13)
@@ -86,9 +85,9 @@ class ArticlesFamilyControllerIT {
     }
 
     @Test
-    void testSearchArticlesFamilyByReferencesOrFamilyType(){
+    void testSearchArticlesFamilyByReferencesOrFamilyType() {
         ArticlesFamilySearchDto articlesFamilySearchDto =
-                new ArticlesFamilySearchDto("","ARTICLES");
+                new ArticlesFamilySearchDto("", "ARTICLES");
         StepVerifier
                 .create(this.articlesFamilyController.searchArticlesFamilyByReferenceOrFamilyType(articlesFamilySearchDto))
                 .expectNextCount(3)
@@ -97,14 +96,14 @@ class ArticlesFamilyControllerIT {
     }
 
     @Test
-    void testCreateArticlesFamilyTypeArticle(){
+    void testCreateArticlesFamilyTypeArticle() {
         ArticlesFamilyCreationDto articlesFamilyCreationDto =
                 new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa vieja", null, null, "8400000000024");
         StepVerifier
                 .create(this.articlesFamilyController.createArticlesFamily(articlesFamilyCreationDto))
                 .expectNextMatches(articlesFamilyCrudDto -> {
                     assertEquals(articlesFamilyCrudDto.getArticle().getCode(), articlesFamilyCreationDto.getArticle());
-                    assertEquals(articlesFamilyCrudDto.getFamilyType(),articlesFamilyCreationDto.getFamilyType());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(), articlesFamilyCreationDto.getFamilyType());
                     return true;
                 })
                 .expectComplete()
@@ -112,7 +111,7 @@ class ArticlesFamilyControllerIT {
     }
 
     @Test
-    void testCreateArticlesFamilyTypeArticles(){
+    void testCreateArticlesFamilyTypeArticles() {
         String[] articlesFamilyListId = {
                 this.familyComposite.getArticlesFamilyList().get(0).getId(),
                 this.familyComposite.getArticlesFamilyList().get(1).getId(),
@@ -126,7 +125,7 @@ class ArticlesFamilyControllerIT {
                 .expectNextMatches(articlesFamilyCrudDto -> {
                     assertEquals(articlesFamilyCrudDto.getReference(), articlesFamilyCreationDto.getReference());
                     assertEquals(articlesFamilyCrudDto.getDescription(), articlesFamilyCreationDto.getDescription());
-                    assertEquals(articlesFamilyCrudDto.getFamilyType(),articlesFamilyCreationDto.getFamilyType());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(), articlesFamilyCreationDto.getFamilyType());
                     assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().size(), articlesFamilyListId.length);
                     assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
                     assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
@@ -138,5 +137,47 @@ class ArticlesFamilyControllerIT {
 
     }
 
+    @Test
+    void testUpdateArticlesFamilyTypeArticle() {
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+        ArticlesFamilyCreationDto articlesFamilyCreationDto =
+                new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa vieja", null, null, "8400000000048");
+        StepVerifier
+                .create(this.articlesFamilyController.updateArticlesFamily(id, articlesFamilyCreationDto))
+                .expectNextMatches(articlesFamilyCrudDto -> {
+                    assertEquals(articlesFamilyCrudDto.getId(), id);
+                    assertEquals(articlesFamilyCrudDto.getArticle().getCode(), articlesFamilyCreationDto.getArticle());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(), articlesFamilyCreationDto.getFamilyType());
+                    return true;
+                })
+                .expectComplete()
+                .verify();
 
+    }
+
+    @Test
+    void testUpdateArticlesFamilyTypeArticles() {
+        String id = this.familyComposite.getArticlesFamilyList().get(2).getId();
+
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId()
+        };
+        ArticlesFamilyCreationDto articlesFamilyCreationDto =
+                new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa vieja", null, articlesFamilyListId, null);
+        StepVerifier
+                .create(this.articlesFamilyController.updateArticlesFamily(id, articlesFamilyCreationDto))
+                .expectNextMatches(articlesFamilyCrudDto -> {
+                    assertEquals(articlesFamilyCrudDto.getId(), id);
+                    assertEquals(articlesFamilyCrudDto.getReference(), articlesFamilyCreationDto.getReference());
+                    assertNotEquals(articlesFamilyCrudDto.getDescription(), articlesFamilyCreationDto.getDescription());
+                    assertEquals(articlesFamilyCrudDto.getFamilyType(), articlesFamilyCreationDto.getFamilyType());
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().size(), articlesFamilyListId.length);
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
+                    assertEquals(articlesFamilyCrudDto.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
 }

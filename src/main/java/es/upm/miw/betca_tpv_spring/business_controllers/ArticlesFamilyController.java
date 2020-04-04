@@ -166,7 +166,7 @@ public class ArticlesFamilyController {
                 .map(articlesFamily1 -> {
                     articlesFamily1.setFamilyType(articlesFamilyCreationDto.getFamilyType());
                     articlesFamily1.setReference(articlesFamilyCreationDto.getReference());
-                    articlesFamily1.setDescription(articlesFamilyCreationDto.getDescription());
+                    if(articlesFamilyCreationDto.getDescription() != null)articlesFamily1.setDescription(articlesFamilyCreationDto.getDescription());
                     if (articlesFamilyCreationDto.getFamilyType() != FamilyType.ARTICLE) {
                         if (articlesFamilyCreationDto.getArticlesFamilyListId() != null && articlesFamilyCreationDto.getArticlesFamilyListId().length > 0) {
                             articlesFamily1.clearArticleFamilyList();
