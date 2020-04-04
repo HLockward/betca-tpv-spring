@@ -146,7 +146,7 @@ class TicketResourceIT {
                 .expectBodyList(TicketOutputDto.class)
                 .returnResult().getResponseBody();
         assertNotNull(tickets);
-        boolean expected = tickets.size() >= 2;
+        boolean expected = tickets.size() >= 1;
         assertTrue(expected);
     }
 
@@ -173,7 +173,7 @@ class TicketResourceIT {
                 .expectBodyList(TicketOutputDto.class)
                 .returnResult().getResponseBody();
         assertNotNull(tickets);
-        boolean expected = tickets.size() >= 2;
+        boolean expected = tickets.size() >= 1;
         assertTrue(expected);
     }
 
