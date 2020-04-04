@@ -9,6 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES_ID;
 
 import java.time.LocalDateTime;
 
@@ -34,8 +35,8 @@ public class MessagesResourceIT {
     void testReadAll() {
         this.restService.loginAdmin(this.webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
-                    .path(contextPath + MESSAGES)
-                    .build())
+                .path(contextPath + MESSAGES)
+                .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(MessagesDto.class)
@@ -51,7 +52,7 @@ public class MessagesResourceIT {
                 "Msg",
                 fixedLdt.plusDays(6)
         );
-        MessagesDto dto = this.restService.loginAdmin(webTestClient)
+        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
                 .post().uri(contextPath + MESSAGES)
                 .body(BodyInserters.fromObject(messagesCreationDto))
                 .exchange()
@@ -59,5 +60,30 @@ public class MessagesResourceIT {
                 .expectBody(MessagesDto.class)
                 .value(Assertions::assertNotNull)
                 .returnResult().getResponseBody();
+        assertEquals("666666000", messagesDtoResponse.getFromUser().getMobile());
+        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("Msg", messagesDtoResponse.getMessageContent());
+        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getSentDate());
+        assertNull(messagesDtoResponse.getReadDate());
+    }
+
+    @Test
+    void testReadMessage() {
+        String idToLookFor = "1";
+        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + MESSAGES + MESSAGES_ID, idToLookFor)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .returnResult().getResponseBody();
+        assertEquals(idToLookFor, messagesDtoResponse.getId());
+        assertNotNull(messagesDtoResponse.getFromUser());
+        assertEquals("666666001", messagesDtoResponse.getFromUser().getMobile());
+        assertNotNull(messagesDtoResponse.getToUser());
+        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("Msg from 1 to 7", messagesDtoResponse.getMessageContent());
+        assertEquals(fixedLdt, messagesDtoResponse.getSentDate());
+        assertEquals(fixedLdt.plusDays(1), messagesDtoResponse.getReadDate());
     }
 }
