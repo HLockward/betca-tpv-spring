@@ -127,7 +127,7 @@ public class TicketControllerIT {
         String id = this.orderRepository.findAll().get(0).getId();
         StepVerifier
                 .create(this.ticketController.searchNotCommittedByOrder(id))
-                .expectNextCount(2)
+                .expectNextCount(1)
                 .thenCancel()
                 .verify();
     }
@@ -147,7 +147,7 @@ public class TicketControllerIT {
         String tag = "tag1";
         StepVerifier
                 .create(this.ticketController.searchNotCommittedByTag(tag))
-                .expectNextCount(2)
+                .expectNextCount(1)
                 .thenCancel()
                 .verify();
     }
