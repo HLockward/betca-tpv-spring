@@ -24,6 +24,6 @@ public interface TicketReactRepository extends ReactiveSortingRepository<Ticket,
 
     Mono<Ticket> findById(String id);
 
-    @Query(value = "{ 'shoppingList.shoppingState': 'NOT_COMMITTED', 'shoppingList.articleId': ?0 }")
+    @Query(value = "{'shoppingList': {  $elemMatch: { 'articleId' : ?0, 'shoppingState' : 'NOT_COMMITTED' } }}")
     Flux<Ticket> findNotCommittedByArticleId(String articleId);
 }
