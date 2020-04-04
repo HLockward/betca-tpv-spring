@@ -68,5 +68,10 @@ public class ArticlesFamilyResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
+    @PutMapping(value = ARTICLES_FAMILY_ID)
+    public Mono<ArticlesFamilyCrudDto> updateArticlesFamily(@PathVariable String id, @Valid @RequestBody ArticlesFamilyCreationDto articlesFamilyCreationDto){
+        return this.articlesFamilyController.updateArticlesFamily(id, articlesFamilyCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 
 }

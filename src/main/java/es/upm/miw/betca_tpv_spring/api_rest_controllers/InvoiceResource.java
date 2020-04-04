@@ -38,9 +38,9 @@ public class InvoiceResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @PatchMapping(value = INVOICE_ID + PRINT)
-    public Mono<byte[]> generate(@PathVariable String id) {
-        return this.invoiceController.updateAndPdf(id)
+    @GetMapping(value = INVOICE_ID)
+    public Mono<byte[]> getPdf(@PathVariable String id) {
+        return this.invoiceController.getPdf(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
@@ -51,8 +51,8 @@ public class InvoiceResource {
     }
 
     @GetMapping()
-    public Flux<InvoiceOutputDto> cget() {
-        return this.invoiceController.readAll()
+    public Flux<InvoiceOutputDto> getAll() {
+        return this.invoiceController.getAll()
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
