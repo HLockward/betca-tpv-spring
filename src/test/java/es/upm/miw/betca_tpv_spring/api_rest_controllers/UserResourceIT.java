@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticleResource.SEARCH;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.USERS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -185,37 +184,6 @@ class UserResourceIT {
     }
 
     @Test
-    void testSendMessageToUser() {
-        LocalDateTime ldt = LocalDateTime.now();
-        MessagesDto messagesDto = new MessagesDto("666666006", "666666007", "FROM 6 to 7", ldt, null);
-        this.restService.loginAdmin(this.webTestClient)
-                .put().uri(contextPath + USERS + MESSAGES)
-                .body(BodyInserters.fromObject(messagesDto)).exchange().expectStatus().isOk()
-                .expectBody(MessagesDto.class)
-                .value(Assertions::assertNotNull);
-    }
-
-    @Test
-    void testSendMessageToUserWihNoOtherMessages() {
-        LocalDateTime ldt = LocalDateTime.now();
-        MessagesDto messagesDto = new MessagesDto("666666002", "666666003", "FROM 2 to 3", ldt, null);
-        this.restService.loginAdmin(this.webTestClient)
-                .put().uri(contextPath + USERS + MESSAGES)
-                .body(BodyInserters.fromObject(messagesDto)).exchange().expectStatus().isOk().expectBody(MessagesDto.class)
-                .value(Assertions::assertNotNull);
-    }
-
-    @Test
-    void updatePassword() {
-        this.restService.loginAdmin(this.webTestClient)
-                .patch().uri(contextPath + USERS + "/password" + UserResource.MOBILE_ID, "6")
-                .body(BodyInserters.fromObject(
-                        new UserCredentialDto("6", "5")
-                )).exchange().expectStatus().isOk().expectBody(UserDto.class)
-                .value(Assertions::assertNotNull);
-    }
-
-    @Test
     void updatePasswordMobileBadRequest() {
         this.restService.loginAdmin(this.webTestClient)
                 .patch().uri(contextPath + USERS + "/password" + UserResource.MOBILE_ID, "")
@@ -306,12 +274,12 @@ class UserResourceIT {
     void testSearchUserNotFound() {
         this.restService.loginAdmin(webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
-                        .path(contextPath + USERS + SEARCH)
-                        .queryParam("mobile", "zz")
-                        .queryParam("username", "")
-                        .queryParam("dni", "")
-                        .queryParam("address", "")
-                        .build()).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+                .path(contextPath + USERS + SEARCH)
+                .queryParam("mobile", "zz")
+                .queryParam("username", "")
+                .queryParam("dni", "")
+                .queryParam("address", "")
+                .build()).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }
