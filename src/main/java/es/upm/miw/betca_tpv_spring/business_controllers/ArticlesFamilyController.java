@@ -131,7 +131,7 @@ public class ArticlesFamilyController {
                 .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Mono<ArticlesFamilyDto> createArticlesFamily(ArticlesFamilyCreationDto articlesFamilyCreationDto) {
+    public Mono<ArticlesFamilyCrudDto> createArticlesFamily(ArticlesFamilyCreationDto articlesFamilyCreationDto) {
         ArticlesFamily articlesFamily;
 
         if (articlesFamilyCreationDto.getFamilyType() == FamilyType.ARTICLE) {
@@ -155,7 +155,7 @@ public class ArticlesFamilyController {
         }
 
         return this.articlesFamilyReactRepository.save(articlesFamily)
-                .map(ArticlesFamilyDto::new);
+                .map(ArticlesFamilyCrudDto::new);
 
     }
 
