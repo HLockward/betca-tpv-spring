@@ -154,6 +154,32 @@ class ArticleControllerIT {
                 .verify();
     }
 
+    @Test
+    void testSearchArticleByRetailPrice() {
+        ArticleAdvancedSearchDto articleAdvancedSearchDto = new ArticleAdvancedSearchDto("descrip-a6", null, null, null, null, true);
+        StepVerifier
+                .create(this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto))
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testSearchArticleByDiscontinuedFalse() {
+        ArticleAdvancedSearchDto articleAdvancedSearchDto = new ArticleAdvancedSearchDto(null, null, null, null, null, false);
+        articleAdvancedSearchDto.setDescription("null");
+        articleAdvancedSearchDto.setReference("null");
+        articleAdvancedSearchDto.setStock(null);
+        articleAdvancedSearchDto.setProvider("null");
+        articleAdvancedSearchDto.setRetailPrice(null);
+        articleAdvancedSearchDto.setDiscontinued(false);
+        StepVerifier
+                .create(this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto))
+                .expectNextCount(9)
+                .expectComplete()
+                .verify();
+    }
+
     @AfterEach
     void delete() {
         this.articleRepository.deleteById(this.articleDto.getCode());

@@ -120,21 +120,18 @@ public class ArticleController {
     }
 
     public Flux<ArticleDto> searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(ArticleAdvancedSearchDto articleAdvancedSearchDto) {
-        System.out.println(articleAdvancedSearchDto);
-        Flux<ArticleDto> articleDtoFlux;
-        if (articleAdvancedSearchDto.getDescription() == "null" && articleAdvancedSearchDto.getProvider() == "null" && articleAdvancedSearchDto.getReference() == "null" && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == false) {
-            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued() == articleDto.getDiscontinued());
+        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == false) {
+            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued().equals(articleDto.getDiscontinued()));
 
         }
-        if (articleAdvancedSearchDto.getDescription() == "null" && articleAdvancedSearchDto.getProvider() == "null" && articleAdvancedSearchDto.getReference() == "null" && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == true) {
-            System.out.println(articleAdvancedSearchDto);
-            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued() == articleDto.getDiscontinued());
+        if (articleAdvancedSearchDto.getDescription().equals("null") && articleAdvancedSearchDto.getProvider().equals("null") && articleAdvancedSearchDto.getReference().equals("null") && articleAdvancedSearchDto.getStock() == null && articleAdvancedSearchDto.getRetailPrice() == null && articleAdvancedSearchDto.getDiscontinued() == true) {
+            return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleAdvancedSearchDto.getDiscontinued().equals(articleDto.getDiscontinued()));
         } else {
             return this.articleReactRepository.findByDescriptionLikeOrReferenceLikeOrStockOrProviderOrRetailPrice(articleAdvancedSearchDto.getDescription(),
                     articleAdvancedSearchDto.getReference(), articleAdvancedSearchDto.getStock(),
                     articleAdvancedSearchDto.getProvider(), articleAdvancedSearchDto.getRetailPrice())
                     .switchIfEmpty(Flux.error(new BadRequestException("Params not found")))
-                    .map(ArticleDto::new).filter(articleDto -> articleDto.getDiscontinued() == articleAdvancedSearchDto.getDiscontinued());
+                    .map(ArticleDto::new).filter(articleDto -> articleDto.getDiscontinued().equals(articleAdvancedSearchDto.getDiscontinued()));
         }
     }
 }
