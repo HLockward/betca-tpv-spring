@@ -14,7 +14,7 @@ public class FamilyComposite extends ArticlesFamily {
     @DBRef(lazy = true)
     private List<ArticlesFamily> articlesFamilyList = getArticlesFamilyList();
 
-    public FamilyComposite() {
+    public FamilyComposite(){
     }
 
     public FamilyComposite(FamilyType familyType, String reference, String description) {
@@ -28,6 +28,7 @@ public class FamilyComposite extends ArticlesFamily {
         return this.description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -48,8 +49,23 @@ public class FamilyComposite extends ArticlesFamily {
     }
 
     @Override
+    public void setArticlesFamilyList(List<ArticlesFamily> articlesFamilyList) {
+        this.articlesFamilyList = articlesFamilyList;
+    }
+
+    @Override
     public Article getArticle() {
         return null;
+    }
+
+    @Override
+    public void setArticle(Article article) {
+        // Do nothing
+    }
+
+    @Override
+    public void clearArticleFamilyList() {
+        this.articlesFamilyList.clear();
     }
 
     @Override

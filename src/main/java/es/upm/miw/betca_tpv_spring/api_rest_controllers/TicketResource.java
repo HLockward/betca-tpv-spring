@@ -24,8 +24,9 @@ public class TicketResource {
     public static final String TICKETS = "/tickets";
     public static final String TICKET_ID = "/{id}";
     public static final String SEARCH = "/search";
-    public static final String SEARCH_BY_ARTICLE = "/search/article/{articleId}";
-    public static final String SEARCH_BY_ORDER = "/search/order/{orderId}";
+    public static final String SEARCH_BY_ARTICLE = SEARCH + "/article/{articleId}";
+    public static final String SEARCH_BY_ORDER = SEARCH + "/order/{orderId}";
+    public static final String SEARCH_BY_TAG = SEARCH + "/tag/{tag}";
 
     private TicketController ticketController;
 
@@ -51,15 +52,15 @@ public class TicketResource {
         return this.ticketController.getPdf(id);
     }
 
-    @GetMapping(value = TICKET_ID )
+    @GetMapping(value = TICKET_ID)
     public Mono<Ticket> getTicket(@PathVariable String id) {
         return this.ticketController.getTicket(id);
     }
 
     @GetMapping(value = SEARCH)
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(@RequestParam(required = false) String mobile,
-                                                         @RequestParam(required = false) String date,
-                                                         @RequestParam(required = false) Integer amount) {
+                                                            @RequestParam(required = false) String date,
+                                                            @RequestParam(required = false) Integer amount) {
         LocalDateTime day = date == null ? null : LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME);
         TicketSearchDto ticketSearchDto = new TicketSearchDto(mobile, day, amount);
         return this.ticketController.searchByMobileDateOrAmount(ticketSearchDto)
@@ -75,6 +76,12 @@ public class TicketResource {
     @GetMapping(value = SEARCH_BY_ORDER)
     public Flux<TicketOutputDto> searchNotCommittedByOrder(@PathVariable String orderId) {
         return this.ticketController.searchNotCommittedByOrder(orderId)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH_BY_TAG)
+    public Flux<TicketOutputDto> searchNotCommittedByTag(@PathVariable String tag) {
+        return this.ticketController.searchNotCommittedByTag(tag)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

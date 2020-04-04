@@ -1,10 +1,13 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
+import es.upm.miw.betca_tpv_spring.documents.ArticlesFamily;
+import es.upm.miw.betca_tpv_spring.documents.FamilyComposite;
 import es.upm.miw.betca_tpv_spring.documents.FamilyType;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
-import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderDto;
+import es.upm.miw.betca_tpv_spring.dtos.*;
+import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
+import es.upm.miw.betca_tpv_spring.repositories.ArticlesFamilyRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +31,27 @@ public class ArticlesFamilyResourceIT {
     @Autowired
     private WebTestClient webTestClient;
 
+    @Autowired
+    private ArticlesFamilyRepository articlesFamilyRepository;
+
+    @Autowired
+    private ArticleRepository articleRepository;
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
+    private ArticlesFamily familyComposite = new FamilyComposite(FamilyType.ARTICLES,
+            "reference",
+            "description");
+
+    private String[] articlesFamilyIdList;
+
+    @BeforeEach
+    void fillArticlesFamilyList(){
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(0));
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(9));
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(12));
+    }
 
     @Test
     void testReadInFamilyCompositeVarios() {
@@ -157,4 +178,25 @@ public class ArticlesFamilyResourceIT {
         assertNotNull(sizes);
         assertTrue(sizes.size()>0);
     }
+
+    @Test
+    void testSearchArticlesFamilyById(){
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCrudDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testReadAllArticlesFamily() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + ARTICLES_FAMILY)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+
 }

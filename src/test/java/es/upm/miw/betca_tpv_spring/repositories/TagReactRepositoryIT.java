@@ -29,5 +29,29 @@ class TagReactRepositoryIT {
                 .verify();
     }
 
+    @Test
+    void testFindByDescription() {
+        StepVerifier
+                .create(this.tagReactRepository.findByDescription("tag1"))
+                .expectNextMatches(tag -> {
+                    assertEquals("tag1", tag.getDescription());
+                    assertNotNull(tag.getId());
+                    assertNotNull(tag.getArticleList());
+                    assertTrue(tag.getArticleList().size() > 0);
+                    assertFalse(tag.toString().matches("@"));
+                    return true;
+                })
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testFindByDescriptionNotFound() {
+        StepVerifier
+                .create(this.tagReactRepository.findByDescription("888"))
+                .expectNextCount(0)
+                .thenCancel()
+                .verify();
+    }
 }
 

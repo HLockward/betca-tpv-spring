@@ -291,4 +291,38 @@ public class InvoiceControllerIT {
                 .verify();
     }
 
+    @Test
+    void testReadQuarterlyVatFoundInvoices() {
+        StepVerifier
+                .create(this.invoiceController.readQuarterlyVat(Quarter.Q2))
+                .expectNextMatches(quarterVATDto -> {
+                    assertNotEquals(quarterVATDto.getTaxes().size(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(0).getVat(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(0).getTaxableAmount(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(2).getVat(), BigDecimal.ZERO);
+                    assertNotEquals(quarterVATDto.getTaxes().get(2).getTaxableAmount(), BigDecimal.ZERO);
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testReadQuarterlyVatNoInvoices() {
+        StepVerifier
+                .create(this.invoiceController.readQuarterlyVat(Quarter.Q4))
+                .expectNextMatches(quarterVATDto -> {
+                    assertNotEquals(quarterVATDto.getTaxes().size(), 0);
+                    assertEquals(quarterVATDto.getTaxes().get(0).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(0).getTaxableAmount(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(1).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(1).getTaxableAmount(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(2).getVat(), BigDecimal.ZERO);
+                    assertEquals(quarterVATDto.getTaxes().get(2).getTaxableAmount(), BigDecimal.ZERO);
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
 }

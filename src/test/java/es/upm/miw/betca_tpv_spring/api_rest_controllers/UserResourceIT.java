@@ -15,9 +15,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticleResource.SEARCH;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.UserResource.USERS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
@@ -261,4 +265,53 @@ class UserResourceIT {
                 )).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
 
     }
+
+    @Test
+    void testSearchUser() {
+        List<UserDto> users = this.restService.loginAdmin(webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                        .path(contextPath + USERS + SEARCH)
+                        .queryParam("mobile", "6")
+                        .queryParam("username", "")
+                        .queryParam("dni", "")
+                        .queryParam("address", "")
+                        .build()).exchange().expectStatus().isOk().expectBodyList(UserDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(users);
+        assertEquals(1, users.size());
+    }
+
+    @Test
+    void testSearchUserSomeResults() {
+        this.restService.loginAdmin(this.webTestClient)
+                .post().uri(contextPath + USERS)
+                .body(BodyInserters.fromObject(
+                        new UserDto(User.builder().mobile("985632145").username("manager").dni("51714988V").address("C/M, 14").email("m001@gmail.com").build()))
+                ).exchange().expectStatus().isOk().expectBody(UserDto.class)
+                .value(Assertions::assertNotNull);
+        List<UserDto> users = this.restService.loginAdmin(webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                        .path(contextPath + USERS + SEARCH)
+                        .queryParam("mobile", "6")
+                        .queryParam("username", "manager")
+                        .queryParam("dni", "")
+                        .queryParam("address", "")
+                        .build()).exchange().expectStatus().isOk().expectBodyList(UserDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(users);
+        assertEquals(3, users.size());
+    }
+
+    @Test
+    void testSearchUserNotFound() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                        .path(contextPath + USERS + SEARCH)
+                        .queryParam("mobile", "zz")
+                        .queryParam("username", "")
+                        .queryParam("dni", "")
+                        .queryParam("address", "")
+                        .build()).exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
 }

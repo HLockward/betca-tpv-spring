@@ -13,4 +13,6 @@ public interface UserReactRepository extends ReactiveSortingRepository<User, Str
 
     @Query(value = "{}", fields = "{ '_id' : 0, 'mobile' : 1, 'username' : 1, 'roles' : []}")
     Flux<UserMinimumDto> findAllUsers();
+
+    Flux<User> findByMobileOrUsernameOrDniOrAddress(String mobile, String username, String dni, String address);
 }

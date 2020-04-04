@@ -144,4 +144,10 @@ public class UserController {
                 });
         return Mono.when(user).then(this.userReactRepository.saveAll(user).next()).map(UserDto::new);
     }
+
+    public Flux<UserDto> findByMobileOrUsernameOrDniOrAddress(UserDto userDto) {
+        return this.userReactRepository.findByMobileOrUsernameOrDniOrAddress(userDto.getMobile(), userDto.getUsername(), userDto.getDni(), userDto.getAddress())
+                .switchIfEmpty(Flux.error(new NotFoundException("No existen usuarios")))
+                .map(UserDto::new);
+    }
 }

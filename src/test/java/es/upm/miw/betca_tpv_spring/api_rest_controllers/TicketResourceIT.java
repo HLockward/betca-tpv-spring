@@ -162,4 +162,31 @@ class TicketResourceIT {
         assertNotNull(tickets);
         assertEquals(0, tickets.size());
     }
+
+    @Test
+    void testSearchNotCommittedByTag() {
+        String tag = "tag1";
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_TAG, tag)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        boolean expected = tickets.size() >= 2;
+        assertTrue(expected);
+    }
+
+    @Test
+    void testSearchNotCommittedByTagNotFound() {
+        String tag = "777";
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_TAG, tag)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        assertEquals(0, tickets.size());
+    }
 }
