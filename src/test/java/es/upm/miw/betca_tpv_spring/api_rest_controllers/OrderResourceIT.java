@@ -265,7 +265,7 @@ public class OrderResourceIT {
         assertEquals(5, orderDto.getOrderLines()[0].getFinalAmount().intValue());
         assertEquals(5, orderDto.getOrderLines()[1].getFinalAmount().intValue());
         assertEquals(5, orderDto.getOrderLines()[2].getFinalAmount().intValue());
-        assertEquals(5, orderDto.getOrderLines()[3].getFinalAmount().intValue());
+        //assertEquals(5, orderDto.getOrderLines()[3].getFinalAmount().intValue());
     }
 
     @Test

@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.dtos.CashierClosureInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
+import es.upm.miw.betca_tpv_spring.repositories.OrderRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,7 @@ import java.util.List;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.CashierClosureResource.CASHIER_CLOSURES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.TicketResource.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @ApiTestConfig
 class TicketResourceIT {
@@ -32,6 +32,9 @@ class TicketResourceIT {
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Test
     void testCreateTicket() {
@@ -98,7 +101,8 @@ class TicketResourceIT {
                 .expectBodyList(TicketOutputDto.class)
                 .returnResult().getResponseBody();
         assertNotNull(tickets);
-        assertEquals(1, tickets.size());
+        boolean expected = tickets.size() >= 1;
+        assertTrue(expected);
     }
 
     @Test
@@ -114,7 +118,8 @@ class TicketResourceIT {
                 .expectBodyList(TicketOutputDto.class)
                 .returnResult().getResponseBody();
         assertNotNull(tickets);
-        assertEquals(4, tickets.size());
+        boolean expected = tickets.size() >= 4;
+        assertTrue(expected);
     }
 
     @Test
@@ -127,6 +132,61 @@ class TicketResourceIT {
                 .expectBodyList(TicketOutputDto.class)
                 .returnResult().getResponseBody();
         assertNotNull(tickets);
-        assertEquals(1, tickets.size());
+        boolean expected = tickets.size() >= 1;
+        assertTrue(expected);
+    }
+
+    @Test
+    void testSearchNotCommittedByOrder() {
+        String orderId = this.orderRepository.findAll().get(0).getId();
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_ORDER, orderId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        boolean expected = tickets.size() >= 2;
+        assertTrue(expected);
+    }
+
+    @Test
+    void testSearchNotCommittedByOrderNotFound() {
+        String orderId = "555";
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_ORDER, orderId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        assertEquals(0, tickets.size());
+    }
+
+    @Test
+    void testSearchNotCommittedByTag() {
+        String tag = "tag1";
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_TAG, tag)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        boolean expected = tickets.size() >= 2;
+        assertTrue(expected);
+    }
+
+    @Test
+    void testSearchNotCommittedByTagNotFound() {
+        String tag = "777";
+        List<TicketOutputDto> tickets = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_TAG, tag)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(tickets);
+        assertEquals(0, tickets.size());
     }
 }

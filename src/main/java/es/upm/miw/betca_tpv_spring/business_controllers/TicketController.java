@@ -33,6 +33,7 @@ public class TicketController {
     private TicketReactRepository ticketReactRepository;
     private UserReactRepository userReactRepository;
     private CashierClosureReactRepository cashierClosureReactRepository;
+    private TagReactRepository tagReactRepository;
     private PdfService pdfService;
     private CustomerPointsReactRepository customerPointsReactRepository;
     private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
@@ -42,7 +43,7 @@ public class TicketController {
     public TicketController(TicketReactRepository ticketReactRepository, UserReactRepository userReactRepository,
                             ArticleReactRepository articleReactRepository, CashierClosureReactRepository cashierClosureReactRepository,
                             PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository,
-                            OrderRepository orderRepository) {
+                            OrderRepository orderRepository, TagReactRepository tagReactRepository) {
         this.ticketReactRepository = ticketReactRepository;
         this.userReactRepository = userReactRepository;
         this.articleReactRepository = articleReactRepository;
@@ -50,6 +51,7 @@ public class TicketController {
         this.pdfService = pdfService;
         this.customerPointsReactRepository = customerPointsReactRepository;
         this.orderRepository = orderRepository;
+        this.tagReactRepository = tagReactRepository;
     }
 
     private Mono<Integer> nextIdStartingDaily() {
@@ -163,7 +165,7 @@ public class TicketController {
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
 
-   public Flux<Ticket> searchNotCommittedByOrder(String orderId) {
+   public Flux<TicketOutputDto> searchNotCommittedByOrder(String orderId) {
        List<Flux<Ticket>> fluxes = new ArrayList<>();
        this.orderRepository.findById(orderId).map(order -> Arrays.asList(order.getOrderLines())).ifPresent(orderLines -> {
            orderLines.forEach(orderLine ->  {
@@ -172,6 +174,17 @@ public class TicketController {
                fluxes.add(tickets);
            });
        });
-       return Flux.merge(fluxes);
+       return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+   }
+
+   public Flux<TicketOutputDto> searchNotCommittedByTag(String tagDescription) {
+        List<Flux<Ticket>> tickets = new ArrayList<>();
+        return this.tagReactRepository.findByDescription(tagDescription)
+                .map(tag -> {
+                    tag.getArticleList().forEach(article -> tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode())));
+                    return tag;
+                })
+                .thenMany(Flux.merge(tickets))
+                .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
 }

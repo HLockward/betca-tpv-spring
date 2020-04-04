@@ -95,5 +95,14 @@ class TicketReactRepositoryIT {
                 .expectNextCount(6)
                 .thenCancel().verify();
     }
+
+    @Test
+    void testFindNotCommittedByArticleId() {
+        String articleId = "8400000000024";
+        StepVerifier
+                .create(this.ticketReactRepository.findNotCommittedByArticleId(articleId))
+                .expectNextCount(1)
+                .thenCancel().verify();
+    }
 }
 

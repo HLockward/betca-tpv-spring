@@ -141,4 +141,24 @@ public class TicketControllerIT {
                 .thenCancel()
                 .verify();
     }
+
+    @Test
+    void testSearchNotCommittedByTag() {
+        String tag = "tag1";
+        StepVerifier
+                .create(this.ticketController.searchNotCommittedByTag(tag))
+                .expectNextCount(2)
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testSearchNotCommittedByTagNotFound() {
+        String tag = "777";
+        StepVerifier
+                .create(this.ticketController.searchNotCommittedByTag(tag))
+                .expectNextCount(0)
+                .thenCancel()
+                .verify();
+    }
 }
