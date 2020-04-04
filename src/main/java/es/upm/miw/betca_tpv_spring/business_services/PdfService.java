@@ -41,6 +41,12 @@ public class PdfService {
     @Value("${miw.company.web}")
     private String web;
 
+    private FileService fileService;
+
+    public PdfService(FileService fileService) {
+        this.fileService = fileService;
+    }
+
     private void addHead(PdfBuilder pdf) {
         pdf.image(this.logo).paragraphEmphasized(this.name).paragraphEmphasized("Tfn: " + this.phone)
                 .paragraph("NIF: " + this.nif + "   -   " + this.address)
@@ -237,5 +243,9 @@ public class PdfService {
             this.addOfferValue(pdf, offer);
             return pdf.build();
         });
+    }
+
+    public byte[] readPdf(String filepath) {
+        return fileService.read(System.getProperty(PdfBuilder.USER_HOME) + filepath + PdfBuilder.PDF_FILE_EXT);
     }
 }

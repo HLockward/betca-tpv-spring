@@ -31,7 +31,7 @@ public class InvoiceResourceIT {
     private String contextPath;
 
     @Test
-    void testCreate() {
+    void testCreateAndGet() {
         this.restService.loginAdmin(webTestClient)
                 .post().uri(contextPath + InvoiceResource.INVOICES)
                 .exchange()
@@ -39,17 +39,6 @@ public class InvoiceResourceIT {
                 .expectBody(byte[].class)
                 .value(Assertions::assertNotNull);
     }
-
-    @Test
-    void testGenerate() {
-        this.restService.loginAdmin(webTestClient)
-                .patch().uri(contextPath + InvoiceResource.INVOICES + "/20201" + InvoiceResource.PRINT)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(byte[].class)
-                .value(Assertions::assertNotNull);
-    }
-
 
     @Test
     void testCreateInvoiceNegative() {
@@ -97,7 +86,7 @@ public class InvoiceResourceIT {
     }
 
     @Test
-    void cget() {
+    void testGetAll() {
         this.restService.loginAdmin(this.webTestClient)
         .get().uri(contextPath + InvoiceResource.INVOICES)
                 .exchange()
@@ -108,11 +97,10 @@ public class InvoiceResourceIT {
     }
 
     @Test
-    void search() {
+    void testSearch() {
         this.restService.loginAdmin(this.webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
                         .path(contextPath + InvoiceResource.INVOICES + InvoiceResource.SEARCH)
-                .queryParam("mobile", null)
                 .queryParam("fromDate", LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE))
                 .queryParam("toDate", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE))
                 .build())
