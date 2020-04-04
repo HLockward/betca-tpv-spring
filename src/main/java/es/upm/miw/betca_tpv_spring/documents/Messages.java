@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Messages {
 
     @Id
-    private ObjectId id;
+    private String id;
     @DBRef
     private User fromUser;
     @DBRef
@@ -18,8 +18,8 @@ public class Messages {
     private LocalDateTime sentDate;
     private LocalDateTime readDate;
 
-    public Messages(User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
-        this.id = ObjectId.get();
+    public Messages(String id, User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+        this.id = id;
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.messageContent = messageContent;
@@ -27,11 +27,11 @@ public class Messages {
         this.readDate = readDate;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
