@@ -1,14 +1,11 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
-import es.upm.miw.betca_tpv_spring.documents.User;
-import reactor.core.publisher.Mono;
-
 import java.time.LocalDateTime;
 
 public class MessagesCreationDto {
 
-    private User fromUser;
-    private User toUser;
+    private String fromUserMobile;
+    private String toUserMobile;
     private String messageContent;
     private LocalDateTime sentDate;
 
@@ -16,27 +13,27 @@ public class MessagesCreationDto {
         // Empty for framework
     }
 
-    public MessagesCreationDto(User fromUser, User toUser, String messageContent, LocalDateTime sentDate) {
-        this.fromUser = fromUser;
-        this.toUser = toUser;
+    public MessagesCreationDto(String fromUserMobile, String toUserMobile, String messageContent, LocalDateTime sentDate) {
+        this.fromUserMobile = fromUserMobile;
+        this.toUserMobile = toUserMobile;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
     }
 
-    public User getFromUser() {
-        return fromUser;
+    public String getFromUserMobile() {
+        return fromUserMobile;
     }
 
-    public void setFromUser(User fromUser) {
-        this.fromUser = fromUser;
+    public void setFromUserMobile(String fromUserMobile) {
+        this.fromUserMobile = fromUserMobile;
     }
 
-    public User getToUser() {
-        return toUser;
+    public String getToUserMobile() {
+        return toUserMobile;
     }
 
-    public void setToUser(User toUser) {
-        this.toUser = toUser;
+    public void setToUserMobile(String toUserMobile) {
+        this.toUserMobile = toUserMobile;
     }
 
     public String getMessageContent() {
@@ -58,8 +55,8 @@ public class MessagesCreationDto {
     @Override
     public String toString() {
         return "MessagesCreationDto{" +
-                "fromUser=" + fromUser +
-                ", toUser=" + toUser +
+                "fromUserMobile=" + fromUserMobile +
+                ", toUserMobile=" + toUserMobile +
                 ", messageContent='" + messageContent + '\'' +
                 ", sentDate=" + sentDate +
                 '}';
