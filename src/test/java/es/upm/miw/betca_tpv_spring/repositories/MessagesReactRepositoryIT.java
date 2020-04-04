@@ -70,4 +70,22 @@ public class MessagesReactRepositoryIT {
                 })
                 .expectComplete().verify();
     }
+
+    @Test
+    void testFindFirstByOrderBySentDateDescIdDesc() {
+        StepVerifier
+                .create(this.messagesReactRepository.findFirstByOrderBySentDateDescIdDesc())
+                .expectNextMatches(messages -> {
+                    assertEquals("3", messages.getId());
+                    assertNotNull(messages.getFromUser());
+                    assertEquals("666666003", messages.getFromUser().getMobile());
+                    assertNotNull(messages.getToUser());
+                    assertEquals("666666007", messages.getToUser().getMobile());
+                    assertEquals("Msg from 3 to 7", messages.getMessageContent());
+                    assertEquals(fixedLdt.plusDays(4), messages.getSentDate());
+                    assertNull(messages.getReadDate());
+                    return true;
+                })
+                .expectComplete().verify();
+    }
 }

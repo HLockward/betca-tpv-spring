@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public class MessagesDto {
 
+    private String id;
     private User fromUser;
     private User toUser;
     private String messageContent;
@@ -17,12 +18,21 @@ public class MessagesDto {
         // Empty for framework
     }
 
-    public MessagesDto(User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+    public MessagesDto(String id, User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+        this.id = id;
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
         this.readDate = readDate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public User getFromUser() {
@@ -76,7 +86,8 @@ public class MessagesDto {
     @Override
     public String toString() {
         return "MessagesDto [" +
-                "fromUser=" + fromUser +
+                "id=" + id +
+                ", fromUser=" + fromUser +
                 ", toUser=" + toUser +
                 ", messageContent=" + messageContent +
                 ", sentDate=" + sentDate +

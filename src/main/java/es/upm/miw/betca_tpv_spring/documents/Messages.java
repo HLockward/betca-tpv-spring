@@ -1,6 +1,5 @@
 package es.upm.miw.betca_tpv_spring.documents;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -33,6 +32,14 @@ public class Messages {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getIdParsedToInteger() {
+        return Integer.parseInt(id);
+    }
+
+    public void setIdFromInt(int idInt) {
+        this.id = "" + idInt;
     }
 
     public User getFromUser() {
