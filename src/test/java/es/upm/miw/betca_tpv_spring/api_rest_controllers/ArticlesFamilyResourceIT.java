@@ -16,10 +16,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.List;
 
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.ARTICLES_FAMILY;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.FAMILY_COMPOSITE;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.*;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ProviderResource.PROVIDERS;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.SIZES;
 import static org.junit.Assert.*;
 
 @ApiTestConfig
@@ -196,6 +194,36 @@ public class ArticlesFamilyResourceIT {
                 .get().uri(contextPath + ARTICLES_FAMILY)
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticle(){
+        this.restService.loginAdmin(webTestClient)
+                .post().uri(contextPath + ARTICLES_FAMILY + CREATE_ARTICLES_FAMILY)
+                .body(
+                        BodyInserters.fromObject(
+                                new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa de hombre", "ropa para hombre", null,"8400000000024")
+                        )
+                ).exchange().expectStatus().isOk().expectBody(ArticlesFamilyDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticles(){
+
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId(),
+                this.familyComposite.getArticlesFamilyList().get(2).getId()
+        };
+        this.restService.loginAdmin(webTestClient)
+                .post().uri(contextPath + ARTICLES_FAMILY + CREATE_ARTICLES_FAMILY)
+                .body(
+                        BodyInserters.fromObject(
+                                new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa de hombre", "ropa para hombre", articlesFamilyListId,null)
+                        )
+                ).exchange().expectStatus().isOk().expectBody(ArticlesFamilyCreationDto.class)
+                .value(Assertions::assertNotNull);
     }
 
 
