@@ -105,26 +105,6 @@ public class UserController {
         return Mono.when(user, noExistByMobile).then(this.userReactRepository.saveAll(user).next()).map(UserDto::new);
     }
 
-
-    public Mono<MessagesDto> sendMessageToUser(MessagesDto messagesDto) {
-        Mono<User> userFrom = this.userReactRepository.findByMobile(messagesDto.getFromUserMobile())
-                .switchIfEmpty(Mono.error(new NotFoundException("User mobile:" + messagesDto.getFromUserMobile())));
-        Mono<User> userTo = this.userReactRepository.findByMobile(messagesDto.getToUserMobile())
-                .switchIfEmpty(Mono.error(new NotFoundException("User mobile:" + messagesDto.getToUserMobile())))
-                .map(user1 -> {
-                    user1.getMessagesList().add(new Messages(
-                            messagesDto.getFromUserMobile(),
-                            messagesDto.getToUserMobile(),
-                            messagesDto.getMessageContent(),
-                            messagesDto.getSentDate(),
-                            null
-                    ));
-                    return user1;
-                });
-        return Mono.when(userFrom, userTo).then(this.userReactRepository.saveAll(userTo).next())
-                .map(user1-> new MessagesDto(user1.getMessagesList().get(user1.getMessagesList().size()-1)));
-    }
-
     public Mono<UserDto> changePassword(String mobile, UserCredentialDto userCredentialDto) {
         Mono<User> user = this.userReactRepository.findByMobile(mobile)
                 .switchIfEmpty(Mono.error(new NotFoundException("User mobile:" + mobile)))

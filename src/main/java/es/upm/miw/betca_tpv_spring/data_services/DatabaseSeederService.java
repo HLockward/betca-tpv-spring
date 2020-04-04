@@ -169,11 +169,6 @@ public class DatabaseSeederService {
     public void seedDataBaseJava() {
         LogManager.getLogger(this.getClass()).warn("------- Initial Load from JAVA -----------");
         Role[] allRoles = {Role.ADMIN, Role.MANAGER, Role.OPERATOR};
-        List<Messages> messagesList = new ManagedList<>();
-        LocalDateTime sentTime = LocalDateTime.of(2020, 3, 13, 9, 0, 0);
-        LocalDateTime readTime = LocalDateTime.of(2020, 3, 14, 9, 0, 0);
-        messagesList.add(new Messages("666666002", "666666007","Message fromm 2 to 7", sentTime, readTime));
-        messagesList.add(new Messages("666666003", "666666007","Message fromm 3 to 7", sentTime.plusDays(1), readTime.plusDays(1)));
         User[] users = {
                 User.builder().mobile("666666000").username("all-roles").password("p000").dni(null).address("C/TPV, 0, MIW").email("u000@gmail.com").roles(allRoles).build(),
                 User.builder().mobile("666666001").username("manager").password("p001").dni("66666601C").address("C/TPV, 1").email("u001@gmail.com").roles(Role.MANAGER).build(),
@@ -182,8 +177,7 @@ public class DatabaseSeederService {
                 User.builder().mobile("666666004").username("u004").password("p004").dni("66666604T").address("C/TPV, 4").email("u004@gmail.com").roles(Role.CUSTOMER).build(),
                 User.builder().mobile("666666005").username("u005").password("p005").dni("66666605R").address("C/TPV, 5").email("u005@gmail.com").roles(Role.CUSTOMER).build(),
                 User.builder().mobile("666666006").username("u006").password("p006").dni("66666606W").address(null).email("u006@gmail.com").roles(Role.CUSTOMER).build(),
-                User.builder().mobile("666666007").username("u007").password("p007").dni("66666607W").address("C/TPV, 7").email("u007@gmail.com")
-                        .roles(Role.OPERATOR).messagesList(messagesList).build(),
+                User.builder().mobile("666666007").username("u007").password("p007").dni("66666607W").address("C/TPV, 7").email("u007@gmail.com").roles(Role.OPERATOR).build(),
         };
         this.userRepository.saveAll(Arrays.asList(users));
         LogManager.getLogger(this.getClass()).warn("        ------- users");
@@ -261,17 +255,17 @@ public class DatabaseSeederService {
         };
         Ticket[] tickets = {
                 new Ticket(1, BigDecimal.TEN, new BigDecimal("25.0"), BigDecimal.ZERO,
-                        new Shopping[]{shoppingList[0], shoppingList[1]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[0], shoppingList[1]}, users[4], "note", null),
                 new Ticket(2, new BigDecimal("18.0"), BigDecimal.ZERO, BigDecimal.ZERO,
-                        new Shopping[]{shoppingList[2]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[2]}, users[4], "note", null),
                 new Ticket(3, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note", null),
                 new Ticket(4, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note", null),
                 new Ticket(5, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[5], "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[5], "note", null),
                 new Ticket(6, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[4], "note", null),
         };
         tickets[0].setId("201901121");
         tickets[1].setId("201901122");
