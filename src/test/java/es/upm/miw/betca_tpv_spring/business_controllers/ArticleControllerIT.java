@@ -215,13 +215,14 @@ class ArticleControllerIT {
 
     @Test
     void testSearchIncompletedArticles() {
-        Article a = Article.builder("666666").description("Article66").retailPrice(new BigDecimal(66)).build();
+        Article a = Article.builder("8400000000987").description("Article66").retailPrice(new BigDecimal(66)).build();
         articleRepository.save(a);
         StepVerifier
                 .create(this.articleController.searchIncompletedArticles())
                 .expectNextCount(1)
                 .expectComplete()
                 .verify();
+        articleRepository.deleteById("8400000000987");
     }
 
     @AfterEach
