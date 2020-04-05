@@ -124,19 +124,14 @@ public class TicketController {
     }
 
 
-    public byte[] getPdf(String id) {
-        try {
-            String path = "/tpv-pdfs/tickets/ticket-" + id;
-            String USER_HOME = "user.home";
-            String PDF_FILE_EXT = ".pdf";
-            return Files.readAllBytes(new File(System.getProperty(USER_HOME) + path + PDF_FILE_EXT).toPath());
-        } catch (IOException ioe) {
-            throw new PdfException("Can’t read PDF");
-        }
+    public byte[] getTicketPdf(String ticketId) throws IOException {
+        return pdfService.getPdfFromTicketId(ticketId);
     }
 
-    public Mono<Ticket> getTicket(String id) {
-        return this.ticketReactRepository.findById(id);
+    public Mono<TicketOutputDto> getTicket(String id) {
+        return this.ticketReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + id + " not found")))
+                .map(TicketOutputDto::new);
     }
 
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(TicketSearchDto ticketSearchDto) {

@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,6 +26,7 @@ public class TicketResource {
 
     public static final String TICKETS = "/tickets";
     public static final String TICKET_ID = "/{id}";
+    public static final String PDF = "/pdf";
     public static final String SEARCH = "/search";
     public static final String SEARCH_BY_ARTICLE = SEARCH + "/article/{articleId}";
     public static final String SEARCH_BY_ORDER = SEARCH + "/order/{orderId}";
@@ -49,13 +51,13 @@ public class TicketResource {
                 .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @GetMapping(value = TICKET_ID + "/pdf")
-    public byte[] getPdf(@PathVariable String id) {
-        return this.ticketController.getPdf(id);
+    @GetMapping(value = TICKET_ID + PDF)
+    public byte[] getPdf(@PathVariable String id) throws IOException {
+        return this.ticketController.getTicketPdf(id);
     }
 
     @GetMapping(value = TICKET_ID)
-    public Mono<Ticket> getTicket(@PathVariable String id) {
+    public Mono<TicketOutputDto> getTicket(@PathVariable String id) {
         return this.ticketController.getTicket(id);
     }
 
