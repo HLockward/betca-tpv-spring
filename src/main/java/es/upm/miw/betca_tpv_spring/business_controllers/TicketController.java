@@ -39,12 +39,14 @@ public class TicketController {
     private CustomerPointsReactRepository customerPointsReactRepository;
     private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
     private OrderReactRepository orderReactRepository;
+    private GiftTicketReactRepository giftTicketReactRepository;
 
     @Autowired
     public TicketController(TicketReactRepository ticketReactRepository, UserReactRepository userReactRepository,
                             ArticleReactRepository articleReactRepository, CashierClosureReactRepository cashierClosureReactRepository,
                             PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository,
-                            OrderReactRepository orderReactRepository, TagReactRepository tagReactRepository) {
+                            OrderReactRepository orderReactRepository, TagReactRepository tagReactRepository,
+                            GiftTicketReactRepository giftTicketReactRepository) {
         this.ticketReactRepository = ticketReactRepository;
         this.userReactRepository = userReactRepository;
         this.articleReactRepository = articleReactRepository;
@@ -53,6 +55,7 @@ public class TicketController {
         this.customerPointsReactRepository = customerPointsReactRepository;
         this.orderReactRepository = orderReactRepository;
         this.tagReactRepository = tagReactRepository;
+        this.giftTicketReactRepository = giftTicketReactRepository;
     }
 
     private Mono<Integer> nextIdStartingDaily() {
@@ -137,6 +140,10 @@ public class TicketController {
 
     public Mono<Ticket> getTicket(String id) {
         return this.ticketReactRepository.findById(id);
+    }
+
+    public Mono<Ticket> searchByGiftTicketReference(String giftTicketReference) {
+        return this.giftTicketReactRepository.findById(giftTicketReference).map(GiftTicket::getTicket);
     }
 
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(TicketSearchDto ticketSearchDto) {
