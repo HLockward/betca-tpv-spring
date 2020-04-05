@@ -3,7 +3,6 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.business_services.Barcode;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.*;
-import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,12 @@ public class ArticlesFamilyController {
 
     @Autowired
     private ArticlesFamilyRepository articlesFamilyRepository;
+
+    @Autowired
+    private ArticleReactRepository articleReactRepository;
+
+    @Autowired
+    private ProviderReactRepository providerReactRepository;
 
     private List<String> getSizes() throws IOException {
         String propFileName = "config.properties";
@@ -73,45 +78,48 @@ public class ArticlesFamilyController {
         return getSizes();
     }
 
-
     public Mono<ArticlesFamilyDto> createArticleFamily(FamilyCompleteDto articlesFamilyDto) throws IOException {
-
         List<String> sizes = getSizes();
+        Flux<Provider> provider =  this.providerReactRepository.findById(articlesFamilyDto.getProvider())
+        .switchIfEmpty(Mono.error(new NotFoundException("Provider (" + articlesFamilyDto.getProvider() + ")"))).flux();
+        Flux<Article> fluxArticles = provider.flatMap(s-> createArticles(s,articlesFamilyDto,sizes));
+        Flux<ArticlesFamily> articlesFamilyFlux = fluxArticles.flatMap(article->createLeaf(article));
+        ArticlesFamily familyCompositeSizesList = new FamilyComposite(FamilyType.SIZES, articlesFamilyDto.getReference(), articlesFamilyDto.getDescription());
+        Mono<Void> finalFlux = articlesFamilyFlux.doOnNext(familyCompositeSizesList::add).then();
+        return Mono.when(finalFlux).then(articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new));
+    }
+
+    public Flux<Article> createArticles(Provider provider, FamilyCompleteDto articlesFamilyDto, List<String> sizes){
+
         int lowerLimit = Integer.parseInt(articlesFamilyDto.getFromSize());
         int upperLimit = Integer.parseInt(articlesFamilyDto.getToSize());
-        List<ArticlesFamily> familyArticleList = new ArrayList<>();
-        Optional<Provider> provider = this.providerRepository.findById(articlesFamilyDto.getProvider());
-
+        Flux<Article> articleFlux = Flux.empty();
         int increment = 1;
-        if (articlesFamilyDto.getIncrement() > 0 && !articlesFamilyDto.getSizeType())
+
+        if (articlesFamilyDto.getIncrement() > 1 && !articlesFamilyDto.getSizeType())
             increment = articlesFamilyDto.getIncrement();
 
-
         for (int index = lowerLimit; index <= upperLimit; index += increment) {
-            String code = new Barcode().generateEan13code(Long.parseLong(this.articleRepository.findFirstByOrderByCodeDesc().getCode().substring(0, 12)) + 1);
-            if (code.length() == 13 && Long.parseLong(code.substring(7, 12)) > 99999L) {
-                return Mono.error(new BadRequestException("Index out of range"));
-            }
 
-            String description;
+            String size;
             if (articlesFamilyDto.getSizeType())
-                description = sizes.get(index);
+                size = sizes.get(index);
             else
-                description = String.valueOf(index);
+                size = String.valueOf(index);
 
-            Article article = Article.builder(code).description(articlesFamilyDto.getReference() + " - " + articlesFamilyDto.getDescription() + " T" + description)
-                    .reference(articlesFamilyDto.getReference() + " T" + description).provider(provider.get()).build();
-            this.articleRepository.save(article);
-            familyArticleList.add(new FamilyArticle(article));
+            int numCode = index + 1;
+            Mono<Article> article = this.articleReactRepository.findFirstByOrderByCodeDesc().switchIfEmpty(Mono.error(new NotFoundException("Article")))
+                    .map(s-> Article.builder(new Barcode().generateEan13code(Long.parseLong(s.getCode().substring(0,12))+numCode)).description(articlesFamilyDto.getReference() + " - " + articlesFamilyDto.getDescription() + " T" + size)
+                            .reference(articlesFamilyDto.getReference() + " T" + size).provider(provider).build());
+            Flux<Article> articleMono  = this.articleReactRepository.saveAll(article.flux());
+            articleFlux = articleFlux.mergeWith(articleMono);
         }
-        this.articlesFamilyRepository.saveAll(familyArticleList);
-        ArticlesFamily familyCompositeSizesList = new FamilyComposite(FamilyType.SIZES, articlesFamilyDto.getReference(), articlesFamilyDto.getDescription());
+        return articleFlux;
+    }
 
-        for (ArticlesFamily articlesFamily : familyArticleList) {
-            familyCompositeSizesList.add(articlesFamily);
-        }
-
-        return this.articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new);
+    public Mono<ArticlesFamily> createLeaf(Article article)
+    {
+        return this.articlesFamilyReactRepository.save(new FamilyArticle(article));
     }
 
     public Flux<ArticlesFamilyCrudDto> readAllArticlesFamily() {
