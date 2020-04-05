@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.TicketPatchDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.exceptions.PdfException;
@@ -191,4 +192,20 @@ public class TicketController {
                 .distinct()
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
+
+    public Mono<TicketOutputDto> updateShoppingTicket(String id, TicketPatchDto shoppingPatchDto) {
+        Mono<Ticket> ticket = this.ticketReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + id + " not found"))).map(ticket1 -> {
+                    Arrays.stream(ticket1.getShoppingList()).forEach(shopping -> {
+                        shoppingPatchDto.getShoppingPatchDtoList().stream().forEach(shoppingPatchDto1 -> {
+                            if (shopping.getArticleId().equals(shoppingPatchDto1.getArticleId())) {
+                                shopping.setAmount(shoppingPatchDto1.getAmount());
+                                shopping.setShoppingState(shoppingPatchDto1.getShoppingState());
+                            }
+                        });
+                    });
+                    return ticket1;
+                });
+        return Mono.when(ticket).then(this.ticketReactRepository.saveAll(ticket).next().map(TicketOutputDto::new));
+    }
 }

@@ -1,13 +1,13 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
-import es.upm.miw.betca_tpv_spring.dtos.CashierClosureInputDto;
-import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
-import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
-import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
+import es.upm.miw.betca_tpv_spring.data_services.DatabaseSeederService;
+import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
+import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
 import es.upm.miw.betca_tpv_spring.repositories.OrderRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
@@ -35,6 +35,14 @@ public class TicketControllerIT {
 
     @Autowired
     private CashierClosureController cashierClosureController;
+
+    @Autowired
+    private DatabaseSeederService databaseSeederService;
+
+    @AfterEach
+    void initialize() {
+        databaseSeederService.deleteAllAndInitializeAndSeedDataBase();
+    }
 
     @Test
     void testUpdateStockWhenCreateTicket() {
@@ -158,6 +166,27 @@ public class TicketControllerIT {
         StepVerifier
                 .create(this.ticketController.searchNotCommittedByTag(tag))
                 .expectNextCount(0)
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testUpdateShoppingTicket() {
+        ShoppingPatchDto shoppingPatchDto1 = new ShoppingPatchDto("8400000000017", 10, ShoppingState.IN_STOCK);
+        ShoppingPatchDto shoppingPatchDto2 = new ShoppingPatchDto("8400000000024", 15, ShoppingState.REQUIRE_PROVIDER);
+        TicketPatchDto ticketPatchDto = new TicketPatchDto();
+        ticketPatchDto.getShoppingPatchDtoList().add(shoppingPatchDto1);
+        ticketPatchDto.getShoppingPatchDtoList().add(shoppingPatchDto2);
+        StepVerifier
+                .create(this.ticketController.updateShoppingTicket("201901121", ticketPatchDto))
+                .expectNextMatches(ticketOutputDto -> {
+                    assertEquals(ticketOutputDto.getId(), "201901121");
+                    assertEquals(ticketOutputDto.getShoppingList()[0].getAmount(), 10);
+                    assertEquals(ticketOutputDto.getShoppingList()[0].getShoppingState(), ShoppingState.IN_STOCK);
+                    assertEquals(ticketOutputDto.getShoppingList()[1].getAmount(), 15);
+                    assertEquals(ticketOutputDto.getShoppingList()[1].getShoppingState(),  ShoppingState.REQUIRE_PROVIDER);
+                    return true;
+                })
                 .thenCancel()
                 .verify();
     }
