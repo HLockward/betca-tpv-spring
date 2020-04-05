@@ -37,14 +37,14 @@ public class MessagesController {
         return this.messagesReactRepository.findById(messagesId).map(MessagesOutputDto::new);
     }
 
-    public Flux<MessagesDto> readAllMessagesByToUser(String toUserMobile) {
+    public Flux<MessagesOutputDto> readAllMessagesByToUser(String toUserMobile) {
         UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
         return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
             userMinimumDto.setMobile(user.getMobile());
             return user;
         }).thenMany(this.messagesReactRepository.findAll()
                 .filter(messages -> userMinimumDto.getMobile().equals(messages.getToUser().getMobile()))
-                .map(MessagesDto::new));
+                .map(MessagesOutputDto::new));
     }
 
     public Flux<MessagesDto> readAllUnReadMessagesByToUser(String toUserMobile) {

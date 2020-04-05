@@ -46,7 +46,7 @@ public class MessagesResource {
     }
 
     @GetMapping(value = TO_USER + MOBILE)
-    public Flux<MessagesDto> readAllMessagesByToUser(@PathVariable String toUserMobile) {
+    public Flux<MessagesOutputDto> readAllMessagesByToUser(@PathVariable String toUserMobile) {
         return this.messagesController.readAllMessagesByToUser(toUserMobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
