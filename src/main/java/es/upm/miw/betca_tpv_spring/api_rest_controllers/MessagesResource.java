@@ -22,6 +22,7 @@ public class MessagesResource {
     public static final String MESSAGES = "/messages";
     public static final String MESSAGES_ID = "/{id}";
     public static final String MY_MESSAGES = "/my-messages";
+    public static final String UNREAD = "/unread";
 
     private MessagesController messagesController;
 
@@ -58,6 +59,12 @@ public class MessagesResource {
     @GetMapping(value = MY_MESSAGES)
     public Flux<MessagesDto> readAllMessagesByToUser(@RequestParam String toUserMobile) {
         return this.messagesController.readAllMessagesByToUser(toUserMobile)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = MY_MESSAGES + UNREAD)
+    public Flux<MessagesDto> readAllUnReadMessagesByToUser(@RequestParam String toUserMobile) {
+        return this.messagesController.readAllUnReadMessagesByToUser(toUserMobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
