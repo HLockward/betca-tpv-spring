@@ -6,6 +6,7 @@ import es.upm.miw.betca_tpv_spring.documents.Ticket;
 import es.upm.miw.betca_tpv_spring.dtos.GiftTicketCreationDto;
 import es.upm.miw.betca_tpv_spring.repositories.GiftTicketReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketReactRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -17,16 +18,18 @@ public class GiftTicketController {
     private TicketReactRepository ticketReactRepository;
     private PdfService pdfService;
 
-    public GiftTicketController(GiftTicketReactRepository giftTicketReactRepository, PdfService pdfService) {
+    @Autowired
+    public GiftTicketController(GiftTicketReactRepository giftTicketReactRepository, TicketReactRepository ticketReactRepository, PdfService pdfService) {
         this.giftTicketReactRepository = giftTicketReactRepository;
+        this.ticketReactRepository = ticketReactRepository;
         this.pdfService = pdfService;
     }
 
-    public Mono<GiftTicket> createGiftTicket(GiftTicketCreationDto giftTicketCreationDto) {
+    private Mono<GiftTicket> createGiftTicket(GiftTicketCreationDto giftTicketCreationDto) {
 
         GiftTicket giftTicket = new GiftTicket(giftTicketCreationDto.getPersonalizedMessage(), null);
 
-        Mono<Ticket> ticket = this.ticketReactRepository.findById(giftTicketCreationDto.getTicket())
+        Mono<Ticket> ticket = this.ticketReactRepository.findFirstByOrderByCreationDateDescIdDesc()
                 .doOnNext(giftTicket::setTicket);
 
         return Mono.when(ticket)
