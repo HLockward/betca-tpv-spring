@@ -83,7 +83,7 @@ public class ArticlesFamilyController {
         Flux<Provider> provider =  this.providerReactRepository.findById(articlesFamilyDto.getProvider())
         .switchIfEmpty(Mono.error(new NotFoundException("Provider (" + articlesFamilyDto.getProvider() + ")"))).flux();
         Flux<Article> fluxArticles = provider.flatMap(s-> createArticles(s,articlesFamilyDto,sizes));
-        Flux<ArticlesFamily> articlesFamilyFlux = fluxArticles.flatMap(article->createLeaf(article));
+        Flux<ArticlesFamily> articlesFamilyFlux = fluxArticles.flatMap(this::createLeaf);
         ArticlesFamily familyCompositeSizesList = new FamilyComposite(FamilyType.SIZES, articlesFamilyDto.getReference(), articlesFamilyDto.getDescription());
         Mono<Void> finalFlux = articlesFamilyFlux.doOnNext(familyCompositeSizesList::add).then();
         return Mono.when(finalFlux).then(articlesFamilyReactRepository.save(familyCompositeSizesList).map(ArticlesFamilyDto::new));
