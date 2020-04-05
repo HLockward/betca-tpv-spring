@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
+import es.upm.miw.betca_tpv_spring.documents.Article;
 import es.upm.miw.betca_tpv_spring.documents.Tax;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleAdvancedSearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
@@ -176,6 +177,17 @@ class ArticleControllerIT {
         StepVerifier
                 .create(this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto))
                 .expectNextCount(9)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testSearchIncompletedArticles() {
+        Article a = Article.builder("666666").description("Article66").retailPrice(new BigDecimal(66)).build();
+        articleRepository.save(a);
+        StepVerifier
+                .create(this.articleController.searchIncompletedArticles())
+                .expectNextCount(1)
                 .expectComplete()
                 .verify();
     }

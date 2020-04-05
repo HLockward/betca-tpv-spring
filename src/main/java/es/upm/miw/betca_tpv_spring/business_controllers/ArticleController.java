@@ -134,4 +134,8 @@ public class ArticleController {
                     .map(ArticleDto::new).filter(articleDto -> articleDto.getDiscontinued().equals(articleAdvancedSearchDto.getDiscontinued()));
         }
     }
+
+    public Flux<ArticleDto> searchIncompletedArticles() {
+        return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleDto.getReference() == null || articleDto.getProvider() == null);
+    }
 }
