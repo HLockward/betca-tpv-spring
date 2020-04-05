@@ -62,18 +62,16 @@ public class MessagesResourceIT {
     @Test
     void testReadById() {
         String idToLookFor = "1";
-        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+        MessagesOutputDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
                 .get().uri(contextPath + MESSAGES + MESSAGES_ID, idToLookFor)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(MessagesDto.class)
+                .expectBody(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .returnResult().getResponseBody();
         assertEquals(idToLookFor, messagesDtoResponse.getId());
-        assertNotNull(messagesDtoResponse.getFromUser());
-        assertEquals("666666001", messagesDtoResponse.getFromUser().getMobile());
-        assertNotNull(messagesDtoResponse.getToUser());
-        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("666666001", messagesDtoResponse.getFromUserMobile());
+        assertEquals("666666007", messagesDtoResponse.getToUserMobile());
         assertEquals("Msg from 1 to 7", messagesDtoResponse.getMessageContent());
         assertEquals(fixedLdt, messagesDtoResponse.getSentDate());
         assertEquals(fixedLdt.plusDays(1), messagesDtoResponse.getReadDate());

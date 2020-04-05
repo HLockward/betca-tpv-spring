@@ -40,7 +40,7 @@ public class MessagesResource {
     }
 
     @GetMapping(value = MESSAGES_ID)
-    public Mono<MessagesDto> readById(@PathVariable String id) {
+    public Mono<MessagesOutputDto> readById(@PathVariable String id) {
         return this.messagesController.readById(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }

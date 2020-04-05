@@ -33,8 +33,8 @@ public class MessagesController {
         return this.messagesReactRepository.findAll().map(MessagesOutputDto::new);
     }
 
-    public Mono<MessagesDto> readById(String messagesId) {
-        return this.messagesReactRepository.findById(messagesId).map(MessagesDto::new);
+    public Mono<MessagesOutputDto> readById(String messagesId) {
+        return this.messagesReactRepository.findById(messagesId).map(MessagesOutputDto::new);
     }
 
     public Flux<MessagesDto> readAllMessagesByToUser(String toUserMobile) {
