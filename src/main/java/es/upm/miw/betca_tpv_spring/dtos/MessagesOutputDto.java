@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 public class MessagesOutputDto {
 
     private String id;
-    private String fromUserMobile;
-    private String toUserMobile;
+    private String fromUsername;
+    private String toUsername;
     private String messageContent;
     private LocalDateTime sentDate;
     private LocalDateTime readDate;
@@ -17,10 +17,10 @@ public class MessagesOutputDto {
         // Empty for framework
     }
 
-    public MessagesOutputDto(String id, String fromUserMobile, String toUserMobile, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+    public MessagesOutputDto(String id, String fromUsername, String toUsername, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
         this.id = id;
-        this.fromUserMobile = fromUserMobile;
-        this.toUserMobile = toUserMobile;
+        this.fromUsername = fromUsername;
+        this.toUsername = toUsername;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
         this.readDate = readDate;
@@ -28,8 +28,8 @@ public class MessagesOutputDto {
 
     public MessagesOutputDto(Messages messages) {
         this.id = messages.getId();
-        this.fromUserMobile = messages.getFromUser().getMobile();
-        this.toUserMobile = messages.getToUser().getMobile();
+        this.fromUsername = messages.getFromUser().getUsername();
+        this.toUsername = messages.getToUser().getUsername();
         this.messageContent = messages.getMessageContent();
         this.sentDate = messages.getSentDate();
         this.readDate = messages.getReadDate();
@@ -43,20 +43,20 @@ public class MessagesOutputDto {
         this.id = id;
     }
 
-    public String getFromUserMobile() {
-        return fromUserMobile;
+    public String getFromUsername() {
+        return fromUsername;
     }
 
-    public void setFromUserMobile(String fromUserMobile) {
-        this.fromUserMobile = fromUserMobile;
+    public void setFromUsername(String fromUsername) {
+        this.fromUsername = fromUsername;
     }
 
-    public String getToUserMobile() {
-        return toUserMobile;
+    public String getToUsername() {
+        return toUsername;
     }
 
-    public void setToUserMobile(String toUserMobile) {
-        this.toUserMobile = toUserMobile;
+    public void setToUsername(String toUsername) {
+        this.toUsername = toUsername;
     }
 
     public String getMessageContent() {
@@ -87,8 +87,8 @@ public class MessagesOutputDto {
     public String toString() {
         return "MessagesOutputDto{" +
                 "id='" + id + '\'' +
-                ", fromUserMobile='" + fromUserMobile + '\'' +
-                ", toUserMobile='" + toUserMobile + '\'' +
+                ", fromUsername='" + fromUsername + '\'' +
+                ", toUsername='" + toUsername + '\'' +
                 ", messageContent='" + messageContent + '\'' +
                 ", sentDate=" + sentDate +
                 ", readDate=" + readDate +

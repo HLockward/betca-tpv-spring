@@ -38,7 +38,7 @@ public class MessagesResourceIT {
 
     @Test
     void testReadAll() {
-        List<MessagesOutputDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesOutputDto> messagesOutputDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
                         .path(contextPath + MESSAGES)
                         .build())
@@ -51,30 +51,28 @@ public class MessagesResourceIT {
         int ItemsOfTheCollectionMessagesInTheSeederWeWantToCheck = 3;
         for (int i = 0; i < ItemsOfTheCollectionMessagesInTheSeederWeWantToCheck; i++) {
             String indexValue = String.valueOf(i + 1);
-            assertEquals(indexValue, messagesDtoList.get(i).getId());
-            assertEquals(String.valueOf(i + 666666001), messagesDtoList.get(i).getFromUserMobile());
-            assertEquals(String.valueOf(666666007), messagesDtoList.get(i).getToUserMobile());
-            assertEquals("Msg from " + indexValue + " to 7", messagesDtoList.get(i).getMessageContent());
-            assertNotNull(messagesDtoList.get(i).getSentDate());
+            assertEquals(indexValue, messagesOutputDtoList.get(i).getId());
+            assertEquals("Msg from " + indexValue + " to 7", messagesOutputDtoList.get(i).getMessageContent());
+            assertNotNull(messagesOutputDtoList.get(i).getSentDate());
         }
     }
 
     @Test
     void testReadById() {
         String idToLookFor = "1";
-        MessagesOutputDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+        MessagesOutputDto messagesOutputDto = this.restService.loginAdmin(webTestClient)
                 .get().uri(contextPath + MESSAGES + MESSAGES_ID, idToLookFor)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .returnResult().getResponseBody();
-        assertEquals(idToLookFor, messagesDtoResponse.getId());
-        assertEquals("666666001", messagesDtoResponse.getFromUserMobile());
-        assertEquals("666666007", messagesDtoResponse.getToUserMobile());
-        assertEquals("Msg from 1 to 7", messagesDtoResponse.getMessageContent());
-        assertEquals(fixedLdt, messagesDtoResponse.getSentDate());
-        assertEquals(fixedLdt.plusDays(1), messagesDtoResponse.getReadDate());
+        assertEquals(idToLookFor, messagesOutputDto.getId());
+        assertEquals("manager", messagesOutputDto.getFromUsername());
+        assertEquals("u007", messagesOutputDto.getToUsername());
+        assertEquals("Msg from 1 to 7", messagesOutputDto.getMessageContent());
+        assertEquals(fixedLdt, messagesOutputDto.getSentDate());
+        assertEquals(fixedLdt.plusDays(1), messagesOutputDto.getReadDate());
     }
 
     @Test
