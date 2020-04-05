@@ -3,7 +3,6 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.documents.Messages;
 import es.upm.miw.betca_tpv_spring.documents.User;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.UserMinimumDto;
 import es.upm.miw.betca_tpv_spring.repositories.MessagesReactRepository;
@@ -59,7 +58,7 @@ public class MessagesController {
                 .map(MessagesOutputDto::new));
     }
 
-    public Mono<MessagesDto> createMessage(MessagesCreationDto messagesCreationDto) {
+    public Mono<MessagesOutputDto> createMessage(MessagesCreationDto messagesCreationDto) {
         Messages messages = new Messages(
                 null,
                 null,
@@ -74,7 +73,7 @@ public class MessagesController {
         Mono<User> userTo = this.userReactRepository.findByMobile(messagesCreationDto.getToUserMobile())
                 .doOnNext(messages::setToUser);
         return Mono.when(userFrom, userTo, nextId)
-                .then(this.messagesReactRepository.save(messages).map(MessagesDto::new));
+                .then(this.messagesReactRepository.save(messages).map(MessagesOutputDto::new));
     }
 
     private Mono<Integer> nextIdMessages() {
@@ -83,11 +82,12 @@ public class MessagesController {
                 .switchIfEmpty(Mono.just(1));
     }
 
-    public Mono<MessagesDto> markMessageAsRead(String id, LocalDateTime ldtReadDate) {
+    public Mono<MessagesOutputDto> markMessageAsRead(String id, LocalDateTime ldtReadDate) {
         Mono<Messages> messagesMono = this.messagesReactRepository.findById(id).map(messages1 -> {
             messages1.setReadDate(ldtReadDate);
             return messages1;
         });
-        return Mono.when(messagesMono).then(this.messagesReactRepository.saveAll(messagesMono).next()).map(MessagesDto::new);
+        return Mono.when(messagesMono).then(this.messagesReactRepository.saveAll(messagesMono).next())
+                .map(MessagesOutputDto::new);
     }
 }

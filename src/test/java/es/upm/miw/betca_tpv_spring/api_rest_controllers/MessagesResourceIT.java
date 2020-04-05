@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
-import es.upm.miw.betca_tpv_spring.dtos.*;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,25 +158,25 @@ public class MessagesResourceIT {
                 "Msg",
                 fixedLdt.plusDays(6)
         );
-        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+        MessagesOutputDto messagesOutputDto = this.restService.loginAdmin(webTestClient)
                 .post().uri(contextPath + MESSAGES)
                 .body(BodyInserters.fromObject(messagesCreationDto))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(MessagesDto.class)
+                .expectBody(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .returnResult().getResponseBody();
-        assertEquals("666666000", messagesDtoResponse.getFromUser().getMobile());
-        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
-        assertEquals("Msg", messagesDtoResponse.getMessageContent());
-        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getSentDate());
-        assertNull(messagesDtoResponse.getReadDate());
+        assertEquals("all-roles", messagesOutputDto.getFromUsername());
+        assertEquals("u007", messagesOutputDto.getToUsername());
+        assertEquals("Msg", messagesOutputDto.getMessageContent());
+        assertEquals(fixedLdt.plusDays(6), messagesOutputDto.getSentDate());
+        assertNull(messagesOutputDto.getReadDate());
     }
 
     @Test
     void testMarkMessageAsRead() {
         String idToLookFor = "3";
-        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+        MessagesOutputDto messagesOutputDto = this.restService.loginAdmin(webTestClient)
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(contextPath + MESSAGES + MESSAGES_ID)
@@ -183,16 +184,14 @@ public class MessagesResourceIT {
                         .build(idToLookFor))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(MessagesDto.class)
+                .expectBody(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .returnResult().getResponseBody();
-        assertEquals(idToLookFor, messagesDtoResponse.getId());
-        assertNotNull(messagesDtoResponse.getFromUser());
-        assertEquals("666666003", messagesDtoResponse.getFromUser().getMobile());
-        assertNotNull(messagesDtoResponse.getToUser());
-        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
-        assertEquals("Msg from 3 to 7", messagesDtoResponse.getMessageContent());
-        assertEquals(fixedLdt.plusDays(4), messagesDtoResponse.getSentDate());
-        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getReadDate());
+        assertEquals(idToLookFor, messagesOutputDto.getId());
+        assertEquals("u003", messagesOutputDto.getFromUsername());
+        assertEquals("u007", messagesOutputDto.getToUsername());
+        assertEquals("Msg from 3 to 7", messagesOutputDto.getMessageContent());
+        assertEquals(fixedLdt.plusDays(4), messagesOutputDto.getSentDate());
+        assertEquals(fixedLdt.plusDays(6), messagesOutputDto.getReadDate());
     }
 }

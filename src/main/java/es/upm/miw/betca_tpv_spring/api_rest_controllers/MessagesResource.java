@@ -2,7 +2,6 @@ package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.MessagesController;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,13 +57,13 @@ public class MessagesResource {
     }
 
     @PostMapping
-    public Mono<MessagesDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
+    public Mono<MessagesOutputDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
         return this.messagesController.createMessage(messagesCreationDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @PutMapping(value = MESSAGES_ID)
-    public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
+    public Mono<MessagesOutputDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
         LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
         return this.messagesController.markMessageAsRead(id, ldtReadDate)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
