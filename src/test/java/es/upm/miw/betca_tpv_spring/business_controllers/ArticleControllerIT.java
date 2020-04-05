@@ -5,6 +5,7 @@ import es.upm.miw.betca_tpv_spring.documents.Tax;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleAdvancedSearchDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleSearchDto;
+import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.ConflictException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
@@ -35,7 +36,7 @@ class ArticleControllerIT {
 
     @BeforeEach
     void seed() {
-        this.articleDto = new ArticleDto("no exist", "descrip", "ref", BigDecimal.TEN, null);
+        this.articleDto = new ArticleDto("8400000002345", "descrip", "ref", BigDecimal.TEN, null);
     }
 
     @Test
@@ -131,6 +132,27 @@ class ArticleControllerIT {
                 )
                 .expectComplete()
                 .verify();
+    }
+
+   // @Test
+    void testCreateArticleWithCodeOutOfRange() {
+        StepVerifier
+                .create(this.articleController.createArticle(new ArticleDto("8400001092832","desc","ref",BigDecimal.TEN,5)))
+                .expectError(BadRequestException.class)
+                .verify();
+    }
+
+    //@Test
+    void testCreateArticleWithCodeRegenerated() {
+        ArticleDto articleDto = new ArticleDto("8403001092832","desc","ref",BigDecimal.TEN,5);
+        articleDto.setTax(Tax.SUPER_REDUCED);
+        StepVerifier
+                .create(this.articleController.createArticle(articleDto))
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+        this.articleRepository.deleteById(this.articleRepository.findFirstByOrderByCodeDesc().getCode());
+
     }
 
     @Test
