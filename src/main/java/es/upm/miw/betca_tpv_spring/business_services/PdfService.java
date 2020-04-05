@@ -1,12 +1,16 @@
 package es.upm.miw.betca_tpv_spring.business_services;
 
 import es.upm.miw.betca_tpv_spring.documents.*;
+import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
@@ -19,6 +23,9 @@ public class PdfService {
     private static final float[] TABLE_COLUMNS_SIZES_TICKETS = {15, 90, 15, 25, 35, 15};
     private static final float[] TABLE_COLUMNS_SIZES_BUDGETS = {15, 90, 15, 25, 35, 15};
     private static final float[] TABLE_COLUMNS_SIZES_INVOICES = {15, 90, 35, 15, 35};
+
+    public static final String USER_HOME = "user.home";
+    public static final String PDF_FILE_EXT = ".pdf";
 
     @Value("${miw.company.logo}")
     private String logo;
@@ -249,5 +256,15 @@ public class PdfService {
 
     public byte[] readPdf(String filepath) {
         return fileService.read(System.getProperty(PdfBuilder.USER_HOME) + filepath + PdfBuilder.PDF_FILE_EXT);
+    }
+
+    public byte[] getPdfFromTicketId(String ticketId) throws IOException {
+        final String path = "/tpv-pdfs/tickets/ticket-" + ticketId;
+        String filename = System.getProperty(USER_HOME) + path + PDF_FILE_EXT;
+        File file = new File(filename);
+        if(!file.exists()){
+            throw new NotFoundException("File with ticket id " +ticketId+" not found");
+        }
+        return Files.readAllBytes(file.toPath());
     }
 }
