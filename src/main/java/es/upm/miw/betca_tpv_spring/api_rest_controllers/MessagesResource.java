@@ -21,6 +21,7 @@ public class MessagesResource {
 
     public static final String MESSAGES = "/messages";
     public static final String MESSAGES_ID = "/{id}";
+    public static final String MY_MESSAGES = "/my-messages";
 
     private MessagesController messagesController;
 
@@ -51,6 +52,12 @@ public class MessagesResource {
     public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
         LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
         return this.messagesController.markMessageAsRead(id, ldtReadDate)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = MY_MESSAGES)
+    public Flux<MessagesDto> readAllMessagesByToUser(@RequestParam String toUserMobile) {
+        return this.messagesController.readAllMessagesByToUser(toUserMobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
