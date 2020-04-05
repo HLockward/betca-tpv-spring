@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES_ID;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MY_MESSAGES;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.UNREAD;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -150,7 +151,7 @@ public class MessagesResourceIT {
 
     @Test
     void testReadAllMessagesToUserAnotherUser() {
-        List<MessagesDto>  messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(contextPath + MESSAGES + MY_MESSAGES)
@@ -168,5 +169,47 @@ public class MessagesResourceIT {
         assertEquals("Msg from 7 to 1", messagesDtoList.get(0).getMessageContent());
         assertEquals(fixedLdt.plusDays(6), messagesDtoList.get(0).getSentDate());
         assertNull(messagesDtoList.get(0).getReadDate());
+    }
+
+    @Test
+    void testReadAllUnReadMessagesByToUser() {
+        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(contextPath + MESSAGES + MY_MESSAGES + UNREAD)
+                        .queryParam("toUserMobile", "666666002")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .value(list -> assertTrue(list.size() >= 1))
+                .returnResult().getResponseBody();
+        assertEquals("5", messagesDtoList.get(0).getId());
+        assertEquals(String.valueOf(666666007), messagesDtoList.get(0).getFromUser().getMobile());
+        assertEquals(String.valueOf(666666002), messagesDtoList.get(0).getToUser().getMobile());
+        assertEquals("Msg from 7 to 2", messagesDtoList.get(0).getMessageContent());
+        assertEquals(fixedLdt.plusDays(8), messagesDtoList.get(0).getSentDate());
+        assertNull(messagesDtoList.get(0).getReadDate());
+    }
+
+    @Test
+    void testReadAllUnReadMessagesByToUserCheckNoReads() {
+        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(contextPath + MESSAGES + MY_MESSAGES + UNREAD)
+                        .queryParam("toUserMobile", "666666007")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .value(list -> assertTrue(list.size() >= 1))
+                .returnResult().getResponseBody();
+        for (MessagesDto messagesDto : messagesDtoList) {
+            assertNotNull(messagesDto.getSentDate());
+            assertNull(messagesDto.getReadDate());
+        }
     }
 }
