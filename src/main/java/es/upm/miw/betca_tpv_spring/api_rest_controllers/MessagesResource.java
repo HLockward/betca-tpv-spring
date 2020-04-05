@@ -21,20 +21,15 @@ public class MessagesResource {
 
     public static final String MESSAGES = "/messages";
     public static final String MESSAGES_ID = "/{id}";
-    public static final String MY_MESSAGES = "/my-messages";
     public static final String UNREAD = "/unread";
+    public static final String TO_USER = "/to-user";
+    public static final String MOBILE = "/{toUserMobile}";
 
     private MessagesController messagesController;
 
     @Autowired
     public MessagesResource(MessagesController messagesController) {
         this.messagesController = messagesController;
-    }
-
-    @PostMapping
-    public Mono<MessagesDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
-        return this.messagesController.createMessage(messagesCreationDto)
-                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping
@@ -49,22 +44,28 @@ public class MessagesResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @PutMapping(value = MESSAGES_ID)
-    public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
-        LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
-        return this.messagesController.markMessageAsRead(id, ldtReadDate)
-                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-    }
-
-    @GetMapping(value = MY_MESSAGES)
-    public Flux<MessagesDto> readAllMessagesByToUser(@RequestParam String toUserMobile) {
+    @GetMapping(value = TO_USER + MOBILE)
+    public Flux<MessagesDto> readAllMessagesByToUser(@PathVariable String toUserMobile) {
         return this.messagesController.readAllMessagesByToUser(toUserMobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @GetMapping(value = MY_MESSAGES + UNREAD)
-    public Flux<MessagesDto> readAllUnReadMessagesByToUser(@RequestParam String toUserMobile) {
+    @GetMapping(value = TO_USER + MOBILE + UNREAD)
+    public Flux<MessagesDto> readAllUnReadMessagesByToUser(@PathVariable String toUserMobile) {
         return this.messagesController.readAllUnReadMessagesByToUser(toUserMobile)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PostMapping
+    public Mono<MessagesDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
+        return this.messagesController.createMessage(messagesCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PutMapping(value = MESSAGES_ID)
+    public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
+        LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
+        return this.messagesController.markMessageAsRead(id, ldtReadDate)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

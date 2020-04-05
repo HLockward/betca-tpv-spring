@@ -10,7 +10,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES_ID;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MY_MESSAGES;
+//import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MY_MESSAGES;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.TO_USER;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MOBILE;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.UNREAD;
 
 import java.time.LocalDateTime;
@@ -128,10 +130,7 @@ public class MessagesResourceIT {
     void testReadAllMessagesToUser() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(contextPath + MESSAGES + MY_MESSAGES)
-                        .queryParam("toUserMobile", "666666007")
-                        .build())
+                .uri(contextPath + MESSAGES + TO_USER + MOBILE, 666666007)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(MessagesDto.class)
@@ -153,10 +152,7 @@ public class MessagesResourceIT {
     void testReadAllMessagesToUserAnotherUser() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(contextPath + MESSAGES + MY_MESSAGES)
-                        .queryParam("toUserMobile", "666666001")
-                        .build())
+                .uri(contextPath + MESSAGES + TO_USER + MOBILE, 666666001)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(MessagesDto.class)
@@ -175,10 +171,7 @@ public class MessagesResourceIT {
     void testReadAllUnReadMessagesByToUser() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(contextPath + MESSAGES + MY_MESSAGES + UNREAD)
-                        .queryParam("toUserMobile", "666666002")
-                        .build())
+                .uri(contextPath + MESSAGES + TO_USER + MOBILE + UNREAD, 666666002)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(MessagesDto.class)
@@ -197,10 +190,7 @@ public class MessagesResourceIT {
     void testReadAllUnReadMessagesByToUserCheckNoReads() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(contextPath + MESSAGES + MY_MESSAGES + UNREAD)
-                        .queryParam("toUserMobile", "666666007")
-                        .build())
+                .uri(contextPath + MESSAGES + TO_USER + MOBILE + UNREAD, 666666007)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(MessagesDto.class)
