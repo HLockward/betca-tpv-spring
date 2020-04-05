@@ -19,7 +19,7 @@ public class CustomerDiscountResource {
 
     public static final String CUSTOMER_DISCOUNTS = "/customer-discounts";
     public static final String MOBILE_ID = "/{mobile}";
-    private static final String CUSTOMER_DISCOUNTS_ID = "/{customerDiscountId}";
+    public static final String CUSTOMER_DISCOUNTS_ID = "/{customerDiscountId}";
 
     private CustomerDiscountController customerDiscountController;
 
