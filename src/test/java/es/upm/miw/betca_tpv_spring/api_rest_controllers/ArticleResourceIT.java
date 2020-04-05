@@ -114,4 +114,12 @@ class ArticleResourceIT {
         ).exchange().expectStatus().isOk();
     }
 
+    @Test
+    void testSearchIncompletedArticles() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(uriBuilder -> uriBuilder
+                .path(contextPath + ARTICLES + SEARCH_INCOMPLETED_ARTICLES).build()
+        ).exchange().expectStatus().isOk();
+    }
+
 }
