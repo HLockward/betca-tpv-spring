@@ -23,6 +23,7 @@ public class ArticleResource {
     public static final String CODE_ID = "/{code}";
     public static final String SEARCH = "/search";
     public static final String ADVANCEDSEARCH = "/advancedSearch";
+    public static final String SEARCH_INCOMPLETED_ARTICLES = "/searchIncompletedArticles";
     private ArticleController articleController;
 
     @Autowired
@@ -75,6 +76,12 @@ public class ArticleResource {
         ArticleAdvancedSearchDto articleAdvancedSearchDto = new ArticleAdvancedSearchDto(description, reference, stock,
                 provider, price, Boolean.valueOf(discontinued));
         return this.articleController.searchArticleByDescriptionOrReferenceOrStockOrProviderOrRetailPriceOrDiscontinued(articleAdvancedSearchDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH_INCOMPLETED_ARTICLES)
+    public Flux<ArticleDto> searchIncompletedArticles() {
+        return this.articleController.searchIncompletedArticles()
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

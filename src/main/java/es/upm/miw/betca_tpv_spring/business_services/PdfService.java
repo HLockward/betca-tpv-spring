@@ -136,15 +136,17 @@ public class PdfService {
         return giftTicketReact.map(giftTicket -> {
             final String path = "/tpv-pdfs/tickets/gift-ticket-" + giftTicket.getId();
             PdfBuilder pdf = new PdfBuilder(path);
+            Ticket myTicket = giftTicket.getTicket();
             this.addHead(pdf);
             pdf.paragraphEmphasized("GIFT TICKET");
             pdf.barCode(giftTicket.getId()).line();
-            pdf.paragraphEmphasized(giftTicket.getTicket().getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            pdf.paragraphEmphasized(myTicket.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             PdfTableBuilder table = pdf.table(TABLE_COLUMNS_SIZES_TICKETS).tableColumnsHeader(TABLE_COLUMNS_HEADERS);
-            for (int i = 0; i < giftTicket.getTicket().getShoppingList().length; i++) {
-                Shopping shopping = giftTicket.getTicket().getShoppingList()[i];
+            for (int i = 0; i < myTicket.getShoppingList().length; i++) {
+                Shopping shopping = myTicket.getShoppingList()[i];
                 table.tableCell(String.valueOf(i + 1), shopping.getDescription(), "" + shopping.getAmount(), " - ", " - ", " - ");
             }
+            table.build();
             pdf.paragraph("Expiration date: " + giftTicket.getExpirationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             pdf.line().paragraphEmphasized("Message: " + giftTicket.getPersonalizedMessage())
                     .paragraphEmphasized(" ").line();
