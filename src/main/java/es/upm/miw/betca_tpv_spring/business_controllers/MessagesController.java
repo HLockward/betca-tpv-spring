@@ -77,4 +77,8 @@ public class MessagesController {
                 .filter(messages -> userMinimumDto.getMobile().equals(messages.getToUser().getMobile()))
                 .map(MessagesDto::new));
     }
+
+    public Flux<MessagesDto> readAllUnReadMessagesByToUser(String toUserMobile) {
+        return null;
+    }
 }
