@@ -36,37 +36,54 @@ public class BudgetController {
     }
 
     public Mono<BudgetDto> readBudget(String code) {
-        List<ShoppingDto> shoppingListDto = new ArrayList<>();
-
+        List<Mono<ShoppingDto>> listShoppingDtoMono = new ArrayList<>();
+        BudgetDto budgetDto = new BudgetDto();
         Mono<BudgetDto> budgetDtoMono = this.budgetReactRepository.findById(code).
                 switchIfEmpty(Mono.error(new NotFoundException("Not found" + code))).
-                map(BudgetDto::new);
+                map(BudgetDto::new).doOnNext(budget->{
+            budgetDto.setShoppingCart(budget.getShoppingCart());
+            budgetDto.setCreationDate(budget.getCreationDate());});
 
-        Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.flatMapIterable(BudgetDto::getShoppingCart);
+        Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.
+                map(budgetMap -> {
+                    budgetMap.getShoppingCart().forEach(shDto ->
+                            listShoppingDtoMono.add(getActualArticle(shDto))
+                    );
+                    return budgetMap;
+                })
+                .thenMany(Flux.merge(listShoppingDtoMono))
+                .distinct()
+                .map(shoppingDto -> new ShoppingDto(shoppingDto.getCode(), shoppingDto.getDescription(), shoppingDto.getRetailPrice(), shoppingDto.getAmount(), shoppingDto.getDiscount(), shoppingDto.getTotal(), shoppingDto.isCommitted()));
 
-        shoppingDtoFlux.toStream().forEach(shDto -> {
-            Mono<Article> article = this.articleReactRepository.findById(shDto.getCode());
-            Flux<Article> concat = Flux.concat(article);
-            concat.toStream().forEach(articleFor -> {
-                if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) < 0) {
+        return Mono.when(shoppingDtoFlux).then(
+                Mono.just(budgetDto));
+    }
+
+    private Mono<ShoppingDto> getActualArticle(ShoppingDto shDto){
+        ShoppingDto shoppingDtoReturn = new ShoppingDto();
+        Mono<Article> shoppingDtoMono= this.articleReactRepository.findById(shDto.getCode()).doOnNext(articleFor -> {
+            if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) < 0) {
+                shDto.setRetailPrice(articleFor.getRetailPrice());
+                shDto.setDiscount(BigDecimal.ZERO);
+                shDto.setTotal(articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount())));
+            } else if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) > 0) {
+                BigDecimal percent = new BigDecimal("100").subtract((shDto.getTotal().divide((articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount()))), MathContext.DECIMAL128).multiply(new BigDecimal("100"))));
+                BigDecimal newTotal = shDto.getTotal().subtract(shDto.getTotal().multiply(percent.divide(new BigDecimal("100"))));
+                if (shDto.getTotal().compareTo(newTotal) > 0) {
+                    shDto.setDiscount(percent);
                     shDto.setRetailPrice(articleFor.getRetailPrice());
-                    shDto.setDiscount(BigDecimal.ZERO);
-                    shDto.setTotal(articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount())));
-                } else if (articleFor.getRetailPrice().compareTo(shDto.getRetailPrice()) > 0) {
-                    BigDecimal percent = new BigDecimal("100").subtract((shDto.getTotal().divide((articleFor.getRetailPrice().multiply(new BigDecimal(shDto.getAmount()))), MathContext.DECIMAL128).multiply(new BigDecimal("100"))));
-                    BigDecimal newTotal = shDto.getTotal().subtract(shDto.getTotal().multiply(percent.divide(new BigDecimal("100"))));
-                    if (shDto.getTotal().compareTo(newTotal) >0) {
-                        shDto.setDiscount(percent);
-                        shDto.setRetailPrice(articleFor.getRetailPrice());
-                    }
                 }
-                shoppingListDto.add(shDto);
-            });
+            }
+            shoppingDtoReturn.setRetailPrice(shDto.getRetailPrice());
+            shoppingDtoReturn.setTotal(shDto.getTotal());
+            shoppingDtoReturn.setDiscount(shDto.getDiscount());
+            shoppingDtoReturn.setAmount(shDto.getAmount());
+            shoppingDtoReturn.setCode(shDto.getCode());
+            shoppingDtoReturn.setCommitted(shDto.isCommitted());
+            shoppingDtoReturn.setDescription(shDto.getDescription());
         });
 
-        return Mono.when(budgetDtoMono).then(budgetDtoMono.doOnNext(bb ->
-                bb.setShoppingCart(shoppingListDto)
-        ));
+        return Mono.when(shoppingDtoMono).then(Mono.just(shoppingDtoReturn));
     }
 
     public Mono<Budget> createBudget(BudgetCreationInputDto budgetCreationInputDto) {

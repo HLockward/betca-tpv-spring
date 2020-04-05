@@ -108,4 +108,12 @@ public class BudgetControllerIT {
                 .verify();
     }
 
+    @Test
+    void testReadBudgetNotFound() {
+        StepVerifier
+                .create(this.budgetController.readBudget( "notFound"))
+                .expectError(NotFoundException.class)
+                .verify();
+    }
+
 }
