@@ -156,6 +156,16 @@ class ArticleControllerIT {
     }
 
     @Test
+    void testCreateArticleWithCodeToLargeError() {
+        ArticleDto articleDto = new ArticleDto("840000000004875","desc","ref",BigDecimal.TEN,5);
+        StepVerifier
+                .create(this.articleController.createArticle(articleDto))
+                .expectError(BadRequestException.class)
+                .verify();
+
+    }
+
+    @Test
     void testSearchArticleByDescriptionOrProvider() {
         ArticleSearchDto articleSearchDto = new ArticleSearchDto("null", this.providerRepository.findAll().get(1).getId());
         StepVerifier
