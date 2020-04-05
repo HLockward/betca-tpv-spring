@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MESSAGES_ID;
-//import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MY_MESSAGES;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.TO_USER;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.MOBILE;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.MessagesResource.UNREAD;
@@ -97,56 +96,56 @@ public class MessagesResourceIT {
 
     @Test
     void testReadAllMessagesByToUserAnotherUser() {
-        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesOutputDto> messagesOutputDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(contextPath + MESSAGES + TO_USER + MOBILE, 666666001)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(MessagesDto.class)
+                .expectBodyList(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .value(list -> assertTrue(list.size() >= 1))
                 .returnResult().getResponseBody();
-        assertEquals("4", messagesDtoList.get(0).getId());
-        assertEquals(String.valueOf(666666007), messagesDtoList.get(0).getFromUser().getMobile());
-        assertEquals(String.valueOf(666666001), messagesDtoList.get(0).getToUser().getMobile());
-        assertEquals("Msg from 7 to 1", messagesDtoList.get(0).getMessageContent());
-        assertEquals(fixedLdt.plusDays(6), messagesDtoList.get(0).getSentDate());
-        assertNull(messagesDtoList.get(0).getReadDate());
+        assertEquals("4", messagesOutputDtoList.get(0).getId());
+        assertEquals("u007", messagesOutputDtoList.get(0).getFromUsername());
+        assertEquals("manager", messagesOutputDtoList.get(0).getToUsername());
+        assertEquals("Msg from 7 to 1", messagesOutputDtoList.get(0).getMessageContent());
+        assertEquals(fixedLdt.plusDays(6), messagesOutputDtoList.get(0).getSentDate());
+        assertNull(messagesOutputDtoList.get(0).getReadDate());
     }
 
     @Test
     void testReadAllUnReadMessagesByToUser() {
-        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesOutputDto> messagesOutputDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(contextPath + MESSAGES + TO_USER + MOBILE + UNREAD, 666666002)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(MessagesDto.class)
+                .expectBodyList(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .value(list -> assertTrue(list.size() >= 1))
                 .returnResult().getResponseBody();
-        assertEquals("5", messagesDtoList.get(0).getId());
-        assertEquals(String.valueOf(666666007), messagesDtoList.get(0).getFromUser().getMobile());
-        assertEquals(String.valueOf(666666002), messagesDtoList.get(0).getToUser().getMobile());
-        assertEquals("Msg from 7 to 2", messagesDtoList.get(0).getMessageContent());
-        assertEquals(fixedLdt.plusDays(8), messagesDtoList.get(0).getSentDate());
-        assertNull(messagesDtoList.get(0).getReadDate());
+        assertEquals("5", messagesOutputDtoList.get(0).getId());
+        assertEquals("u007", messagesOutputDtoList.get(0).getFromUsername());
+        assertEquals("u002", messagesOutputDtoList.get(0).getToUsername());
+        assertEquals("Msg from 7 to 2", messagesOutputDtoList.get(0).getMessageContent());
+        assertEquals(fixedLdt.plusDays(8), messagesOutputDtoList.get(0).getSentDate());
+        assertNull(messagesOutputDtoList.get(0).getReadDate());
     }
 
     @Test
     void testReadAllUnReadMessagesByToUserCheckNoReads() {
-        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesOutputDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(contextPath + MESSAGES + TO_USER + MOBILE + UNREAD, 666666007)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(MessagesDto.class)
+                .expectBodyList(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .value(list -> assertTrue(list.size() >= 1))
                 .returnResult().getResponseBody();
-        for (MessagesDto messagesDto : messagesDtoList) {
-            assertNotNull(messagesDto.getSentDate());
-            assertNull(messagesDto.getReadDate());
+        for (MessagesOutputDto messagesOutputDto : messagesDtoList) {
+            assertNotNull(messagesOutputDto.getSentDate());
+            assertNull(messagesOutputDto.getReadDate());
         }
     }
 
