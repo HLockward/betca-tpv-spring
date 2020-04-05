@@ -28,6 +28,36 @@ public class MessagesController {
 
     }
 
+    public Flux<MessagesDto> readAll() {
+        return this.messagesReactRepository.findAll().map(MessagesDto::new);
+    }
+
+    public Mono<MessagesDto> readById(String messagesId) {
+        return this.messagesReactRepository.findById(messagesId).map(MessagesDto::new);
+    }
+
+    public Flux<MessagesDto> readAllMessagesByToUser(String toUserMobile) {
+        UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
+        return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
+            userMinimumDto.setMobile(user.getMobile());
+            return user;
+        }).thenMany(this.messagesReactRepository.findAll()
+                .filter(messages -> userMinimumDto.getMobile().equals(messages.getToUser().getMobile()))
+                .map(MessagesDto::new));
+    }
+
+    public Flux<MessagesDto> readAllUnReadMessagesByToUser(String toUserMobile) {
+        UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
+        return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
+            userMinimumDto.setMobile(user.getMobile());
+            return user;
+        }).thenMany(this.messagesReactRepository.findAll()
+                .filter(messages ->
+                        userMinimumDto.getMobile().equals(messages.getToUser().getMobile())
+                                && messages.getReadDate() == null)
+                .map(MessagesDto::new));
+    }
+
     public Mono<MessagesDto> createMessage(MessagesCreationDto messagesCreationDto) {
         Messages messages = new Messages(
                 null,
@@ -52,41 +82,11 @@ public class MessagesController {
                 .switchIfEmpty(Mono.just(1));
     }
 
-    public Flux<MessagesDto> readAll() {
-        return this.messagesReactRepository.findAll().map(MessagesDto::new);
-    }
-
-    public Mono<MessagesDto> readById(String messagesId) {
-        return this.messagesReactRepository.findById(messagesId).map(MessagesDto::new);
-    }
-
     public Mono<MessagesDto> markMessageAsRead(String id, LocalDateTime ldtReadDate) {
         Mono<Messages> messagesMono = this.messagesReactRepository.findById(id).map(messages1 -> {
             messages1.setReadDate(ldtReadDate);
             return messages1;
         });
         return Mono.when(messagesMono).then(this.messagesReactRepository.saveAll(messagesMono).next()).map(MessagesDto::new);
-    }
-
-    public Flux<MessagesDto> readAllMessagesByToUser(String toUserMobile) {
-        UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
-        return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
-            userMinimumDto.setMobile(user.getMobile());
-            return user;
-        }).thenMany(this.messagesReactRepository.findAll()
-                .filter(messages -> userMinimumDto.getMobile().equals(messages.getToUser().getMobile()))
-                .map(MessagesDto::new));
-    }
-
-    public Flux<MessagesDto> readAllUnReadMessagesByToUser(String toUserMobile) {
-        UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
-        return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
-            userMinimumDto.setMobile(user.getMobile());
-            return user;
-        }).thenMany(this.messagesReactRepository.findAll()
-                .filter(messages ->
-                        userMinimumDto.getMobile().equals(messages.getToUser().getMobile())
-                        && messages.getReadDate() == null)
-                .map(MessagesDto::new));
     }
 }

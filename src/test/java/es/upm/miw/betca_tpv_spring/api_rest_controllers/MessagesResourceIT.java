@@ -60,30 +60,7 @@ public class MessagesResourceIT {
     }
 
     @Test
-    void testCreateMessage() {
-        MessagesCreationDto messagesCreationDto = new MessagesCreationDto(
-                "666666000",
-                "666666007",
-                "Msg",
-                fixedLdt.plusDays(6)
-        );
-        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
-                .post().uri(contextPath + MESSAGES)
-                .body(BodyInserters.fromObject(messagesCreationDto))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(MessagesDto.class)
-                .value(Assertions::assertNotNull)
-                .returnResult().getResponseBody();
-        assertEquals("666666000", messagesDtoResponse.getFromUser().getMobile());
-        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
-        assertEquals("Msg", messagesDtoResponse.getMessageContent());
-        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getSentDate());
-        assertNull(messagesDtoResponse.getReadDate());
-    }
-
-    @Test
-    void testReadMessage() {
+    void testReadById() {
         String idToLookFor = "1";
         MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
                 .get().uri(contextPath + MESSAGES + MESSAGES_ID, idToLookFor)
@@ -103,31 +80,7 @@ public class MessagesResourceIT {
     }
 
     @Test
-    void testMarkMessageAsRead() {
-        String idToLookFor = "3";
-        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(contextPath + MESSAGES + MESSAGES_ID)
-                        .queryParam("readDate", fixedLdt.plusDays(6).toString())
-                        .build(idToLookFor))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(MessagesDto.class)
-                .value(Assertions::assertNotNull)
-                .returnResult().getResponseBody();
-        assertEquals(idToLookFor, messagesDtoResponse.getId());
-        assertNotNull(messagesDtoResponse.getFromUser());
-        assertEquals("666666003", messagesDtoResponse.getFromUser().getMobile());
-        assertNotNull(messagesDtoResponse.getToUser());
-        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
-        assertEquals("Msg from 3 to 7", messagesDtoResponse.getMessageContent());
-        assertEquals(fixedLdt.plusDays(4), messagesDtoResponse.getSentDate());
-        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getReadDate());
-    }
-
-    @Test
-    void testReadAllMessagesToUser() {
+    void testReadAllMessagesByToUser() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(contextPath + MESSAGES + TO_USER + MOBILE, 666666007)
@@ -149,7 +102,7 @@ public class MessagesResourceIT {
     }
 
     @Test
-    void testReadAllMessagesToUserAnotherUser() {
+    void testReadAllMessagesByToUserAnotherUser() {
         List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get()
                 .uri(contextPath + MESSAGES + TO_USER + MOBILE, 666666001)
@@ -201,5 +154,52 @@ public class MessagesResourceIT {
             assertNotNull(messagesDto.getSentDate());
             assertNull(messagesDto.getReadDate());
         }
+    }
+
+    @Test
+    void testCreateMessage() {
+        MessagesCreationDto messagesCreationDto = new MessagesCreationDto(
+                "666666000",
+                "666666007",
+                "Msg",
+                fixedLdt.plusDays(6)
+        );
+        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+                .post().uri(contextPath + MESSAGES)
+                .body(BodyInserters.fromObject(messagesCreationDto))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .returnResult().getResponseBody();
+        assertEquals("666666000", messagesDtoResponse.getFromUser().getMobile());
+        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("Msg", messagesDtoResponse.getMessageContent());
+        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getSentDate());
+        assertNull(messagesDtoResponse.getReadDate());
+    }
+
+    @Test
+    void testMarkMessageAsRead() {
+        String idToLookFor = "3";
+        MessagesDto messagesDtoResponse = this.restService.loginAdmin(webTestClient)
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(contextPath + MESSAGES + MESSAGES_ID)
+                        .queryParam("readDate", fixedLdt.plusDays(6).toString())
+                        .build(idToLookFor))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MessagesDto.class)
+                .value(Assertions::assertNotNull)
+                .returnResult().getResponseBody();
+        assertEquals(idToLookFor, messagesDtoResponse.getId());
+        assertNotNull(messagesDtoResponse.getFromUser());
+        assertEquals("666666003", messagesDtoResponse.getFromUser().getMobile());
+        assertNotNull(messagesDtoResponse.getToUser());
+        assertEquals("666666007", messagesDtoResponse.getToUser().getMobile());
+        assertEquals("Msg from 3 to 7", messagesDtoResponse.getMessageContent());
+        assertEquals(fixedLdt.plusDays(4), messagesDtoResponse.getSentDate());
+        assertEquals(fixedLdt.plusDays(6), messagesDtoResponse.getReadDate());
     }
 }
