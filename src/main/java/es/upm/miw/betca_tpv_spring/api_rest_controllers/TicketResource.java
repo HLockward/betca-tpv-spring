@@ -4,7 +4,9 @@ import es.upm.miw.betca_tpv_spring.business_controllers.TicketController;
 import es.upm.miw.betca_tpv_spring.documents.Ticket;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.TicketPatchDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
+import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -83,5 +85,13 @@ public class TicketResource {
     public Flux<TicketOutputDto> searchNotCommittedByTag(@PathVariable String tag) {
         return this.ticketController.searchNotCommittedByTag(tag)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PatchMapping(value = TICKET_ID)
+    public Mono<TicketOutputDto> updateAmountAndShoppingStateTicket(@PathVariable String id, @RequestBody TicketPatchDto ticketPatchDto){
+        if (ticketPatchDto.getShoppingPatchDtoList().size() == 0) {
+            return Mono.error(new BadRequestException("Empty ShoppingList"));
+        }
+        return this.ticketController.updateShoppingTicket(id, ticketPatchDto);
     }
 }
