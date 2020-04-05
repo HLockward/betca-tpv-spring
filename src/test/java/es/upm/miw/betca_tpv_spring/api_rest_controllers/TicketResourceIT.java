@@ -222,17 +222,6 @@ class TicketResourceIT {
     }
 
     @Test
-    void testGetPdf() {
-        byte[] file = this.restService.loginAdmin(webTestClient)
-                .get().uri(contextPath + TICKETS + "/201901121" + PDF)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(byte[].class)
-                .returnResult().getResponseBody();
-        assertNotNull(file);
-    }
-
-    @Test
     void testGetPdfNotFound() {
         this.restService.loginAdmin(webTestClient)
                 .get().uri(contextPath + TICKETS + "/99999999" + PDF)
