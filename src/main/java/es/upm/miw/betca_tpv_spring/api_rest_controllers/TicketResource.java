@@ -31,6 +31,7 @@ public class TicketResource {
     public static final String SEARCH_BY_ARTICLE = SEARCH + "/article/{articleId}";
     public static final String SEARCH_BY_ORDER = SEARCH + "/order/{orderId}";
     public static final String SEARCH_BY_TAG = SEARCH + "/tag/{tag}";
+    public static final String SEARCH_BY_GIFT_TICKET_REFERENCE = SEARCH + "/giftTicket/{giftTicketReference}";
 
     private TicketController ticketController;
 
@@ -59,6 +60,12 @@ public class TicketResource {
     @GetMapping(value = TICKET_ID)
     public Mono<TicketOutputDto> getTicket(@PathVariable String id) {
         return this.ticketController.getTicket(id);
+    }
+
+    @GetMapping(value = SEARCH_BY_GIFT_TICKET_REFERENCE)
+    public Mono<Ticket> searchByGiftTicketReference(@PathVariable String giftTicketReference) {
+        return this.ticketController.searchByGiftTicketReference(giftTicketReference)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping(value = SEARCH)
