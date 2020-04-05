@@ -5,7 +5,6 @@ import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class DatabaseSeederService {
@@ -50,6 +48,7 @@ public class DatabaseSeederService {
     private SendingsRepository sendingsRepository;
     private StaffRepository staffRepository;
     private StockAlarmRepository stockAlarmRepository;
+    private MessagesRepository messagesRepository;
 
     @Autowired
     public DatabaseSeederService(
@@ -72,7 +71,8 @@ public class DatabaseSeederService {
             CustomerPointsRepository customerPointsRepository,
             SendingsRepository sendingsRepository,
             StaffRepository staffRepository,
-            StockAlarmRepository stockAlarmRepository
+            StockAlarmRepository stockAlarmRepository,
+            MessagesRepository messagesRepository
     ) {
         this.ticketRepository = ticketRepository;
         this.giftTicketRepository = giftTicketRepository;
@@ -94,6 +94,7 @@ public class DatabaseSeederService {
         this.sendingsRepository = sendingsRepository;
         this.staffRepository = staffRepository;
         this.stockAlarmRepository = stockAlarmRepository;
+        this.messagesRepository = messagesRepository;
     }
 
     @PostConstruct
@@ -148,6 +149,7 @@ public class DatabaseSeederService {
         this.ticketRepository.deleteAll();
         this.giftTicketRepository.deleteAll();
         this.articleRepository.deleteAll();
+        this.messagesRepository.deleteAll();
 
         this.cashierClosureRepository.deleteAll();
         this.providerRepository.deleteAll();
@@ -169,11 +171,6 @@ public class DatabaseSeederService {
     public void seedDataBaseJava() {
         LogManager.getLogger(this.getClass()).warn("------- Initial Load from JAVA -----------");
         Role[] allRoles = {Role.ADMIN, Role.MANAGER, Role.OPERATOR};
-        List<Messages> messagesList = new ManagedList<>();
-        LocalDateTime sentTime = LocalDateTime.of(2020, 3, 13, 9, 0, 0);
-        LocalDateTime readTime = LocalDateTime.of(2020, 3, 14, 9, 0, 0);
-        messagesList.add(new Messages("666666002", "666666007","Message fromm 2 to 7", sentTime, readTime));
-        messagesList.add(new Messages("666666003", "666666007","Message fromm 3 to 7", sentTime.plusDays(1), readTime.plusDays(1)));
         User[] users = {
                 User.builder().mobile("666666000").username("all-roles").password("p000").dni(null).address("C/TPV, 0, MIW").email("u000@gmail.com").roles(allRoles).build(),
                 User.builder().mobile("666666001").username("manager").password("p001").dni("66666601C").address("C/TPV, 1").email("u001@gmail.com").roles(Role.MANAGER).build(),
@@ -182,8 +179,7 @@ public class DatabaseSeederService {
                 User.builder().mobile("666666004").username("u004").password("p004").dni("66666604T").address("C/TPV, 4").email("u004@gmail.com").roles(Role.CUSTOMER).build(),
                 User.builder().mobile("666666005").username("u005").password("p005").dni("66666605R").address("C/TPV, 5").email("u005@gmail.com").roles(Role.CUSTOMER).build(),
                 User.builder().mobile("666666006").username("u006").password("p006").dni("66666606W").address(null).email("u006@gmail.com").roles(Role.CUSTOMER).build(),
-                User.builder().mobile("666666007").username("u007").password("p007").dni("66666607W").address("C/TPV, 7").email("u007@gmail.com")
-                        .roles(Role.OPERATOR).messagesList(messagesList).build(),
+                User.builder().mobile("666666007").username("u007").password("p007").dni("66666607W").address("C/TPV, 7").email("u007@gmail.com").roles(Role.OPERATOR).build(),
         };
         this.userRepository.saveAll(Arrays.asList(users));
         LogManager.getLogger(this.getClass()).warn("        ------- users");
@@ -261,17 +257,17 @@ public class DatabaseSeederService {
         };
         Ticket[] tickets = {
                 new Ticket(1, BigDecimal.TEN, new BigDecimal("25.0"), BigDecimal.ZERO,
-                        new Shopping[]{shoppingList[0], shoppingList[1]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[0], shoppingList[1]}, users[4], "note", null),
                 new Ticket(2, new BigDecimal("18.0"), BigDecimal.ZERO, BigDecimal.ZERO,
-                        new Shopping[]{shoppingList[2]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[2]}, users[4], "note", null),
                 new Ticket(3, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note", null),
                 new Ticket(4, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, null, "note", null),
                 new Ticket(5, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[5], "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[5], "note", null),
                 new Ticket(6, BigDecimal.ZERO, new BigDecimal("16.18"), new BigDecimal("5"),
-                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[4], "note",null),
+                        new Shopping[]{shoppingList[3], shoppingList[4]}, users[4], "note", null),
         };
         tickets[0].setId("201901121");
         tickets[1].setId("201901122");
@@ -288,10 +284,20 @@ public class DatabaseSeederService {
         };
         this.giftTicketRepository.saveAll(Arrays.asList(giftTickets));
         LogManager.getLogger(this.getClass()).warn("        ------- gift-tickets");
+        LocalDateTime fixedLdt = LocalDateTime.of(2020, 4, 1, 1, 1, 1);
+        Messages[] messagesArray = {
+                new Messages("1", users[1], users[7], "Msg from 1 to 7", fixedLdt, fixedLdt.plusDays(1)),
+                new Messages("2", users[2], users[7], "Msg from 2 to 7", fixedLdt.plusDays(2), fixedLdt.plusDays(3)),
+                new Messages("3", users[3], users[7], "Msg from 3 to 7", fixedLdt.plusDays(4), null),
+                new Messages("4", users[7], users[1], "Msg from 7 to 1", fixedLdt.plusDays(6), null),
+                new Messages("5", users[7], users[2], "Msg from 7 to 2", fixedLdt.plusDays(8), null),
+        };
+        this.messagesRepository.saveAll(Arrays.asList(messagesArray));
+        LogManager.getLogger(this.getClass()).warn("        ------- messages");
         Invoice[] invoices = {
                 new Invoice(1, users[4], tickets[1]),
                 new Invoice(2, users[5], tickets[5]),
-                new Invoice(3, users[4], tickets[4])
+                new Invoice(3, users[4], tickets[4]),
         };
         invoices[1].setTax(new BigDecimal("0.0368"));
         invoices[1].setBaseTax(new BigDecimal("0.6624"));

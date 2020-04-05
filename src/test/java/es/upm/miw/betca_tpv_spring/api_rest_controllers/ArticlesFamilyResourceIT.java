@@ -1,10 +1,13 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
+import es.upm.miw.betca_tpv_spring.documents.ArticlesFamily;
+import es.upm.miw.betca_tpv_spring.documents.FamilyComposite;
 import es.upm.miw.betca_tpv_spring.documents.FamilyType;
-import es.upm.miw.betca_tpv_spring.dtos.ArticlesFamilyDto;
-import es.upm.miw.betca_tpv_spring.dtos.FamilyCompleteDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.ProviderDto;
+import es.upm.miw.betca_tpv_spring.dtos.*;
+import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
+import es.upm.miw.betca_tpv_spring.repositories.ArticlesFamilyRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,11 +15,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.List;
+import java.util.Optional;
 
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.ARTICLES_FAMILY;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.FAMILY_COMPOSITE;
+import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.*;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ProviderResource.PROVIDERS;
-import static es.upm.miw.betca_tpv_spring.api_rest_controllers.ArticlesFamilyResource.SIZES;
 import static org.junit.Assert.*;
 
 @ApiTestConfig
@@ -28,9 +30,27 @@ public class ArticlesFamilyResourceIT {
     @Autowired
     private WebTestClient webTestClient;
 
+    @Autowired
+    private ArticlesFamilyRepository articlesFamilyRepository;
+
+    @Autowired
+    private ArticleRepository articleRepository;
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
+    private ArticlesFamily familyComposite = new FamilyComposite(FamilyType.ARTICLES,
+            "reference",
+            "description");
+
+    private String[] articlesFamilyIdList;
+
+    @BeforeEach
+    void fillArticlesFamilyList(){
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(0));
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(9));
+        this.familyComposite.add(this.articlesFamilyRepository.findAll().get(12));
+    }
 
     @Test
     void testReadInFamilyCompositeVarios() {
@@ -157,4 +177,110 @@ public class ArticlesFamilyResourceIT {
         assertNotNull(sizes);
         assertTrue(sizes.size()>0);
     }
+
+    @Test
+    void testSearchArticlesFamilyById(){
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCrudDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testReadAllArticlesFamily() {
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + ARTICLES_FAMILY)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticle(){
+        this.restService.loginAdmin(webTestClient)
+                .post().uri(contextPath + ARTICLES_FAMILY + CREATE_ARTICLES_FAMILY)
+                .body(
+                        BodyInserters.fromObject(
+                                new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa de hombre", "ropa para hombre", null,"8400000000024")
+                        )
+                ).exchange().expectStatus().isOk().expectBody(ArticlesFamilyDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testCreateArticlesFamilyTypeArticles(){
+
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId(),
+                this.familyComposite.getArticlesFamilyList().get(2).getId()
+        };
+        this.restService.loginAdmin(webTestClient)
+                .post().uri(contextPath + ARTICLES_FAMILY + CREATE_ARTICLES_FAMILY)
+                .body(
+                        BodyInserters.fromObject(
+                                new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa de hombre", "ropa para hombre", articlesFamilyListId,null)
+                        )
+                ).exchange().expectStatus().isOk().expectBody(ArticlesFamilyCreationDto.class)
+                .value(Assertions::assertNotNull);
+    }
+
+    @Test
+    void testUpdateArticlesFamilyTypeArticle(){
+        String id = this.familyComposite.getArticlesFamilyList().get(0).getId();
+
+        ArticlesFamilyCrudDto articlesFamilyCrudDto = this.restService.loginAdmin(webTestClient)
+                .put().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .body(BodyInserters.fromObject(
+                        new ArticlesFamilyCreationDto(FamilyType.ARTICLE, "ropa vieja", null, null, "8400000000024")
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCrudDto.class)
+                .returnResult().getResponseBody();
+
+        ArticlesFamily articlesFamily = this.articlesFamilyRepository.findById(id).get();
+        assertEquals(articlesFamily.getId(), articlesFamilyCrudDto.getId());
+        assertEquals(articlesFamily.getReference(), articlesFamilyCrudDto.getReference());
+        assertEquals(articlesFamily.getArticle(), articlesFamilyCrudDto.getArticle());
+    }
+
+    @Test
+    void testUpdateArticlesFamilyTypeArticles(){
+        String id = this.familyComposite.getArticlesFamilyList().get(2).getId();
+        String[] articlesFamilyListId = {
+                this.familyComposite.getArticlesFamilyList().get(0).getId(),
+                this.familyComposite.getArticlesFamilyList().get(1).getId()
+        };
+        ArticlesFamilyCreationDto articlesFamilyCreationDto = this.restService.loginAdmin(webTestClient)
+                .put().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .body(BodyInserters.fromObject(
+                        new ArticlesFamilyCreationDto(FamilyType.ARTICLES, "ropa vieja", "description", articlesFamilyListId, null)
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArticlesFamilyCreationDto.class)
+                .returnResult().getResponseBody();
+
+        ArticlesFamily articlesFamily = this.articlesFamilyRepository.findById(id).get();
+        assertEquals(articlesFamily.getId(), articlesFamilyCreationDto.getId());
+        assertEquals(articlesFamily.getReference(), articlesFamilyCreationDto.getReference());
+        assertEquals(articlesFamily.getArticlesFamilyList().size(), articlesFamilyListId.length);
+        assertEquals(articlesFamily.getArticlesFamilyList().get(0).getId(), articlesFamilyListId[0]);
+        assertEquals(articlesFamily.getArticlesFamilyList().get(1).getId(), articlesFamilyListId[1]);
+    }
+
+    @Test
+    void testDeleteArticleFamilyById(){
+        String id = this.familyComposite.getArticlesFamilyList().get(2).getId();
+        this.restService.loginAdmin(webTestClient)
+                .delete().uri(contextPath + ARTICLES_FAMILY +"/"+ id)
+                .exchange()
+                .expectStatus().isOk();
+        assertEquals(Optional.empty(), this.articlesFamilyRepository.findById(id));
+    }
+
+
 }

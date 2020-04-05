@@ -1,27 +1,28 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
+import es.upm.miw.betca_tpv_spring.business_services.FileService;
 import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
-import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.QuarterVATDto;
+import es.upm.miw.betca_tpv_spring.dtos.TaxDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.InvoiceReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketReactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.swing.text.DefaultEditorKit;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,16 +31,27 @@ import java.util.stream.Stream;
 @Controller
 public class InvoiceController {
 
+    @Value("${miw.tax.general}")
+    private Double generalTax;
+    @Value("${miw.tax.reduced}")
+    private Double reducedTax;
+    @Value("${miw.tax.super.reduced}")
+    private Double superReducedTax;
+    @Value("${miw.invoices.filepath}")
+    private String invoiceFilePath;
+
     private PdfService pdfService;
     private InvoiceReactRepository invoiceReactRepository;
     private TicketReactRepository ticketReactRepository;
     private ArticleReactRepository articleReactRepository;
 
+
     @Autowired
     public InvoiceController(PdfService pdfService,
                              InvoiceReactRepository invoiceReactRepository,
                              TicketReactRepository ticketReactRepository,
-                             ArticleReactRepository articleReactRepository) {
+                             ArticleReactRepository articleReactRepository,
+                             FileService fileService) {
         this.pdfService = pdfService;
         this.invoiceReactRepository = invoiceReactRepository;
         this.ticketReactRepository = ticketReactRepository;
@@ -103,15 +115,10 @@ public class InvoiceController {
     }
 
     @Transactional
-    public Mono<byte[]> updateAndPdf(String id) {
-        return pdfService.generateInvoice(this.updateInvoice(id));
-    }
-
-    private Mono<Invoice> updateInvoice(String id) {
+    public Mono<byte[]> getPdf(String id) {
         return invoiceReactRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Invoice(" + id + ")")))
-                .flatMap(invoice -> this.calculateBaseAndTax(invoice, invoice.getTicket().getShoppingList()))
-                .flatMap(invoice -> invoiceReactRepository.save(invoice));
+                .map(invoice -> pdfService.readPdf(invoiceFilePath + "invoice-" + id));
     }
 
     private Mono<Invoice> calculateBaseAndTax(Invoice invoice, Shopping[] shoppingList) {
@@ -169,18 +176,63 @@ public class InvoiceController {
 
     }
 
-    public Flux<InvoiceOutputDto> readAll() {
+    public Flux<InvoiceOutputDto> getAll() {
         return invoiceReactRepository.findAll()
                 .map(InvoiceOutputDto::new);
     }
 
-    public Flux<InvoiceOutputDto> readAllByFilters(InvoiceFilterDto invoiceFilterDto) {
-        LocalDate fromDate = invoiceFilterDto.getFromDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getFromDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate toDate = invoiceFilterDto.getToDate().isEmpty() ? null : LocalDate.parse(invoiceFilterDto.getToDate(), DateTimeFormatter.ISO_DATE);
+    public Flux<InvoiceOutputDto> readAllByFilters(String mobile, LocalDate fromDate, LocalDate toDate) {
         return invoiceReactRepository.findAll()
-                .filter(invoice -> (invoiceFilterDto.getMobile() == null || invoiceFilterDto.getMobile() == "" || invoice.getUser().getMobile().equals(invoiceFilterDto.getMobile()))
-                && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
-                && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) < 0))
+                .filter(invoice -> ((mobile == null || mobile.equals("")) || invoice.getUser().getMobile().equals(mobile))
+                        && (fromDate == null || invoice.getCreationDate().toLocalDate().compareTo(fromDate) >= 0)
+                        && (toDate == null || invoice.getCreationDate().toLocalDate().compareTo(toDate) <= 0))
                 .map(InvoiceOutputDto::new);
+    }
+
+    public Mono<QuarterVATDto> readQuarterlyVat(Quarter quarter) {
+        QuarterVATDto quarterVATDto = new QuarterVATDto(quarter, new TaxDto(Tax.GENERAL, generalTax), new TaxDto(Tax.REDUCED, reducedTax), new TaxDto(Tax.SUPER_REDUCED, superReducedTax));
+        Flux<Shopping[]> shoppingFlux = this.invoiceReactRepository.findAll()
+                .filter(invoice -> quarter.getQuarterFromDate(invoice.getCreationDate()).equals(quarter))
+                .map(invoice -> invoice.getTicket().getShoppingList());
+        Flux<ShoppingLine> shoppingLineFlux = shoppingFlux
+                .flatMap(shoppings -> this.convertShoppingArrayToShoppingLineFlux(shoppings));
+        Flux<ShoppingLine> finalFlux = shoppingLineFlux
+                .map(shoppingLine -> addVatToDtoFromShoppingLine(quarterVATDto, shoppingLine));
+        return Mono.when(finalFlux).then(Mono.just(quarterVATDto));
+    }
+
+    private ShoppingLine addVatToDtoFromShoppingLine(QuarterVATDto quarterVATDto, ShoppingLine shoppingLine) {
+        if (shoppingLine.getTax().compareTo(Tax.GENERAL) == 0) {
+            quarterVATDto.getTaxes().get(0).setTaxableAmount(quarterVATDto.getTaxes().get(0).getTaxableAmount().add(shoppingLine.getTaxableAmount()));
+            quarterVATDto.getTaxes().get(0).setVat(quarterVATDto.getTaxes().get(0).getVat().add(shoppingLine.getVat()));
+        } else if (shoppingLine.getTax().compareTo(Tax.REDUCED) == 0) {
+            quarterVATDto.getTaxes().get(1).setTaxableAmount(quarterVATDto.getTaxes().get(1).getTaxableAmount().add(shoppingLine.getTaxableAmount()));
+            quarterVATDto.getTaxes().get(1).setVat(quarterVATDto.getTaxes().get(1).getVat().add(shoppingLine.getVat()));
+        } else if (shoppingLine.getTax().compareTo(Tax.SUPER_REDUCED) == 0) {
+            quarterVATDto.getTaxes().get(2).setTaxableAmount(quarterVATDto.getTaxes().get(2).getTaxableAmount().add(shoppingLine.getTaxableAmount()));
+            quarterVATDto.getTaxes().get(2).setVat(quarterVATDto.getTaxes().get(2).getVat().add(shoppingLine.getVat()));
+        }
+        return shoppingLine;
+    }
+
+    private Flux<ShoppingLine> convertShoppingArrayToShoppingLineFlux(Shopping[] shoppings) {
+        Flux<ShoppingLine> shoppingLineFlux = Flux.empty();
+        for (Shopping shopping : shoppings) {
+            Mono<ShoppingLine> taxDtoMono = this.articleReactRepository.findById(shopping.getArticleId())
+                    .map(Article::getTax)
+                    .map(tax -> new ShoppingLine(tax, this.vatFromTax(tax), shopping.getShoppingTotal()));
+            shoppingLineFlux = shoppingLineFlux.mergeWith(taxDtoMono);
+        }
+        return shoppingLineFlux;
+    }
+
+    private BigDecimal vatFromTax(Tax tax) {
+        if (tax.equals(Tax.SUPER_REDUCED)) {
+            return BigDecimal.valueOf(this.superReducedTax);
+        } else if (tax.equals(Tax.REDUCED)) {
+            return BigDecimal.valueOf(this.reducedTax);
+        } else if (tax.equals(Tax.GENERAL)) {
+            return BigDecimal.valueOf(this.generalTax);
+        } else return BigDecimal.ZERO;
     }
 }

@@ -4,11 +4,11 @@ import es.upm.miw.betca_tpv_spring.documents.Invoice;
 
 public class InvoiceOutputDto {
 
-    String invoice;
+    private String invoice;
 
-    String ticket;
+    private String ticket;
 
-    String mobile;
+    private String mobile;
 
     public InvoiceOutputDto() {
     }

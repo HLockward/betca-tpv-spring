@@ -1,13 +1,15 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
 import es.upm.miw.betca_tpv_spring.documents.Messages;
+import es.upm.miw.betca_tpv_spring.documents.User;
 
 import java.time.LocalDateTime;
 
 public class MessagesDto {
 
-    private String fromUserMobile;
-    private String toUserMobile;
+    private String id;
+    private User fromUser;
+    private User toUser;
     private String messageContent;
     private LocalDateTime sentDate;
     private LocalDateTime readDate;
@@ -16,36 +18,46 @@ public class MessagesDto {
         // Empty for framework
     }
 
-    public MessagesDto(String fromUserMobile, String toUserMobile, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
-        this.fromUserMobile = fromUserMobile;
-        this.toUserMobile = toUserMobile;
+    public MessagesDto(String id, User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+        this.id = id;
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
         this.readDate = readDate;
     }
 
-    public String getFromUserMobile() {
-        return fromUserMobile;
+    public String getId() {
+        return id;
     }
 
-    public void setFromUserMobile(String fromUserMobile) {
-        this.fromUserMobile = fromUserMobile;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public User getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
     }
 
     public MessagesDto(Messages messages) {
-        this.fromUserMobile = messages.getFromUserMobile();
-        this.toUserMobile = messages.getToUserMobile();
+        this.id = messages.getId();
+        this.fromUser = messages.getFromUser();
+        this.toUser = messages.getToUser();
         this.messageContent = messages.getMessageContent();
         this.sentDate = messages.getSentDate();
         this.readDate = messages.getReadDate();
     }
 
-    public String getToUserMobile() {
-        return toUserMobile;
+    public User getToUser() {
+        return toUser;
     }
 
-    public void setToUserMobile(String toUserMobile) {
-        this.toUserMobile = toUserMobile;
+    public void setToUser(User toUser) {
+        this.toUser = toUser;
     }
 
     public String getMessageContent() {
@@ -75,8 +87,9 @@ public class MessagesDto {
     @Override
     public String toString() {
         return "MessagesDto [" +
-                "fromUserMobile=" + fromUserMobile +
-                ", toUserMobile=" + toUserMobile +
+                "id=" + id +
+                ", fromUser=" + fromUser +
+                ", toUser=" + toUser +
                 ", messageContent=" + messageContent +
                 ", sentDate=" + sentDate +
                 ", readDate=" + readDate +

@@ -24,7 +24,7 @@ public class UserResource {
     public static final String USERS = "/users";
     public static final String TOKEN = "/token";
     public static final String MOBILE_ID = "/{mobile}";
-    public static final String MESSAGES = "/messages";
+    public static final String SEARCH = "/search";
 
     private UserController userController;
 
@@ -66,12 +66,6 @@ public class UserResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @PutMapping(value = MESSAGES)
-    public Mono<MessagesDto> sendMessageToUser(@Valid @RequestBody MessagesDto messagesDto) {
-        return this.userController.sendMessageToUser(messagesDto)
-                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-    }
-
     @PatchMapping(value = "/password" + MOBILE_ID)
     public Mono<UserDto> changePassword(@PathVariable String mobile, @Valid @RequestBody UserCredentialDto userCredentialDto) {
         return this.userController.changePassword(mobile, userCredentialDto)
@@ -81,6 +75,21 @@ public class UserResource {
     @PatchMapping(value = MOBILE_ID)
     public Mono<UserDto> updateRoles(@PathVariable String mobile, @Valid @RequestBody UserMinimumDto userMinimumDto) {
         return this.userController.updateRoles(mobile, userMinimumDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = SEARCH)
+    public Flux<UserDto> findByMobileOrUsernameOrDniOrAddress(@RequestParam(required = false) String mobile,
+                                                              @RequestParam(required = false) String username,
+                                                              @RequestParam(required = false) String dni,
+                                                              @RequestParam(required = false) String address) {
+
+        UserDto userDto = new UserDto();
+        userDto.setMobile(mobile);
+        userDto.setUsername(username);
+        userDto.setDni(dni);
+        userDto.setAddress(address);
+        return this.userController.findByMobileOrUsernameOrDniOrAddress(userDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

@@ -1,49 +1,62 @@
 package es.upm.miw.betca_tpv_spring.documents;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 
 public class Messages {
 
     @Id
-    private ObjectId id;
-
-    private String fromUserMobile;
-    private String toUserMobile;
+    private String id;
+    @DBRef
+    private User fromUser;
+    @DBRef
+    private User toUser;
     private String messageContent;
     private LocalDateTime sentDate;
     private LocalDateTime readDate;
 
-    public Messages(String fromUserMobile, String toUserMobile, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
-        this.id = ObjectId.get();
-        this.fromUserMobile = fromUserMobile;
-        this.toUserMobile = toUserMobile;
+    public Messages(String id, User fromUser, User toUser, String messageContent, LocalDateTime sentDate, LocalDateTime readDate) {
+        this.id = id;
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.messageContent = messageContent;
         this.sentDate = sentDate;
         this.readDate = readDate;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public String getFromUserMobile() {
-        return fromUserMobile;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setFromUserMobile(String fromUserMobile) {
-        this.fromUserMobile = fromUserMobile;
+    public int getIdParsedToInteger() {
+        return Integer.parseInt(id);
+    }
+
+    public void setIdFromInt(int idInt) {
+        this.id = "" + idInt;
+    }
+
+    public User getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
     }
 
 
-    public String getToUserMobile() {
-        return toUserMobile;
+    public User getToUser() {
+        return toUser;
     }
 
-    public void setToUserMobile(String toUserMobile) {
-        this.toUserMobile = toUserMobile;
+    public void setToUser(User toUser) {
+        this.toUser = toUser;
     }
 
 
@@ -75,8 +88,8 @@ public class Messages {
     public String toString() {
         return "Messages{" +
                 "id='" + id + '\'' +
-                ", fromUserMobile='" + fromUserMobile + "\'" +
-                ", toUserMobile='" + toUserMobile + "\'" +
+                ", fromUser='" + fromUser +
+                ", toUser='" + toUser +
                 ", messageContent='" + messageContent + "\'" +
                 ", sentDate='" + sentDate + "\'" +
                 ", readDate='" + readDate + "\'" +

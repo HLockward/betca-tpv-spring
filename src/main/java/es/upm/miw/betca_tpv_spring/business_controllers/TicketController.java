@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.business_services.PdfService;
 import es.upm.miw.betca_tpv_spring.documents.*;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
+import es.upm.miw.betca_tpv_spring.dtos.TicketPatchDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.exceptions.PdfException;
@@ -33,23 +34,25 @@ public class TicketController {
     private TicketReactRepository ticketReactRepository;
     private UserReactRepository userReactRepository;
     private CashierClosureReactRepository cashierClosureReactRepository;
+    private TagReactRepository tagReactRepository;
     private PdfService pdfService;
     private CustomerPointsReactRepository customerPointsReactRepository;
     private static final Integer EACH_TWO_UNIT_ONE_POINT = 2;
-    private OrderRepository orderRepository;
+    private OrderReactRepository orderReactRepository;
 
     @Autowired
     public TicketController(TicketReactRepository ticketReactRepository, UserReactRepository userReactRepository,
                             ArticleReactRepository articleReactRepository, CashierClosureReactRepository cashierClosureReactRepository,
                             PdfService pdfService, CustomerPointsReactRepository customerPointsReactRepository,
-                            OrderRepository orderRepository) {
+                            OrderReactRepository orderReactRepository, TagReactRepository tagReactRepository) {
         this.ticketReactRepository = ticketReactRepository;
         this.userReactRepository = userReactRepository;
         this.articleReactRepository = articleReactRepository;
         this.cashierClosureReactRepository = cashierClosureReactRepository;
         this.pdfService = pdfService;
         this.customerPointsReactRepository = customerPointsReactRepository;
-        this.orderRepository = orderRepository;
+        this.orderReactRepository = orderReactRepository;
+        this.tagReactRepository = tagReactRepository;
     }
 
     private Mono<Integer> nextIdStartingDaily() {
@@ -155,23 +158,54 @@ public class TicketController {
                 return numberOfItems.get().equals(ticketSearchDto.getAmount());
             });
         }
-        return ticketFlux.map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+        return ticketFlux.distinct()
+                .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
 
     public Flux<TicketOutputDto> searchNotCommittedByArticle(String articleId) {
         return this.ticketReactRepository.findNotCommittedByArticleId(articleId)
+                .distinct()
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
     }
 
    public Flux<TicketOutputDto> searchNotCommittedByOrder(String orderId) {
-       List<Flux<Ticket>> fluxes = new ArrayList<>();
-       this.orderRepository.findById(orderId).map(order -> Arrays.asList(order.getOrderLines())).ifPresent(orderLines -> {
-           orderLines.forEach(orderLine ->  {
-               String articleId = orderLine.getArticle().getCode();
-               Flux<Ticket> tickets = this.ticketReactRepository.findNotCommittedByArticleId(articleId);
-               fluxes.add(tickets);
-           });
-       });
-       return Flux.merge(fluxes).map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+       List<Flux<Ticket>> tickets = new ArrayList<>();
+       return this.orderReactRepository.findById(orderId)
+               .map(order -> Arrays.stream(order.getOrderLines()).map(orderLine -> {
+                   Article article = orderLine.getArticle();
+                   tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode()));
+                   return article;
+               }).collect(Collectors.toList()))
+               .thenMany(Flux.merge(tickets))
+               .distinct()
+               .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
    }
+
+   public Flux<TicketOutputDto> searchNotCommittedByTag(String tagDescription) {
+        List<Flux<Ticket>> tickets = new ArrayList<>();
+        return this.tagReactRepository.findByDescription(tagDescription)
+                .map(tag -> {
+                    tag.getArticleList().forEach(article -> tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode())));
+                    return tag;
+                })
+                .thenMany(Flux.merge(tickets))
+                .distinct()
+                .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));
+   }
+
+    public Mono<TicketOutputDto> updateShoppingTicket(String id, TicketPatchDto shoppingPatchDto) {
+        Mono<Ticket> ticket = this.ticketReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + id + " not found"))).map(ticket1 -> {
+                    Arrays.stream(ticket1.getShoppingList()).forEach(shopping -> {
+                        shoppingPatchDto.getShoppingPatchDtoList().stream().forEach(shoppingPatchDto1 -> {
+                            if (shopping.getArticleId().equals(shoppingPatchDto1.getArticleId())) {
+                                shopping.setAmount(shoppingPatchDto1.getAmount());
+                                shopping.setShoppingState(shoppingPatchDto1.getShoppingState());
+                            }
+                        });
+                    });
+                    return ticket1;
+                });
+        return Mono.when(ticket).then(this.ticketReactRepository.saveAll(ticket).next().map(TicketOutputDto::new));
+    }
 }

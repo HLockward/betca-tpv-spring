@@ -33,6 +33,14 @@ public class UserDto extends UserMinimumDto {
         this.registrationDate = user.getRegistrationDate();
     }
 
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getEmail() {
         return email;
     }

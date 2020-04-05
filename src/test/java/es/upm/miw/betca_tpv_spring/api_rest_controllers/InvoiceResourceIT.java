@@ -1,6 +1,5 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
-import es.upm.miw.betca_tpv_spring.dtos.InvoiceFilterDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceNegativeCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.InvoiceOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.ShoppingDto;
@@ -12,10 +11,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,7 +31,7 @@ public class InvoiceResourceIT {
     private String contextPath;
 
     @Test
-    void testCreate() {
+    void testCreateAndGet() {
         this.restService.loginAdmin(webTestClient)
                 .post().uri(contextPath + InvoiceResource.INVOICES)
                 .exchange()
@@ -41,17 +39,6 @@ public class InvoiceResourceIT {
                 .expectBody(byte[].class)
                 .value(Assertions::assertNotNull);
     }
-
-    @Test
-    void testGenerate() {
-        this.restService.loginAdmin(webTestClient)
-                .patch().uri(contextPath + InvoiceResource.INVOICES + "/20201" + InvoiceResource.PRINT)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(byte[].class)
-                .value(Assertions::assertNotNull);
-    }
-
 
     @Test
     void testCreateInvoiceNegative() {
@@ -99,7 +86,7 @@ public class InvoiceResourceIT {
     }
 
     @Test
-    void cget() {
+    void testGetAll() {
         this.restService.loginAdmin(this.webTestClient)
         .get().uri(contextPath + InvoiceResource.INVOICES)
                 .exchange()
@@ -110,13 +97,12 @@ public class InvoiceResourceIT {
     }
 
     @Test
-    void search() {
+    void testSearch() {
         this.restService.loginAdmin(this.webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
                         .path(contextPath + InvoiceResource.INVOICES + InvoiceResource.SEARCH)
-                .queryParam("mobile", null)
-                .queryParam("fromDate", LocalDateTime.now().minusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
-                .queryParam("toDate", LocalDateTime.now().plusDays(1).toLocalDate().format(DateTimeFormatter.ISO_DATE))
+                .queryParam("fromDate", LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE))
+                .queryParam("toDate", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE))
                 .build())
                 .exchange()
                 .expectStatus().isOk()

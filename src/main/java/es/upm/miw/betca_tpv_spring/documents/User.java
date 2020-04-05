@@ -27,12 +27,10 @@ public class User {
     private String dni;
     private String address;
     private Role[] roles;
-    private List<Messages> messagesList;
 
     public User() {
         this.registrationDate = LocalDateTime.now();
         this.active = true;
-        this.messagesList =  new ArrayList<>();
     }
 
     public static Builder builder() {
@@ -115,14 +113,6 @@ public class User {
         this.roles = roles;
     }
 
-    public List<Messages> getMessagesList() {
-        return messagesList;
-    }
-
-    public void setMessagesList(List<Messages> messagesList) {
-        this.messagesList = messagesList;
-    }
-
     @Override
     public int hashCode() {
         return this.mobile.hashCode();
@@ -146,7 +136,6 @@ public class User {
                 ", dni='" + dni + '\'' +
                 ", address='" + address + '\'' +
                 ", roles=" + Arrays.toString(roles) +
-                ", messagesList=" + messagesList +
                 '}';
     }
 
@@ -201,11 +190,6 @@ public class User {
 
         public Builder roles(Role... roles) {
             this.user.roles = roles;
-            return this;
-        }
-
-        public Builder messagesList(List<Messages> messagesList) {
-            this.user.messagesList = messagesList;
             return this;
         }
 
