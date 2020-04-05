@@ -139,7 +139,7 @@ public class ArticlesFamilyResourceIT {
     }
 
     @Test
-    void testCreateArticleFamilyServerError() {
+    void testCreateArticleFamilyClientError() {
         FamilyCompleteDto familyCompleteDto = FamilyCompleteDto.builder()
                 .description("Jeans").sizeType(false).reference("Zaara")
                 .fromSize("0").toSize("40").increment(2).build();
@@ -147,7 +147,7 @@ public class ArticlesFamilyResourceIT {
                 .post().uri(contextPath + ARTICLES_FAMILY)
                 .body(BodyInserters.fromObject(familyCompleteDto))
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().is4xxClientError()
                 .expectBody(ArticlesFamilyDto.class)
                 .returnResult().getResponseBody();
         assertNull(articleFamily.getReference());
