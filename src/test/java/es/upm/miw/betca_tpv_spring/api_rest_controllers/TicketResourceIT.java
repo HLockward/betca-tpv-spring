@@ -1,8 +1,10 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
+import es.upm.miw.betca_tpv_spring.data_services.DatabaseSeederService;
 import es.upm.miw.betca_tpv_spring.documents.ShoppingState;
 import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.repositories.OrderRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,14 @@ class TicketResourceIT {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private DatabaseSeederService databaseSeederService;
+
+    @AfterEach
+    void initialize() {
+        databaseSeederService.deleteAllAndInitializeAndSeedDataBase();
+    }
 
     @Test
     void testCreateTicket() {
