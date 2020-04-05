@@ -38,13 +38,13 @@ public class MessagesResourceIT {
 
     @Test
     void testReadAll() {
-        List<MessagesDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
+        List<MessagesOutputDto> messagesDtoList = this.restService.loginAdmin(this.webTestClient)
                 .get().uri(uriBuilder -> uriBuilder
                         .path(contextPath + MESSAGES)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(MessagesDto.class)
+                .expectBodyList(MessagesOutputDto.class)
                 .value(Assertions::assertNotNull)
                 .value(list -> assertTrue(list.size() >= 1))
                 .returnResult().getResponseBody();
@@ -52,8 +52,8 @@ public class MessagesResourceIT {
         for (int i = 0; i < ItemsOfTheCollectionMessagesInTheSeederWeWantToCheck; i++) {
             String indexValue = String.valueOf(i + 1);
             assertEquals(indexValue, messagesDtoList.get(i).getId());
-            assertEquals(String.valueOf(i + 666666001), messagesDtoList.get(i).getFromUser().getMobile());
-            assertEquals(String.valueOf(666666007), messagesDtoList.get(i).getToUser().getMobile());
+            assertEquals(String.valueOf(i + 666666001), messagesDtoList.get(i).getFromUserMobile());
+            assertEquals(String.valueOf(666666007), messagesDtoList.get(i).getToUserMobile());
             assertEquals("Msg from " + indexValue + " to 7", messagesDtoList.get(i).getMessageContent());
             assertNotNull(messagesDtoList.get(i).getSentDate());
         }

@@ -4,6 +4,7 @@ import es.upm.miw.betca_tpv_spring.documents.Messages;
 import es.upm.miw.betca_tpv_spring.documents.User;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.UserMinimumDto;
 import es.upm.miw.betca_tpv_spring.repositories.MessagesReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.UserReactRepository;
@@ -28,8 +29,8 @@ public class MessagesController {
 
     }
 
-    public Flux<MessagesDto> readAll() {
-        return this.messagesReactRepository.findAll().map(MessagesDto::new);
+    public Flux<MessagesOutputDto> readAll() {
+        return this.messagesReactRepository.findAll().map(MessagesOutputDto::new);
     }
 
     public Mono<MessagesDto> readById(String messagesId) {

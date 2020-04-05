@@ -3,6 +3,7 @@ package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 import es.upm.miw.betca_tpv_spring.business_controllers.MessagesController;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +34,7 @@ public class MessagesResource {
     }
 
     @GetMapping
-    public Flux<MessagesDto> readAll() {
+    public Flux<MessagesOutputDto> readAll() {
         return this.messagesController.readAll()
                 .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
