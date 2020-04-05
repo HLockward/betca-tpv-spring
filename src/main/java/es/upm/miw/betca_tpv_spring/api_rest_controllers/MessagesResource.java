@@ -2,7 +2,7 @@ package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.MessagesController;
 import es.upm.miw.betca_tpv_spring.dtos.MessagesCreationDto;
-import es.upm.miw.betca_tpv_spring.dtos.MessagesDto;
+import es.upm.miw.betca_tpv_spring.dtos.MessagesOutputDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +21,9 @@ public class MessagesResource {
 
     public static final String MESSAGES = "/messages";
     public static final String MESSAGES_ID = "/{id}";
-    public static final String MY_MESSAGES = "/my-messages";
+    public static final String UNREAD = "/unread";
+    public static final String TO_USER = "/to-user";
+    public static final String MOBILE = "/{toUserMobile}";
 
     private MessagesController messagesController;
 
@@ -30,34 +32,40 @@ public class MessagesResource {
         this.messagesController = messagesController;
     }
 
-    @PostMapping
-    public Mono<MessagesDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
-        return this.messagesController.createMessage(messagesCreationDto)
-                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-    }
-
     @GetMapping
-    public Flux<MessagesDto> readAll() {
+    public Flux<MessagesOutputDto> readAll() {
         return this.messagesController.readAll()
                 .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @GetMapping(value = MESSAGES_ID)
-    public Mono<MessagesDto> readById(@PathVariable String id) {
+    public Mono<MessagesOutputDto> readById(@PathVariable String id) {
         return this.messagesController.readById(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @PutMapping(value = MESSAGES_ID)
-    public Mono<MessagesDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
-        LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
-        return this.messagesController.markMessageAsRead(id, ldtReadDate)
+    @GetMapping(value = TO_USER + MOBILE)
+    public Flux<MessagesOutputDto> readAllMessagesByToUser(@PathVariable String toUserMobile) {
+        return this.messagesController.readAllMessagesByToUser(toUserMobile)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @GetMapping(value = MY_MESSAGES)
-    public Flux<MessagesDto> readAllMessagesByToUser(@RequestParam String toUserMobile) {
-        return this.messagesController.readAllMessagesByToUser(toUserMobile)
+    @GetMapping(value = TO_USER + MOBILE + UNREAD)
+    public Flux<MessagesOutputDto> readAllUnReadMessagesByToUser(@PathVariable String toUserMobile) {
+        return this.messagesController.readAllUnReadMessagesByToUser(toUserMobile)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PostMapping
+    public Mono<MessagesOutputDto> createMessage(@Valid @RequestBody MessagesCreationDto messagesCreationDto) {
+        return this.messagesController.createMessage(messagesCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @PutMapping(value = MESSAGES_ID)
+    public Mono<MessagesOutputDto> markMessageAsRead(@PathVariable String id, @RequestParam String readDate) {
+        LocalDateTime ldtReadDate = LocalDateTime.parse(readDate, DateTimeFormatter.ISO_DATE_TIME);
+        return this.messagesController.markMessageAsRead(id, ldtReadDate)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }

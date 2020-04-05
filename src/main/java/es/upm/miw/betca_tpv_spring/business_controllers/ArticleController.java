@@ -64,11 +64,12 @@ public class ArticleController {
 
     public Mono<ArticleDto> createArticle(ArticleDto articleDto) {
         String code = articleDto.getCode();
-        if (code == null) {
+        if (code == null || !code.substring(0,6).equals("840000")) {
+            System.out.println(code.substring(0,6).equals("840000"));
             code = new Barcode().generateEan13code(Long.parseLong(this.articleRepository.findFirstByOrderByCodeDesc().getCode().substring(0, 12)) + 1);
-            if (code.length() == 13 && Long.parseLong(code.substring(7, 12)) > 99999L) {
-                return Mono.error(new BadRequestException("Index out of range"));
-            }
+        }
+        if (code.length() > 13 || Long.parseLong(code.substring(6, 12)) > 99999L) {
+            return Mono.error(new BadRequestException("Index out of range"));
         }
         Mono<Void> noExistsByIdAssured = this.noExistsByIdAssured(code);
         int stock = (articleDto.getStock() == null) ? 10 : articleDto.getStock();
@@ -133,5 +134,9 @@ public class ArticleController {
                     .switchIfEmpty(Flux.error(new BadRequestException("Params not found")))
                     .map(ArticleDto::new).filter(articleDto -> articleDto.getDiscontinued().equals(articleAdvancedSearchDto.getDiscontinued()));
         }
+    }
+
+    public Flux<ArticleDto> searchIncompletedArticles() {
+        return this.articleReactRepository.findAll().map(ArticleDto::new).filter(articleDto -> articleDto.getReference() == null || articleDto.getProvider() == null);
     }
 }
