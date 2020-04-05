@@ -79,6 +79,14 @@ public class MessagesController {
     }
 
     public Flux<MessagesDto> readAllUnReadMessagesByToUser(String toUserMobile) {
-        return null;
+        UserMinimumDto userMinimumDto = new UserMinimumDto(null, null, null);
+        return this.userReactRepository.findByMobile(toUserMobile).map(user -> {
+            userMinimumDto.setMobile(user.getMobile());
+            return user;
+        }).thenMany(this.messagesReactRepository.findAll()
+                .filter(messages ->
+                        userMinimumDto.getMobile().equals(messages.getToUser().getMobile())
+                        && messages.getReadDate() == null)
+                .map(MessagesDto::new));
     }
 }
