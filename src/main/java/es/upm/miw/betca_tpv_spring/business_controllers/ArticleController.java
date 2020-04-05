@@ -64,7 +64,7 @@ public class ArticleController {
 
     public Mono<ArticleDto> createArticle(ArticleDto articleDto) {
         String code = articleDto.getCode();
-        if (code == null) {
+        if (code == null || !code.substring(0,6).equals("840000")) {
             System.out.println(code.substring(0,6).equals("840000"));
             code = new Barcode().generateEan13code(Long.parseLong(this.articleRepository.findFirstByOrderByCodeDesc().getCode().substring(0, 12)) + 1);
         }

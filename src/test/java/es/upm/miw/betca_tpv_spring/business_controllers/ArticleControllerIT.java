@@ -134,7 +134,7 @@ class ArticleControllerIT {
                 .verify();
     }
 
-   // @Test
+    @Test
     void testCreateArticleWithCodeOutOfRange() {
         StepVerifier
                 .create(this.articleController.createArticle(new ArticleDto("8400001092832","desc","ref",BigDecimal.TEN,5)))
@@ -142,7 +142,7 @@ class ArticleControllerIT {
                 .verify();
     }
 
-    //@Test
+    @Test
     void testCreateArticleWithCodeRegenerated() {
         ArticleDto articleDto = new ArticleDto("8403001092832","desc","ref",BigDecimal.TEN,5);
         articleDto.setTax(Tax.SUPER_REDUCED);
