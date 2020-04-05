@@ -76,13 +76,13 @@ public class MessagesReactRepositoryIT {
         StepVerifier
                 .create(this.messagesReactRepository.findFirstByOrderBySentDateDescIdDesc())
                 .expectNextMatches(messages -> {
-                    assertEquals("3", messages.getId());
+                    assertEquals("5", messages.getId());
                     assertNotNull(messages.getFromUser());
-                    assertEquals("666666003", messages.getFromUser().getMobile());
+                    assertEquals("666666007", messages.getFromUser().getMobile());
                     assertNotNull(messages.getToUser());
-                    assertEquals("666666007", messages.getToUser().getMobile());
-                    assertEquals("Msg from 3 to 7", messages.getMessageContent());
-                    assertEquals(fixedLdt.plusDays(4), messages.getSentDate());
+                    assertEquals("666666002", messages.getToUser().getMobile());
+                    assertEquals("Msg from 7 to 2", messages.getMessageContent());
+                    assertEquals(fixedLdt.plusDays(8), messages.getSentDate());
                     assertNull(messages.getReadDate());
                     return true;
                 })

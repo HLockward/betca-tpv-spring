@@ -289,6 +289,8 @@ public class DatabaseSeederService {
                 new Messages("1", users[1], users[7], "Msg from 1 to 7", fixedLdt, fixedLdt.plusDays(1)),
                 new Messages("2", users[2], users[7], "Msg from 2 to 7", fixedLdt.plusDays(2), fixedLdt.plusDays(3)),
                 new Messages("3", users[3], users[7], "Msg from 3 to 7", fixedLdt.plusDays(4), null),
+                new Messages("4", users[7], users[1], "Msg from 7 to 1", fixedLdt.plusDays(6), null),
+                new Messages("5", users[7], users[2], "Msg from 7 to 2", fixedLdt.plusDays(8), null),
         };
         this.messagesRepository.saveAll(Arrays.asList(messagesArray));
         LogManager.getLogger(this.getClass()).warn("        ------- messages");
