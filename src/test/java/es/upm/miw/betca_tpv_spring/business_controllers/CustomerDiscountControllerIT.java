@@ -1,23 +1,50 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.api_rest_controllers.ApiTestConfig;
-import es.upm.miw.betca_tpv_spring.api_rest_controllers.RestService;
+import es.upm.miw.betca_tpv_spring.documents.User;
+import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountDto;
+import es.upm.miw.betca_tpv_spring.repositories.CustomerDiscountRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.test.StepVerifier;
 
-import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ApiTestConfig
 public class CustomerDiscountControllerIT {
 
     @Autowired
-    private RestService restService;
+    CustomerDiscountController customerDiscountController;
 
     @Autowired
-    private WebTestClient webTestClient;
+    private CustomerDiscountRepository customerDiscountRepository;
 
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
+    @Test
+    void testFindCustomerDiscountByUserMobile() {
+        StepVerifier
+                .create(this.customerDiscountController.findByUserMobile("666666004"))
+                .expectNextMatches(cd -> {
+                    assertNotNull(cd);
+                    assertEquals(new BigDecimal(10), cd.getDiscount());
+                    return true;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void testCreateCustomerDiscount() {
+        CustomerDiscountDto customerDiscountDto = new CustomerDiscountDto("desc5", LocalDateTime.now(),
+                new BigDecimal(15), new BigDecimal(5), User.builder().build(), "555550147");
+        StepVerifier
+                .create(this.customerDiscountController.createCustomerDiscount(customerDiscountDto))
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+    }
+
 }
