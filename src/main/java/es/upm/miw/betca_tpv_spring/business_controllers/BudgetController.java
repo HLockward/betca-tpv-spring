@@ -46,9 +46,9 @@ public class BudgetController {
 
         Flux<ShoppingDto> shoppingDtoFlux = budgetDtoMono.
                 map(budgetMap -> {
-                    budgetMap.getShoppingCart().forEach(shDto -> {
-                        listShoppingDtoMono.add(getActualArticle(shDto));
-                    });
+                    budgetMap.getShoppingCart().forEach(shDto ->
+                            listShoppingDtoMono.add(getActualArticle(shDto))
+                    );
                     return budgetMap;
                 })
                 .thenMany(Flux.merge(listShoppingDtoMono))
