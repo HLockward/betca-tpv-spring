@@ -63,7 +63,7 @@ public class TicketResource {
     }
 
     @GetMapping(value = SEARCH_BY_GIFT_TICKET_REFERENCE)
-    public Mono<Ticket> searchByGiftTicketReference(@PathVariable String giftTicketReference) {
+    public Mono<TicketOutputDto> searchByGiftTicketReference(@PathVariable String giftTicketReference) {
         return this.ticketController.searchByGiftTicketReference(giftTicketReference)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }

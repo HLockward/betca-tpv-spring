@@ -2,6 +2,7 @@ package es.upm.miw.betca_tpv_spring.business_services;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.repositories.BudgetReactRepository;
+import es.upm.miw.betca_tpv_spring.repositories.GiftTicketReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.InvoiceReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TicketReactRepository;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,21 @@ class PdfServiceIT {
     @Autowired
     private InvoiceReactRepository invoiceReactRepository;
 
+    @Autowired
+    private GiftTicketReactRepository giftTicketReactRepository;
+
     @Test
     void testPdfGenerateTicket() {
         StepVerifier
                 .create(this.pdfService.generateTicket(this.ticketReactRepository.findById("201901121")))
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testPdfGenerateGiftTicket() {
+        StepVerifier
+                .create(this.pdfService.generateGiftTicket(this.giftTicketReactRepository.findById("Wt5sVW6HTrK6vV0gz3Mk4g")))
                 .thenCancel()
                 .verify();
     }

@@ -282,6 +282,7 @@ public class DatabaseSeederService {
                 new GiftTicket("Felicidades, esto es para ti", tickets[1]),
                 new GiftTicket("", tickets[2]),
         };
+        giftTickets[0].setId("Wt5sVW6HTrK6vV0gz3Mk4g");
         this.giftTicketRepository.saveAll(Arrays.asList(giftTickets));
         LogManager.getLogger(this.getClass()).warn("        ------- gift-tickets");
         LocalDateTime fixedLdt = LocalDateTime.of(2020, 4, 1, 1, 1, 1);
