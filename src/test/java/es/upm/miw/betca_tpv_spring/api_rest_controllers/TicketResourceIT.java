@@ -260,4 +260,26 @@ class TicketResourceIT {
         assertEquals(ticketUpdated.getShoppingList()[1].getShoppingState(),  ShoppingState.REQUIRE_PROVIDER);
     }
 
+    @Test
+    void testGetTicketByGiftTicketNotFound() {
+        String giftTicketReference = "123456789";
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_GIFT_TICKET_REFERENCE, giftTicketReference)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testGetTicketByGiftTicket() {
+        String giftTicketReference = "Wt5sVW6HTrK6vV0gz3Mk4g";
+        TicketOutputDto ticket = this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + TICKETS + SEARCH_BY_GIFT_TICKET_REFERENCE, giftTicketReference)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TicketOutputDto.class)
+                .returnResult().getResponseBody();
+        assertNotNull(ticket);
+        assertEquals(ticket.getId(), "201901121");
+    }
+
 }

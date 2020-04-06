@@ -137,8 +137,10 @@ public class TicketController {
                 .map(TicketOutputDto::new);
     }
 
-    public Mono<Ticket> searchByGiftTicketReference(String giftTicketReference) {
-        return this.giftTicketReactRepository.findById(giftTicketReference).map(GiftTicket::getTicket);
+    public Mono<TicketOutputDto> searchByGiftTicketReference(String giftTicketReference) {
+        return this.giftTicketReactRepository.findById(giftTicketReference)
+                .switchIfEmpty(Mono.error(new NotFoundException("GiftTicket " + giftTicketReference + " not found")))
+                .map(giftTicket -> new TicketOutputDto(giftTicket.getTicket()));
     }
 
     public Flux<TicketOutputDto> searchByMobileDateOrAmount(TicketSearchDto ticketSearchDto) {
