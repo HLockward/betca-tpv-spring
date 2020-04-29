@@ -1,27 +1,28 @@
-package es.upm.miw.betca_tpv_spring.documents;
+package es.upm.miw.betca_tpv_spring.dtos;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
+import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
+import es.upm.miw.betca_tpv_spring.documents.StockAlarmArticle;
 
 import java.util.Arrays;
 
-@Document
-public class StockAlarm {
+public class StockAlarmDto {
 
-    @Id
     private String id;
+
     private String description;
-    @DBRef
-    private Provider provider;
+
+    private String provider;
+
     private Integer warning;
+
     private Integer critical;
+
     private StockAlarmArticle[] stockAlarmArticle;
 
-    public StockAlarm() {
+    public StockAlarmDto() {
     }
 
-    public StockAlarm(String description, Provider provider, Integer warning, Integer critical, StockAlarmArticle[] stockAlarmArticle) {
+    public StockAlarmDto(String description, String provider, Integer warning, Integer critical, StockAlarmArticle[] stockAlarmArticle) {
         this.description = description;
         this.provider = provider;
         this.warning = warning;
@@ -29,8 +30,25 @@ public class StockAlarm {
         this.stockAlarmArticle = stockAlarmArticle;
     }
 
+    public StockAlarmDto(String id, String description, String provider, Integer warning, Integer critical, StockAlarmArticle[] stockAlarmArticle) {
+        this.id = id;
+        this.description = description;
+        this.provider = provider;
+        this.warning = warning;
+        this.critical = critical;
+        this.stockAlarmArticle = stockAlarmArticle;
+    }
+
+    public StockAlarmDto(StockAlarm stockAlarm) {
+        this(stockAlarm.getId(), stockAlarm.getDescription(), stockAlarm.getProvider().getId(), stockAlarm.getWarning(), stockAlarm.getCritical(), stockAlarm.getStockAlarmArticle());
+    }
+
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -41,11 +59,11 @@ public class StockAlarm {
         this.description = description;
     }
 
-    public Provider getProvider() {
+    public String getProvider() {
         return provider;
     }
 
-    public void setProvider(Provider provider) {
+    public void setProvider(String provider) {
         this.provider = provider;
     }
 
@@ -75,13 +93,13 @@ public class StockAlarm {
 
     @Override
     public String toString() {
-        return "StockAlarm{" +
+        return "StockAlarmDto{" +
                 "id='" + id + '\'' +
                 ", description='" + description + '\'' +
                 ", provider='" + provider + '\'' +
                 ", warning=" + warning +
                 ", critical=" + critical +
-                ", alarmArticle=" + Arrays.toString(stockAlarmArticle) +
+                ", stockAlarmArticle=" + Arrays.toString(stockAlarmArticle) +
                 '}';
     }
 }

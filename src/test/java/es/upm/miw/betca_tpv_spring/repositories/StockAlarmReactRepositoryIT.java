@@ -19,13 +19,12 @@ class StockAlarmReactRepositoryIT {
         StepVerifier
                 .create(this.stockAlarmReactRepository.findAll())
                 .expectNextMatches(stockAlarm -> {
-                    assertEquals("222", stockAlarm.getId());
-                    assertEquals("2222", stockAlarm.getDescription());
-                    assertEquals("upm", stockAlarm.getProvider());
-                    assertNotNull(stockAlarm.getAlarmArticle());
+                    assertNotNull(stockAlarm.getId());
+                    assertEquals("222", stockAlarm.getDescription());
+                    assertNotNull(stockAlarm.getProvider());
                     assertEquals(new Integer(2), stockAlarm.getWarning());
                     assertEquals(new Integer(2), stockAlarm.getCritical());
-                    assertNotNull(stockAlarm.getAlarmArticle());
+                    assertNotNull(stockAlarm.getStockAlarmArticle());
                     return true;
                 })
                 .thenCancel()
