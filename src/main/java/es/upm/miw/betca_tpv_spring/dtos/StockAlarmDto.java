@@ -1,5 +1,6 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
+import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
 import es.upm.miw.betca_tpv_spring.documents.StockAlarmArticle;
 
 import java.util.Arrays;
@@ -27,6 +28,19 @@ public class StockAlarmDto {
         this.warning = warning;
         this.critical = critical;
         this.stockAlarmArticle = stockAlarmArticle;
+    }
+
+    public StockAlarmDto(String id, String description, String provider, Integer warning, Integer critical, StockAlarmArticle[] stockAlarmArticle) {
+        this.id = id;
+        this.description = description;
+        this.provider = provider;
+        this.warning = warning;
+        this.critical = critical;
+        this.stockAlarmArticle = stockAlarmArticle;
+    }
+
+    public StockAlarmDto(StockAlarm stockAlarm) {
+        this(stockAlarm.getId(), stockAlarm.getDescription(), stockAlarm.getProvider().getId(), stockAlarm.getWarning(), stockAlarm.getCritical(), stockAlarm.getStockAlarmArticle());
     }
 
     public String getId() {

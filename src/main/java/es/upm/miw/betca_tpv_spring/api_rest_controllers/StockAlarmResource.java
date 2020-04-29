@@ -28,11 +28,11 @@ public class StockAlarmResource {
         this.stockAlarmController = stockAlarmController;
     }
 
-//    @GetMapping
-//    public Flux<StockAlarmDto> readAll() {
-//        return this.stockAlarmController.readAll()
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
+    @GetMapping
+    public Flux<StockAlarmDto> readAll() {
+        return this.stockAlarmController.readAll()
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 //
 //    @PostMapping
 //    public Mono<StockAlarmDto> createStockAlarm(@RequestBody StockAlarmCreationDto stockAlarmCreationDto) {

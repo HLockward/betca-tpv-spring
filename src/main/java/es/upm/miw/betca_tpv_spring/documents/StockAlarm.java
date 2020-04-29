@@ -29,6 +29,10 @@ public class StockAlarm {
         this.stockAlarmArticle = stockAlarmArticle;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getDescription() {
         return description;
     }

@@ -29,11 +29,11 @@ public class StockAlarmController {
         this.stockAlarmReactRepository = stockAlarmReactRepository;
     }
 
-//    public Flux<StockAlarmDto> readAll() {
-//        return this.stockAlarmReactRepository.findAll()
-//                .switchIfEmpty(Flux.error(new BadRequestException("Bad Request")))
-//                .map(StockAlarmDto::new);
-//    }
+    public Flux<StockAlarmDto> readAll() {
+        return this.stockAlarmReactRepository.findAll()
+                .switchIfEmpty(Flux.error(new BadRequestException("Bad Request")))
+                .map(StockAlarmDto::new);
+    }
 
 //    public Mono<StockAlarmDto> createStockAlarm(StockAlarmCreationDto stockAlarmCreationDto) {
 //        StockAlarm stockAlarm = new StockAlarm(
