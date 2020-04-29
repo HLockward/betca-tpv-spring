@@ -1,20 +1,14 @@
-package es.upm.miw.betca_tpv_spring.documents;
+package es.upm.miw.betca_tpv_spring.dtos;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+public class StockAlarmArticleDto {
 
-@Document
-public class AlarmArticle {
-
-    @Id
     private String articleId;
+
     private Integer warning;
+
     private Integer critical;
 
-    public AlarmArticle() {
-    }
-
-    public AlarmArticle(String articleId, Integer warning, Integer critical) {
+    public StockAlarmArticleDto(String articleId, Integer warning, Integer critical) {
         this.articleId = articleId;
         this.warning = warning;
         this.critical = critical;
@@ -46,7 +40,7 @@ public class AlarmArticle {
 
     @Override
     public String toString() {
-        return "AlarmArticle{" +
+        return "StockAlarmArticleDto{" +
                 "articleId='" + articleId + '\'' +
                 ", warning=" + warning +
                 ", critical=" + critical +

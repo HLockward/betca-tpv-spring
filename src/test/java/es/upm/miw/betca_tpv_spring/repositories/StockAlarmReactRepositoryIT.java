@@ -14,21 +14,21 @@ class StockAlarmReactRepositoryIT {
     @Autowired
     private StockAlarmReactRepository stockAlarmReactRepository;
 
-    @Test
-    void testReadAllAndDatabaseSeeder() {
-        StepVerifier
-                .create(this.stockAlarmReactRepository.findAll())
-                .expectNextMatches(stockAlarm -> {
-                    assertEquals("222", stockAlarm.getId());
-                    assertEquals("2222", stockAlarm.getDescription());
-                    assertEquals("upm", stockAlarm.getProvider());
-                    assertNotNull(stockAlarm.getAlarmArticle());
-                    assertEquals(new Integer(2), stockAlarm.getWarning());
-                    assertEquals(new Integer(2), stockAlarm.getCritical());
-                    assertNotNull(stockAlarm.getAlarmArticle());
-                    return true;
-                })
-                .thenCancel()
-                .verify();
-    }
+//    @Test
+//    void testReadAllAndDatabaseSeeder() {
+//        StepVerifier
+//                .create(this.stockAlarmReactRepository.findAll())
+//                .expectNextMatches(stockAlarm -> {
+//                    assertEquals("222", stockAlarm.getId());
+//                    assertEquals("2222", stockAlarm.getDescription());
+//                    assertEquals("upm", stockAlarm.getProvider());
+//                    assertNotNull(stockAlarm.getAlarmArticle());
+//                    assertEquals(new Integer(2), stockAlarm.getWarning());
+//                    assertEquals(new Integer(2), stockAlarm.getCritical());
+//                    assertNotNull(stockAlarm.getAlarmArticle());
+//                    return true;
+//                })
+//                .thenCancel()
+//                .verify();
+//    }
 }

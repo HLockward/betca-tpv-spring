@@ -372,16 +372,16 @@ public class DatabaseSeederService {
         this.customerPointsRepository.saveAll(Arrays.asList(customerPoints));
         LogManager.getLogger(this.getClass()).warn("        ------- customerPoints");
 
-        AlarmArticle[] alarmArticles = {
-                new AlarmArticle("1", 500, 1500),
-                new AlarmArticle("8400000000017", 15, 20)
-        };
-
-        StockAlarm[] stockAlarms = {
-                new StockAlarm("222", "2222", "upm", 2, 2, alarmArticles)
-        };
-        this.stockAlarmRepository.saveAll(Arrays.asList(stockAlarms));
-        LogManager.getLogger(this.getClass()).warn("        ------- stockAlarms");
+//        AlarmArticle[] alarmArticles = {
+//                new AlarmArticle("1", 500, 1500),
+//                new AlarmArticle("8400000000017", 15, 20)
+//        };
+//
+//        StockAlarm[] stockAlarms = {
+//                new StockAlarm("222", "2222", "upm", 2, 2, alarmArticles)
+//        };
+//        this.stockAlarmRepository.saveAll(Arrays.asList(stockAlarms));
+//        LogManager.getLogger(this.getClass()).warn("        ------- stockAlarms");
 
     }
 
