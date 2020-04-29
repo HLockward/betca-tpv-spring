@@ -33,36 +33,10 @@ public class StockAlarmResource {
         return this.stockAlarmController.readAll()
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
-//
-//    @PostMapping
-//    public Mono<StockAlarmDto> createStockAlarm(@RequestBody StockAlarmCreationDto stockAlarmCreationDto) {
-//        return this.stockAlarmController.createStockAlarm(stockAlarmCreationDto)
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
-//
-//    @PutMapping(value = STOCK_ALARMS_ID)
-//    public Mono<StockAlarmDto> updateStockAlarm(@PathVariable String stockAlarmId, @RequestBody StockAlarmCreationDto stockAlarmCreationDto) {
-//        return this.stockAlarmController.updateStockAlarm(stockAlarmId, stockAlarmCreationDto)
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
-//
-//    @DeleteMapping(value = STOCK_ALARMS_ID)
-//    public Mono<Void> deleteStockAlarm(@PathVariable String stockAlarmId) {
-//        return this.stockAlarmController.deleteStockAlarm(stockAlarmId)
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
-//
-//    @GetMapping(value = STOCK_ALARMS_WARNING)
-//    public Flux<StockAlarmDto> searchWarning() {
-//        String warning = "warning";
-//        return this.stockAlarmController.searchWarning(warning)
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
-//
-//    @GetMapping(value = STOCK_ALARMS_CRITICAL)
-//    public Flux<StockAlarmDto> searchCritical() {
-//        String critical = "critical";
-//        return this.stockAlarmController.searchWarning(critical)
-//                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
-//    }
+
+    @PostMapping
+    public Mono<StockAlarmDto> createStockAlarm(@RequestBody StockAlarmCreationDto stockAlarmCreationDto) {
+        return this.stockAlarmController.createStockAlarm(stockAlarmCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 }
