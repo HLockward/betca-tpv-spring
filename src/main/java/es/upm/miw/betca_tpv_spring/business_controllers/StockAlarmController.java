@@ -68,4 +68,36 @@ public class StockAlarmController {
                 .map(StockAlarmDto::new);
     }
 
+    public Mono<StockAlarmDto> updateStockAlarm(String id,  StockAlarmCreationDto stockAlarmCreationDto) {
+        List<StockAlarmArticle> stockAlarmArticles = new ArrayList<>();
+        Flux<Article> articles = Flux.empty();
+        for (StockAlarmArticleDto stockAlarmArticleDto : stockAlarmCreationDto.getStockAlarmArticle()) {
+            Mono<Article> articleReact = this.articleReactRepository.findById(stockAlarmArticleDto.getArticleId())
+                    .switchIfEmpty(Mono.error(new NotFoundException("Article (" + stockAlarmArticleDto.getArticleId() + ")")))
+                    .map(article -> {
+                        stockAlarmArticles.add(new StockAlarmArticle(article, stockAlarmArticleDto.getWarning(),stockAlarmArticleDto.getCritical()));
+                        return article;
+                    });
+            articles = articles.mergeWith(articleReact);
+        }
+        Mono<StockAlarm> stockAlarm = this.stockAlarmReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("StockAlarm (" + id + ")")))
+                .map(stockAlarmUpdate -> {
+                    stockAlarmUpdate.setDescription(stockAlarmCreationDto.getDescription());
+                    stockAlarmUpdate.setWarning(stockAlarmCreationDto.getWarning());
+                    stockAlarmUpdate.setCritical(stockAlarmCreationDto.getCritical());
+                    stockAlarmUpdate.setStockAlarmArticle(stockAlarmArticles.toArray(new StockAlarmArticle[stockAlarmArticles.size()]));
+                    return stockAlarmUpdate;
+                });
+        return Mono.when(articles).then(stockAlarm).then(this.stockAlarmReactRepository.saveAll(stockAlarm).next()
+                .map(StockAlarmDto::new));
+    }
+
+    public Mono<Void> deleteStockAlarm(String id) {
+        Mono<StockAlarm> stockAlarmMono = this.stockAlarmReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("StockAlarm (" + id + ")")));
+        return Mono
+                .when(stockAlarmMono)
+                .then(this.stockAlarmReactRepository.deleteById(id));
+    }
 }
