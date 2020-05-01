@@ -35,13 +35,9 @@ class StockAlarmControllerIT {
 
     @BeforeEach
     void seed() {
-        StockAlarmArticle[] stockAlarmArticle = {
-                new StockAlarmArticle(this.articleRepository.findAll().get(0),1,1),
-                new StockAlarmArticle(this.articleRepository.findAll().get(1),2,2),
-        };
-        this.stockAlarmDto = new StockAlarmDto("stockT", this.providerRepository.findAll().get(0).getId(),5,5,stockAlarmArticle);
         this.stockAlarmRepository.save(new StockAlarm("stockT",this.providerRepository.findAll().get(0),3,3,
                 new StockAlarmArticle[]{
+                        new StockAlarmArticle(this.articleRepository.findAll().get(0),1,1),
                         new StockAlarmArticle(this.articleRepository.findAll().get(1),1,1)
                 }));
     }
@@ -49,11 +45,10 @@ class StockAlarmControllerIT {
     @Test
     void testCreateStockAlarm() {
         StockAlarmArticleDto[] stockAlarmArticleDto = {
-                new StockAlarmArticleDto("1", 500, 1500),
-                new StockAlarmArticleDto("8400000000017", 15, 20),
+                new StockAlarmArticleDto(this.articleRepository.findAll().get(0).getCode(), 500, 1500),
+                new StockAlarmArticleDto(this.articleRepository.findAll().get(1).getCode(), 15, 20),
         };
-       StockAlarmCreationDto stockAlarmCreationDto = new StockAlarmCreationDto(
-               "stockAlarm1",
+       StockAlarmCreationDto stockAlarmCreationDto = new StockAlarmCreationDto("stockAlarm1",
                this.providerRepository.findAll().get(1).getId(), 500,1000,stockAlarmArticleDto);
 
         StepVerifier
@@ -83,8 +78,8 @@ class StockAlarmControllerIT {
                 .expectNextMatches(stockAlarmDto1 -> {
                     assertEquals(this.stockAlarmRepository.findById(id).get().getId(), stockAlarmDto1.getId());
                     assertEquals(this.stockAlarmRepository.findById(id).get().getDescription(), stockAlarmDto1.getDescription());
-                    assertEquals(new Integer(2),stockAlarmDto1.getWarning());
-                    assertEquals(new Integer(2), stockAlarmDto1.getCritical());
+                    assertEquals(Integer.valueOf(2),stockAlarmDto1.getWarning());
+                    assertEquals(Integer.valueOf(2), stockAlarmDto1.getCritical());
                     return true;
                 })
                 .expectComplete()
