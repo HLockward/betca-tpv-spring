@@ -92,4 +92,12 @@ public class StockAlarmController {
         return Mono.when(articles).then(stockAlarm).then(this.stockAlarmReactRepository.saveAll(stockAlarm).next()
                 .map(StockAlarmDto::new));
     }
+
+    public Mono<Void> deleteStockAlarm(String id) {
+        Mono<StockAlarm> stockAlarmMono = this.stockAlarmReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("StockAlarm (" + id + ")")));
+        return Mono
+                .when(stockAlarmMono)
+                .then(this.stockAlarmReactRepository.deleteById(id));
+    }
 }

@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
+import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
 import es.upm.miw.betca_tpv_spring.documents.StockAlarmArticle;
 import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,6 +40,10 @@ class StockAlarmControllerIT {
                 new StockAlarmArticle(this.articleRepository.findAll().get(1),2,2),
         };
         this.stockAlarmDto = new StockAlarmDto("stockT", this.providerRepository.findAll().get(0).getId(),5,5,stockAlarmArticle);
+        this.stockAlarmRepository.save(new StockAlarm("stockT",this.providerRepository.findAll().get(0),3,3,
+                new StockAlarmArticle[]{
+                        new StockAlarmArticle(this.articleRepository.findAll().get(1),1,1)
+                }));
     }
 
     @Test
@@ -78,11 +85,20 @@ class StockAlarmControllerIT {
                     assertEquals(this.stockAlarmRepository.findById(id).get().getDescription(), stockAlarmDto1.getDescription());
                     assertEquals(new Integer(2),stockAlarmDto1.getWarning());
                     assertEquals(new Integer(2), stockAlarmDto1.getCritical());
-                    assertEquals(this.stockAlarmRepository.findById(id).get().getStockAlarmArticle().length, stockAlarmDto1.getStockAlarmArticle().length);
                     return true;
                 })
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    void testStockAlarmDelete() {
+        String id = this.stockAlarmRepository.findAll().get(1).getId();
+        StepVerifier
+                .create(this.stockAlarmController.deleteStockAlarm(id))
+                .expectComplete()
+                .verify();
+        assertEquals(this.stockAlarmRepository.findById(id),Optional.empty());
     }
 }
 

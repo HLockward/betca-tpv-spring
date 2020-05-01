@@ -45,4 +45,10 @@ public class StockAlarmResource {
         return this.stockAlarmController.updateStockAlarm(stockAlarmId, stockAlarmCreationDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
+
+    @DeleteMapping(value = STOCK_ALARMS_ID)
+    public Mono<Void> deleteStockAlarm(@PathVariable String stockAlarmId){
+        return this.stockAlarmController.deleteStockAlarm(stockAlarmId)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 }
