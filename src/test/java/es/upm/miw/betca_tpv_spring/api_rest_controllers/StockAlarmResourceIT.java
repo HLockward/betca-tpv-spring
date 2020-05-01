@@ -1,11 +1,9 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
-import es.upm.miw.betca_tpv_spring.documents.StockAlarmArticle;
 import es.upm.miw.betca_tpv_spring.dtos.*;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
 import es.upm.miw.betca_tpv_spring.repositories.ProviderRepository;
 import es.upm.miw.betca_tpv_spring.repositories.StockAlarmRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,15 +36,6 @@ class StockAlarmResourceIT {
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
-
-    @BeforeEach
-    void seed() {
-        StockAlarmArticle[] stockAlarmArticle = {
-                new StockAlarmArticle(this.articleRepository.findAll().get(0),1,1),
-                new StockAlarmArticle(this.articleRepository.findAll().get(1),2,2),
-        };
-        this.stockAlarmDto = new StockAlarmDto("stockT", this.providerRepository.findAll().get(0).getId(),5,5,stockAlarmArticle);
-    }
 
     @Test
     void testStockAlarmReadAll() {
