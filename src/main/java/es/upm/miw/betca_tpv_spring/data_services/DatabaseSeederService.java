@@ -235,9 +235,13 @@ public class DatabaseSeederService {
         };
         this.articleRepository.saveAll(Arrays.asList(articles));
         LogManager.getLogger(this.getClass()).warn("        ------- articles");
+        Article[] articles1 = {articles[0], articles[1],articles[4]};
+        Article[] articles2 = {articles[0], articles[3],articles[4]};
+        Article[] articles3 = {articles[0], articles[4],articles[5]};
         Tag[] tags = {
-                new Tag("tag1", Arrays.asList(articles[0], articles[1], articles[2])),
-                new Tag("tag2", Arrays.asList(articles[0], articles[1], articles[4])),
+                new Tag("tag1", articles1),
+                new Tag("tag2", articles2),
+                new Tag("tag3", articles3),
         };
         this.tagRepository.saveAll(Arrays.asList(tags));// subscribe() for not blocking
         LogManager.getLogger(this.getClass()).warn("        ------- tags");

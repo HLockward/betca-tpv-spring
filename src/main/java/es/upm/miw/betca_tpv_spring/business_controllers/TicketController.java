@@ -188,10 +188,10 @@ public class TicketController {
    public Flux<TicketOutputDto> searchNotCommittedByTag(String tagDescription) {
         List<Flux<Ticket>> tickets = new ArrayList<>();
         return this.tagReactRepository.findByDescription(tagDescription)
-                .map(tag -> {
-                    tag.getArticleList().forEach(article -> tickets.add(this.ticketReactRepository.findNotCommittedByArticleId(article.getCode())));
+                .map(tag -> Arrays.stream(tag.getArticleList()).map(article -> {
+                    tickets.add(ticketReactRepository.findNotCommittedByArticleId(article.getCode()));
                     return tag;
-                })
+                }).collect(Collectors.toList()))
                 .thenMany(Flux.merge(tickets))
                 .distinct()
                 .map(ticket -> new TicketOutputDto(ticket.getId(), ticket.getReference()));

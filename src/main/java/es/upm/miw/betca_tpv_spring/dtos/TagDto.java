@@ -4,26 +4,49 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import es.upm.miw.betca_tpv_spring.documents.Article;
 import es.upm.miw.betca_tpv_spring.documents.Tag;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TagDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String id;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
-    private List<Article> articles;
+    private List<ArticleDto> articles;
 
     public TagDto() {
         // Empty for framework
     }
 
-    public TagDto(String description, List<Article> articles) {
+    public TagDto(String id, String description, List<ArticleDto> articles) {
+        this.id = id;
         this.description = description;
         this.articles = articles;
     }
 
     public TagDto(Tag tag) {
-        this.description = tag.getDescription();
-        this.articles = tag.getArticleList();
+        this(tag.getId(), tag.getDescription(), mapArticlesToDto(tag));
+    }
+
+    private static List<ArticleDto> mapArticlesToDto(Tag tag) {
+        List<Article> articlesList = new ArrayList<>();
+        Collections.addAll(articlesList, tag.getArticleList());
+
+        Stream<Object> stream = articlesList.stream().map(articleDto -> {
+            return new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock());
+        });
+
+        return Arrays.asList(stream.toArray(ArticleDto[]::new));
+    }
+
+
+    public String getId() {
+        return id;
     }
 
     public String getDescription() {
@@ -34,18 +57,19 @@ public class TagDto {
         this.description = description;
     }
 
-    public List<Article> getArticles() {
+    public List<ArticleDto> getArticles() {
         return articles;
     }
 
-    public void setArticles(List<Article> articles) {
+    public void setArticles(List<ArticleDto> articles) {
         this.articles = articles;
     }
 
     @Override
     public String toString() {
         return "TagDto{" +
-                "description='" + description + '\'' +
+                "id='" + id + '\'' +
+                ", description='" + description + '\'' +
                 ", articles=" + articles +
                 '}';
     }

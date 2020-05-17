@@ -21,7 +21,7 @@ class TagReactRepositoryIT {
                     assertEquals("tag1", tag.getDescription());
                     assertNotNull(tag.getId());
                     assertNotNull(tag.getArticleList());
-                    assertTrue(tag.getArticleList().size() > 0);
+                    assertTrue(tag.getArticleList().length > 0);
                     assertFalse(tag.toString().matches("@"));
                     return true;
                 })
@@ -32,12 +32,12 @@ class TagReactRepositoryIT {
     @Test
     void testFindByDescription() {
         StepVerifier
-                .create(this.tagReactRepository.findByDescription("tag1"))
+                .create(this.tagReactRepository.findByDescription("tag3"))
                 .expectNextMatches(tag -> {
-                    assertEquals("tag1", tag.getDescription());
+                    assertEquals("tag3", tag.getDescription());
                     assertNotNull(tag.getId());
                     assertNotNull(tag.getArticleList());
-                    assertTrue(tag.getArticleList().size() > 0);
+                    assertTrue(tag.getArticleList().length > 0);
                     assertFalse(tag.toString().matches("@"));
                     return true;
                 })
