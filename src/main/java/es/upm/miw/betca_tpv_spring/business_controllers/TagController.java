@@ -1,5 +1,8 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
+import es.upm.miw.betca_tpv_spring.documents.Article;
+import es.upm.miw.betca_tpv_spring.documents.Tag;
+import es.upm.miw.betca_tpv_spring.dtos.TagCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.TagDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
@@ -28,5 +31,18 @@ public class TagController {
         return this.tagReactRepository.findAll()
                 .switchIfEmpty(Flux.error(new BadRequestException("Bad Request")))
                 .map(TagDto::new);
+    }
+
+    public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
+        Article[] articles;
+        articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
+        .description(articleDto.getDescription())
+        .build()).toArray(Article[]::new);
+    Tag tag = new Tag();
+    tag.setDescription(tagCreationDto.getDescription());
+    tag.setArticleList(articles);
+
+    return tagReactRepository.save(tag);
+
     }
 }
