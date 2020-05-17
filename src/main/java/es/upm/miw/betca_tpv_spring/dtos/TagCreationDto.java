@@ -8,6 +8,7 @@ public class TagCreationDto {
     private List<ArticleDto> articleList;
 
     public TagCreationDto() {
+        // empty for framework
     }
 
     public TagCreationDto(String description, List<ArticleDto> articleList) {
@@ -27,15 +28,11 @@ public class TagCreationDto {
         return articleList;
     }
 
-    public void setArticleList(List<ArticleDto> articleList) {
-        this.articleList = articleList;
-    }
 
     @Override
     public String toString() {
         return "TagCreationDto{" +
                 "description='" + description + '\'' +
-                ", articleList=" + articleList +
                 '}';
     }
 }

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import es.upm.miw.betca_tpv_spring.documents.Article;
 import es.upm.miw.betca_tpv_spring.documents.Tag;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class TagDto {
@@ -72,5 +69,20 @@ public class TagDto {
                 ", description='" + description + '\'' +
                 ", articles=" + articles +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TagDto tagDto = (TagDto) o;
+        return Objects.equals(id, tagDto.id) &&
+                Objects.equals(description, tagDto.description) &&
+                Objects.equals(articles, tagDto.articles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, description, articles);
     }
 }
