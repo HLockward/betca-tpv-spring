@@ -20,6 +20,12 @@ public class StockAlarmArticle {
         this.critical = critical;
     }
 
+    public StockAlarmArticle(StockAlarmArticle stockAlarmArticle) {
+        this.article = stockAlarmArticle.getArticle();
+        this.warning = stockAlarmArticle.getWarning();
+        this.critical = stockAlarmArticle.getCritical();
+    }
+
     public Article getArticle() {
         return article;
     }

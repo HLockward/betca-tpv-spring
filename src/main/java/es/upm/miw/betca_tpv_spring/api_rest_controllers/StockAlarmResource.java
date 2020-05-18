@@ -3,6 +3,7 @@ package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 import es.upm.miw.betca_tpv_spring.business_controllers.StockAlarmController;
 import es.upm.miw.betca_tpv_spring.dtos.StockAlarmCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.StockAlarmDto;
+import es.upm.miw.betca_tpv_spring.dtos.StockAlarmSearchDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,8 +19,7 @@ public class StockAlarmResource {
 
     public static final String STOCK_ALARMS = "/stock-alarms";
     public static final String STOCK_ALARMS_ID = "/{stockAlarmId}";
-    public static final String STOCK_ALARMS_WARNING = "/warning";
-    public static final String STOCK_ALARMS_CRITICAL = "/critical";
+    public static final String STOCK_ALARMS_SEARCH = "/{searchArticleState}";
 
     private StockAlarmController stockAlarmController;
 
@@ -49,6 +49,12 @@ public class StockAlarmResource {
     @DeleteMapping(value = STOCK_ALARMS_ID)
     public Mono<Void> deleteStockAlarm(@PathVariable String stockAlarmId){
         return this.stockAlarmController.deleteStockAlarm(stockAlarmId)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
+    @GetMapping(value = STOCK_ALARMS_SEARCH)
+    public Flux<StockAlarmSearchDto> searchWarning(@PathVariable String searchArticleState) {
+        return this.stockAlarmController.getAllArticlesInStockAlarm(searchArticleState)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 }
