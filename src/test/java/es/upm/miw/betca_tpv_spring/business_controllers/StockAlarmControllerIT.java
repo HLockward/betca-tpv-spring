@@ -33,13 +33,13 @@ class StockAlarmControllerIT {
 
     private StockAlarmDto stockAlarmDto;
 
-    @BeforeEach
-    void seed() {
-        this.stockAlarmRepository.save(new StockAlarm("stockT",this.providerRepository.findAll().get(0),3,3,
-                new StockAlarmArticle[]{
-                        new StockAlarmArticle(this.articleRepository.findAll().get(0),1,1),
-                        new StockAlarmArticle(this.articleRepository.findAll().get(1),1,1)
-                }));
+    @Test
+    void testStockAlarmReadAll() {
+        StepVerifier
+                .create(this.stockAlarmController.readAll())
+                .expectNextCount(1)
+                .thenCancel()
+                .verify();
     }
 
     @Test
@@ -58,7 +58,6 @@ class StockAlarmControllerIT {
                     assertEquals(this.providerRepository.findAll().get(1).getId(), stockAlarm.getProvider());
                     assertEquals(new Integer(500),stockAlarm.getWarning());
                     assertEquals(new Integer(1000), stockAlarm.getCritical());
-                    assertEquals(2,stockAlarm.getStockAlarmArticle().length);
                     return true;
                 })
                 .expectComplete()
@@ -94,6 +93,24 @@ class StockAlarmControllerIT {
                 .expectComplete()
                 .verify();
         assertEquals(this.stockAlarmRepository.findById(id),Optional.empty());
+    }
+
+    @Test
+    void testStockAlarmGetAllArticle() {
+        StepVerifier
+                .create(this.stockAlarmController.getAllStockAlarmArticle())
+                .expectNextCount(1)
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testStockAlarmGetAllArticlesByState() {
+        StepVerifier
+                .create(this.stockAlarmController.getAllArticlesInStockAlarm("warning"))
+                .expectNextCount(1)
+                .thenCancel()
+                .verify();
     }
 }
 

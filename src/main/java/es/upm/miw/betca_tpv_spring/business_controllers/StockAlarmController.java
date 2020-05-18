@@ -6,6 +6,7 @@ import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
 import es.upm.miw.betca_tpv_spring.dtos.StockAlarmArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.StockAlarmCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.StockAlarmDto;
+import es.upm.miw.betca_tpv_spring.dtos.StockAlarmSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
@@ -68,7 +69,7 @@ public class StockAlarmController {
                 .map(StockAlarmDto::new);
     }
 
-    public Mono<StockAlarmDto> updateStockAlarm(String id,  StockAlarmCreationDto stockAlarmCreationDto) {
+    public Mono<StockAlarmDto> updateStockAlarm(String id, StockAlarmCreationDto stockAlarmCreationDto) {
         List<StockAlarmArticle> stockAlarmArticles = new ArrayList<>();
         Flux<Article> articles = Flux.empty();
         for (StockAlarmArticleDto stockAlarmArticleDto : stockAlarmCreationDto.getStockAlarmArticle()) {
@@ -99,5 +100,32 @@ public class StockAlarmController {
         return Mono
                 .when(stockAlarmMono)
                 .then(this.stockAlarmReactRepository.deleteById(id));
+    }
+
+    public Flux<StockAlarmSearchDto> getAllArticlesInStockAlarm(String searchArticleState) {
+        return this.getAllStockAlarmArticle()
+                .filter(stockAlarmArticle -> {
+                    if (searchArticleState.equals("warning")) {
+                         return stockAlarmArticle.getArticle().getStock() < stockAlarmArticle.getWarning();
+                    }else {
+                         return stockAlarmArticle.getArticle().getStock() < stockAlarmArticle.getCritical();
+                         }
+                })
+                .map(stockAlarmArticle -> {
+                    StockAlarmSearchDto stockAlarmSearchDto = new StockAlarmSearchDto();
+                    stockAlarmSearchDto.setCode(stockAlarmArticle.getArticle().getCode());
+                    stockAlarmSearchDto.setDescription(stockAlarmArticle.getArticle().getDescription());
+                    stockAlarmSearchDto.setStock(stockAlarmArticle.getArticle().getStock());
+                    stockAlarmSearchDto.setWarning(stockAlarmArticle.getWarning());
+                    stockAlarmSearchDto.setCritical(stockAlarmArticle.getCritical());
+                    return stockAlarmSearchDto;
+                });
+    }
+
+    public Flux<StockAlarmArticle> getAllStockAlarmArticle() {
+        Flux<StockAlarm> stockAlarmFlux = this.stockAlarmReactRepository.findAll();
+        return stockAlarmFlux
+                .flatMap(stockAlarm -> Flux.just(stockAlarm.getStockAlarmArticle()))
+                .map(StockAlarmArticle::new);
     }
 }

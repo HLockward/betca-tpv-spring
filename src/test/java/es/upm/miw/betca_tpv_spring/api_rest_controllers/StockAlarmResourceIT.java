@@ -82,4 +82,31 @@ class StockAlarmResourceIT {
                 .returnResult().getResponseBody();
         assertEquals(id, stockAlarmDto.getId());
     }
+
+    @Test
+    void testStockAlarmDelete() {
+        String id = this.stockAlarmRepository.findAll().get(0).getId();
+        this.restService.loginAdmin(webTestClient)
+                .delete().uri(contextPath + STOCK_ALARMS + STOCK_ALARMS_ID, id)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void testStockAlarmSearchWarning() {
+        String state = "warning";
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + STOCK_ALARMS + STOCK_ALARMS_SEARCH, state)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void testStockAlarmSearchCritical() {
+        String state = "critical";
+        this.restService.loginAdmin(webTestClient)
+                .get().uri(contextPath + STOCK_ALARMS + STOCK_ALARMS_SEARCH, state)
+                .exchange()
+                .expectStatus().isOk();
+    }
 }
