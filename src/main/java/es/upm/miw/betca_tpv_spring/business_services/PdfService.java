@@ -267,4 +267,14 @@ public class PdfService {
         }
         return Files.readAllBytes(file.toPath());
     }
+
+    public Mono<byte[]> generateTag(Mono<Tag> tagReact){
+        return tagReact.map(tag -> {
+            final String path = "/tpv-pdfs/tags/tag-" + tag.getId();
+            PdfBuilder pdf = new PdfBuilder(path);
+            this.addHead(pdf);
+            pdf.qrCode(tag.getId());
+            return pdf.build();
+        });
+    }
 }
