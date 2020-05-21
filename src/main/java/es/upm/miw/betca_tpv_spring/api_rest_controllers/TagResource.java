@@ -19,8 +19,9 @@ import javax.validation.Valid;
 public class TagResource {
     public static final String TAGS = "/tags";
     public static final String TAG_ID = "/{id}";
-    public static final String PRINT = "/print";
+    private static final String PRINT = "/print";
     public static final String TAG_DESCRIPTION = "/{description}";
+
     private TagController tagController;
 
     @Autowired
@@ -45,6 +46,9 @@ public class TagResource {
         return this.tagController.createTag(tagCreationDto).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-
+    @GetMapping(value = TAG_ID + PRINT, produces = {"application/pdf"})
+    public Mono<byte[]> print(@PathVariable String id){
+        return this.tagController.printTag(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 
 }

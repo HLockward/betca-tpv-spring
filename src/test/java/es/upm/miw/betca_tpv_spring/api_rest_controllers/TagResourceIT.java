@@ -17,12 +17,14 @@ import org.springframework.web.reactive.function.BodyInserters;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.TagResource.TAGS;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.TagResource.TAG_DESCRIPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ApiTestConfig
 class TagResourceIT {
+
     @Autowired
     private RestService restService;
 
@@ -34,6 +36,7 @@ class TagResourceIT {
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
 
     @Test
     void testReadOne() {
@@ -61,7 +64,14 @@ class TagResourceIT {
         assertEquals(new String("tag4"), tagDto.getDescription());
     }
 
-
+    @Test
+    void testPrintTag(){
+        TagDto tagDto = createDto();
+        this.restService.loginAdmin(this.webTestClient)
+                .get().uri(contextPath + TAGS + "/" + tagDto.getId() + "/print")
+                .exchange()
+                .expectStatus().isOk();
+    }
     private TagDto createDto(){
         ArticleDto[] articles = {new ArticleDto(Article.builder("0000009").description("Pomelo").retailPrice(new BigDecimal(3)).build())};
         TagCreationDto tagCreationDto = new TagCreationDto("tag4", Arrays.asList(articles));
@@ -74,4 +84,5 @@ class TagResourceIT {
                 .expectBody(TagDto.class)
                 .returnResult().getResponseBody();
     }
+
 }
