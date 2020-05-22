@@ -14,6 +14,7 @@ public class TagDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ArticleDto> articles;
 
     public TagDto() {
