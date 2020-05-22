@@ -49,14 +49,6 @@ class TagResourceIT {
     }
 
     @Test
-    void testReadAll() {
-        this.restService.loginAdmin(webTestClient)
-                .get().uri(contextPath + TAGS)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
     void testCreate(){
         TagDto tagDto = createDto();
 
