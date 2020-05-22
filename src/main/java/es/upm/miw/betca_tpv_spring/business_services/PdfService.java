@@ -269,7 +269,7 @@ public class PdfService {
     }
 
     private void addTagValue(PdfBuilder pdf, Tag tag){
-        pdf.paragraphEmphasized(tag.getArticleList().toString())
+        pdf.paragraphEmphasized(tag.getId())
                 .paragraphEmphasized(" ").line();
     }
     public Mono<byte[]> generateTag(Mono<Tag> tagReact){
