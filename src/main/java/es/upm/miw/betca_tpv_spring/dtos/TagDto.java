@@ -15,16 +15,16 @@ public class TagDto {
     private String description;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ArticleDto> articles;
+    private List<ArticleDto> articlesList;
 
     public TagDto() {
         // Empty for framework
     }
 
-    public TagDto(String id, String description, List<ArticleDto> articles) {
+    public TagDto(String id, String description, List<ArticleDto> articlesList) {
         this.id = id;
         this.description = description;
-        this.articles = articles;
+        this.articlesList = articlesList;
     }
 
     public TagDto(Tag tag) {
@@ -56,11 +56,11 @@ public class TagDto {
     }
 
     public List<ArticleDto> getArticles() {
-        return articles;
+        return articlesList;
     }
 
     public void setArticles(List<ArticleDto> articles) {
-        this.articles = articles;
+        this.articlesList = articles;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class TagDto {
         return "TagDto{" +
                 "id='" + id + '\'' +
                 ", description='" + description + '\'' +
-                ", articles=" + articles +
+                ", articles=" + articlesList +
                 '}';
     }
 
@@ -79,11 +79,11 @@ public class TagDto {
         TagDto tagDto = (TagDto) o;
         return Objects.equals(id, tagDto.id) &&
                 Objects.equals(description, tagDto.description) &&
-                Objects.equals(articles, tagDto.articles);
+                Objects.equals(articlesList, tagDto.articlesList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, articles);
+        return Objects.hash(id, description, articlesList);
     }
 }
