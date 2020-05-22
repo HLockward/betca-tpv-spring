@@ -268,12 +268,17 @@ public class PdfService {
         return Files.readAllBytes(file.toPath());
     }
 
+    private void addTagValue(PdfBuilder pdf, Tag tag){
+        pdf.paragraphEmphasized(tag.getArticleList().toString())
+                .paragraphEmphasized(" ").line();
+    }
     public Mono<byte[]> generateTag(Mono<Tag> tagReact){
         return tagReact.map(tag -> {
             final String path = "/tpv-pdfs/tags/tag-" + tag.getId();
             PdfBuilder pdf = new PdfBuilder(path);
             this.addHead(pdf);
-            pdf.qrCode(tag.getId());
+            pdf.qrCode(tag.getDescription());
+            this.addTagValue(pdf, tag);
             return pdf.build();
         });
     }
