@@ -40,23 +40,23 @@ public class TagController {
     }
 
     public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
-        Article[] articlesList;
-        articlesList = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
+        Article[] articles;
+        articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
-        tag.setArticleList(articlesList);
+        tag.setArticleList(articles);
         return tagReactRepository.save(tag);
     }
     public Mono<Tag> updateTag(String description, TagCreationDto tagCreationDto) {
-        Article[] articlesList;
-        articlesList = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
+        Article[] articles;
+        articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
         Tag tag = new Tag();
         tag.setDescription(description);
-        tag.setArticleList(articlesList);
+        tag.setArticleList(articles);
         return tagReactRepository.save(tag);
     }
     @Transactional
