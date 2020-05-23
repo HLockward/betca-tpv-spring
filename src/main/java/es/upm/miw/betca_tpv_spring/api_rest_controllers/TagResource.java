@@ -45,6 +45,12 @@ public class TagResource {
     public  Mono<Tag> create(@Valid @RequestBody TagCreationDto tagCreationDto) {
         return this.tagController.createTag(tagCreationDto).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
+    @PutMapping(value = TAG_DESCRIPTION, produces = {"application/json"})
+    public Mono<Tag> update(@PathVariable String description, @Valid @RequestBody TagCreationDto tagCreationDto){
+        return this.tagController.updateTag(description, tagCreationDto)
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
+
 
     @GetMapping(value = TAG_ID + PRINT, produces = {"application/pdf"})
     public Mono<byte[]> print(@PathVariable String id){
