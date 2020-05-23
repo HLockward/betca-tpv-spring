@@ -40,16 +40,25 @@ public class TagController {
     }
 
     public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
-        Article[] articles;
-        articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
+        Article[] articlesList;
+        articlesList = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
-        tag.setArticleList(articles);
+        tag.setArticleList(articlesList);
         return tagReactRepository.save(tag);
     }
-
+    public Mono<Tag> updateTag(String description, TagCreationDto tagCreationDto) {
+        Article[] articlesList;
+        articlesList = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
+                .description(articleDto.getDescription())
+                .build()).toArray(Article[]::new);
+        Tag tag = new Tag();
+        tag.setDescription(description);
+        tag.setArticleList(articlesList);
+        return tagReactRepository.save(tag);
+    }
     @Transactional
     public Mono<byte[]> printTag(String id) {
         Mono<Tag> tagReact = tagReactRepository.findById(id).switchIfEmpty(Mono.error(new NotFoundException("Tag code (" + id + ")")));
