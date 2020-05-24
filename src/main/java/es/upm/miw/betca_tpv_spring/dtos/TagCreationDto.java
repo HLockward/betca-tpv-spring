@@ -1,7 +1,5 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
-import es.upm.miw.betca_tpv_spring.documents.Tag;
-
 import java.util.List;
 
 public class TagCreationDto {
@@ -18,10 +16,6 @@ public class TagCreationDto {
         this.articleList = articleList;
     }
 
-    public TagCreationDto(Tag tag) {
-        this.description = description;
-        this.articleList = articleList;
-    }
 
     public String getDescription() {
         return description;
