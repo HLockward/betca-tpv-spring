@@ -16,6 +16,7 @@ public class TagCreationDto {
         this.articleList = articleList;
     }
 
+
     public String getDescription() {
         return description;
     }

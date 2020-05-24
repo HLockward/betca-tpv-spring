@@ -2,8 +2,10 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
 import es.upm.miw.betca_tpv_spring.documents.Article;
+import es.upm.miw.betca_tpv_spring.documents.Tag;
 import es.upm.miw.betca_tpv_spring.dtos.ArticleDto;
 import es.upm.miw.betca_tpv_spring.dtos.TagCreationDto;
+import es.upm.miw.betca_tpv_spring.dtos.TagDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
@@ -38,13 +40,13 @@ class TagControllerIT {
 
     @Test
     void testCreateTag(){
-        ArticleDto[] articles = {new ArticleDto(Article.builder("0000008").description("Apple").retailPrice(new BigDecimal(3)).build())};
+        ArticleDto[] articles = {new ArticleDto(Article.builder("0000008").description("Apple").retailPrice(new BigDecimal(8)).build()), new ArticleDto(Article.builder("00000082").description("Apple2").retailPrice(new BigDecimal(8)).build())};
         TagCreationDto tagCreationDto = new TagCreationDto("tagC", Arrays.asList(articles));
 
         StepVerifier
                 .create(this.tagController.createTag(tagCreationDto))
                 .expectNextMatches(tag -> {
-                    assertEquals(1,tag.getArticleList().length);
+                    assertEquals(2,tag.getArticleList().length);
                     assertEquals("tagC",tag.getDescription());
                     return true;
                 })
