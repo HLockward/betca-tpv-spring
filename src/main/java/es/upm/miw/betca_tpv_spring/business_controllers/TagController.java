@@ -49,16 +49,17 @@ public class TagController {
         tag.setArticleList(articles);
         return tagReactRepository.save(tag);
     }
-    public Mono<TagDto> updateTag(String description, TagDto tagDto) {
+    public Mono<TagDto> updateTag(String description, TagCreationDto tagCreationDto) {
         Article[] articles;
-        articles = tagDto.getArticles().stream().map(articleDto -> Article.builder(articleDto.getCode())
+        articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
         Mono<Tag> tag = tagReactRepository.findByDescription(description).
                 switchIfEmpty(Mono.error(new NotFoundException("Tag description ("+ description +")")))
                 .map(tag1 -> {
-                   tag1.setDescription(description);
-                   tag1.setArticleList(articles);
+                    tag1.setId(tagCreationDto.getId());
+                    tag1.setDescription(description);
+                    tag1.setArticleList(articles);
                    return tag1;
                 });
 
