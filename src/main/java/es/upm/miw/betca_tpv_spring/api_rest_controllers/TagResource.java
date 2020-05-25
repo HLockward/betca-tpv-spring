@@ -47,8 +47,8 @@ public class TagResource {
     }
 
     @PutMapping(value = TAG_DESCRIPTION, produces = {"application/json"})
-    public Mono<TagDto> update(@PathVariable String description, @Valid @RequestBody TagDto tagDto){
-        return this.tagController.updateTag(description, tagDto)
+    public Mono<TagDto> update(@PathVariable String description, @Valid @RequestBody TagCreationDto tagCreationDto){
+        return this.tagController.updateTag(description, tagCreationDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 

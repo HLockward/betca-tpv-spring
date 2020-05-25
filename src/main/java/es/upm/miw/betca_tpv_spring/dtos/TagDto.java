@@ -17,7 +17,12 @@ public class TagDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ArticleDto> articleList;
 
+
     public TagDto() {
+        // Empty for framework
+    }
+
+    public TagDto(TagCreationDto tagCreationDto1) {
         // Empty for framework
     }
 
