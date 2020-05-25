@@ -71,4 +71,11 @@ public class TagController {
         Mono<Tag> tagReact = tagReactRepository.findById(id).switchIfEmpty(Mono.error(new NotFoundException("Tag code (" + id + ")")));
         return pdfService.generateTag(tagReact);
     }
+    public Mono<Void> deleteTag(String id){
+        Mono<Tag> tag = this.tagReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Tag id:" + id )));
+        return Mono
+                .when(tag)
+                .then(this.tagReactRepository.deleteById(id));
+    }
 }

@@ -25,11 +25,6 @@ public class TagCreationDto {
         this.articleList = articleList;
     }
 
-    public TagCreationDto(Tag tag) {
-        this.description = description;
-        this.articleList = articleList;
-    }
-
     public String getId() {
         return id;
     }

@@ -57,5 +57,8 @@ public class TagResource {
     public Mono<byte[]> print(@PathVariable String id){
         return this.tagController.printTag(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
-
+    @DeleteMapping(value =TAG_ID)
+    public Mono<Void> delete(@PathVariable String id){
+        return this.tagController.deleteTag(id).doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
+    }
 }
