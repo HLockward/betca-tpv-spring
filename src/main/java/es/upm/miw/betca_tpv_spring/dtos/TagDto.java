@@ -40,7 +40,7 @@ public class TagDto {
         List<Article> articlesList = new ArrayList<>();
         Collections.addAll(articlesList, tag.getArticleList());
 
-        Stream<Object> stream = articlesList.stream().map((articleDto) ->
+        Stream<Object> stream = articlesList.stream().map(articleDto ->
                 new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock())
         );
 
