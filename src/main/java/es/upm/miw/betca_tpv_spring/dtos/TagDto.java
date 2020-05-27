@@ -26,7 +26,7 @@ public class TagDto {
         // Empty for framework
     }
 
-    public TagDto(String id, String description, List<ArticleDto> articleList) {
+    private TagDto(String id, String description, List<ArticleDto> articleList) {
         this.id = id;
         this.description = description;
         this.articleList = articleList;
@@ -40,9 +40,9 @@ public class TagDto {
         List<Article> articlesList = new ArrayList<>();
         Collections.addAll(articlesList, tag.getArticleList());
 
-        Stream<Object> stream = articlesList.stream().map(articleDto -> {
-            return new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock());
-        });
+        Stream<Object> stream = articlesList.stream().map((articleDto) ->
+                new ArticleDto(articleDto.getCode(), articleDto.getDescription(), articleDto.getReference(), articleDto.getRetailPrice(), articleDto.getStock())
+        );
 
         return Arrays.asList(stream.toArray(ArticleDto[]::new));
     }
