@@ -1,7 +1,5 @@
 package es.upm.miw.betca_tpv_spring.dtos;
 
-import es.upm.miw.betca_tpv_spring.documents.Tag;
-
 import java.util.List;
 
 public class TagCreationDto {
