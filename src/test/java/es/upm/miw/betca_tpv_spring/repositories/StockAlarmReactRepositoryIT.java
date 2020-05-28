@@ -13,6 +13,7 @@ class StockAlarmReactRepositoryIT {
 
     @Autowired
     private StockAlarmReactRepository stockAlarmReactRepository;
+    private ArticleRepository articleRepository;
 
     @Test
     void testReadAllAndDatabaseSeeder() {
