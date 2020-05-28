@@ -26,10 +26,11 @@ public class TagController {
     private ArticleRepository articleRepository;
 
     @Autowired
-    public TagController(TagReactRepository tagReactRepository, PdfService pdfService) {
-
+    public TagController(TagReactRepository tagReactRepository, PdfService pdfService, SimpleMongoRepository articleReactRepository, ArticleRepository articleRepository) {
         this.tagReactRepository = tagReactRepository;
         this.pdfService = pdfService;
+        this.articleReactRepository = articleReactRepository;
+        this.articleRepository = articleRepository;
     }
 
     public Mono<TagDto> readOne(String description) {
