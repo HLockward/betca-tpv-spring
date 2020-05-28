@@ -52,4 +52,15 @@ class TagControllerIT {
                 .expectComplete()
                 .verify();
     }
+    @Test
+    void testCreateTagWithEmptyArticles() {
+        ArticleDto[] articles = {new ArticleDto(Article.builder("asldhajsd").description("Apple").retailPrice(new BigDecimal(8)).build()), new ArticleDto(Article.builder("00000082").description("Apple2").retailPrice(new BigDecimal(8)).build())};
+        TagCreationDto tagCreationDto = new TagCreationDto("tagC", Arrays.asList(articles));
+
+        StepVerifier
+                .create(this.tagController.createTag(tagCreationDto))
+                .expectError()
+                .verify();
+
+    }
 }

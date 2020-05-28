@@ -6,13 +6,11 @@ import es.upm.miw.betca_tpv_spring.documents.Tag;
 import es.upm.miw.betca_tpv_spring.dtos.TagCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.TagDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
-import es.upm.miw.betca_tpv_spring.exceptions.ConflictException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TagReactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -48,7 +46,7 @@ public class TagController {
                 .map(TagDto::new);
     }
 
-    private Mono<Void> noExistsByIdAssured(String id) {
+    private Mono<Article> noExistsByIdAssured(String id) {
         return this.articleReactRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Article with Id:" + id)));
     }
@@ -58,10 +56,11 @@ public class TagController {
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
-        Arrays.stream(articles).forEach(article -> {
-            this.noExistsByIdAssured(article.getCode());
+        Mono<Article>  notExist;
+                Arrays.stream(articles).forEach(article -> {
+          notExist =  this.noExistsByIdAssured(article.getCode());
         });
-
+if(notExist)
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
         tag.setArticleList(articles);
