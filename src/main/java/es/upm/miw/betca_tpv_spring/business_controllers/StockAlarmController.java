@@ -129,5 +129,10 @@ public class StockAlarmController {
                 .map(StockAlarmArticle::new);
     }
 
+    public Flux<StockAlarmSearchDto> readStockAlarmWithArticle(Article article) {
+        return this.stockAlarmReactRepository.findByArticle(article)
+                .switchIfEmpty(Flux.error(new BadRequestException("Bad Request")))
+                .map(StockAlarmSearchDto::new);
 
+    }
 }

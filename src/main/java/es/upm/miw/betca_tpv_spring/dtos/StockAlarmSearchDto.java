@@ -2,6 +2,7 @@ package es.upm.miw.betca_tpv_spring.dtos;
 
 
 import es.upm.miw.betca_tpv_spring.documents.Article;
+import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
 
 public class StockAlarmSearchDto extends ArticleMinimumDto {
 
@@ -21,6 +22,10 @@ public class StockAlarmSearchDto extends ArticleMinimumDto {
 
     public StockAlarmSearchDto(Article article) {
         super(article);
+    }
+
+    public StockAlarmSearchDto(StockAlarm stockAlarm) {
+
     }
 
     public Integer getStock() {
