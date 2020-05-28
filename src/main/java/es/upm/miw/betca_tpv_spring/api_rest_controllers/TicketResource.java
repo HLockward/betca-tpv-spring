@@ -1,7 +1,6 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.TicketController;
-import es.upm.miw.betca_tpv_spring.documents.Ticket;
 import es.upm.miw.betca_tpv_spring.dtos.TicketCreationInputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketPatchDto;
@@ -53,7 +52,7 @@ public class TicketResource {
     }
 
     @GetMapping(value = TICKET_ID + PDF)
-    public byte[] getPdf(@PathVariable String id) throws IOException {
+    public Mono<byte[]> getPdf(@PathVariable String id) throws IOException {
         return this.ticketController.getTicketPdf(id);
     }
 

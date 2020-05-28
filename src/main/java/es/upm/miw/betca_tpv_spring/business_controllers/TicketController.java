@@ -7,7 +7,6 @@ import es.upm.miw.betca_tpv_spring.dtos.TicketOutputDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketPatchDto;
 import es.upm.miw.betca_tpv_spring.dtos.TicketSearchDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
-import es.upm.miw.betca_tpv_spring.exceptions.PdfException;
 import es.upm.miw.betca_tpv_spring.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -126,9 +123,10 @@ public class TicketController {
         return this.ticketReactRepository.findAllTickets();
     }
 
-//
-    public byte[] getTicketPdf(String ticketId) throws IOException {
-        return pdfService.getPdfFromTicketId(ticketId);
+    public Mono<byte[]> getTicketPdf(String ticketId) throws IOException {
+        Mono<Ticket> ticket = this.ticketReactRepository.findById(ticketId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + ticketId + " not found")));
+        return pdfService.generateTicket(ticket);
     }
 
     public Mono<TicketOutputDto> getTicket(String id) {
