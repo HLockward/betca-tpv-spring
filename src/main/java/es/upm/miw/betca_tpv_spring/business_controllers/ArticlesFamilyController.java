@@ -145,7 +145,8 @@ public class ArticlesFamilyController {
 
         if (articlesFamilyCreationDto.getFamilyType() == FamilyType.ARTICLE) {
 
-            Mono<Article> article = this.articleReactRepository.findById(articlesFamilyCreationDto.getArticle());
+            Mono<Article> article = this.articleReactRepository
+                    .findById(articlesFamilyCreationDto.getArticle()).map(a -> new FamilyArticle(a));
             articlesFamily = new  FamilyArticle(article);
 
         } else {
