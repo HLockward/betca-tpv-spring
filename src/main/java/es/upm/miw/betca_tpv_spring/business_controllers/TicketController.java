@@ -126,7 +126,7 @@ public class TicketController {
         return this.ticketReactRepository.findAllTickets();
     }
 
-
+//
     public byte[] getTicketPdf(String ticketId) throws IOException {
         return pdfService.getPdfFromTicketId(ticketId);
     }
