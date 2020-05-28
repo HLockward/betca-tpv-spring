@@ -30,4 +30,10 @@ class StockAlarmReactRepositoryIT {
                 .thenCancel()
                 .verify();
     }
+
+    @Test
+    void readStockAlarmWithArticle() {
+
+
+    }
 }
