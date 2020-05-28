@@ -25,7 +25,6 @@ public class StockAlarmSearchDto extends ArticleMinimumDto {
     }
 
     public StockAlarmSearchDto(StockAlarm stockAlarm) {
-
     }
 
     public Integer getStock() {

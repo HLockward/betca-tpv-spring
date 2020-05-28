@@ -8,6 +8,6 @@ import reactor.core.publisher.Flux;
 
 public interface StockAlarmReactRepository extends ReactiveSortingRepository<StockAlarm, String> {
 
-    @Query(value = "{'stockAlarmArticle': {  $elemMatch: { 'article' : ?0 } }}")
+    @Query(value = "{'stockAlarmArticle': {  $elemMatch: { 'article' : ?1 } }}")
     Flux<StockAlarm> findByArticle(Article article);
 }
