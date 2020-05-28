@@ -6,9 +6,12 @@ import es.upm.miw.betca_tpv_spring.documents.Tag;
 import es.upm.miw.betca_tpv_spring.dtos.TagCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.TagDto;
 import es.upm.miw.betca_tpv_spring.exceptions.BadRequestException;
+import es.upm.miw.betca_tpv_spring.exceptions.ConflictException;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
+import es.upm.miw.betca_tpv_spring.repositories.ArticleRepository;
 import es.upm.miw.betca_tpv_spring.repositories.TagReactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -19,6 +22,8 @@ public class TagController {
 
     private TagReactRepository tagReactRepository;
     private PdfService pdfService;
+    private SimpleMongoRepository articleReactRepository;
+    private ArticleRepository articleRepository;
 
     @Autowired
     public TagController(TagReactRepository tagReactRepository, PdfService pdfService) {
@@ -38,15 +43,25 @@ public class TagController {
                 .switchIfEmpty(Flux.error(new BadRequestException("Bad Request")))
                 .map(TagDto::new);
     }
+    private Mono<Void> noExistsByIdAssured(String id) {
+        return this.articleReactRepository.existsById(id)
+                .handle((result, sink) -> {
+                    if (Boolean.TRUE.equals(result)) {
+                        sink.error(new ConflictException("Article code (" + id + ")"));
+                    } else {
+                        sink.complete();
+                    }
+                });
+    }
 
     public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
 
-                if(tagCreationDto.getArticleList().contains(null))
         Article[] articles;
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
-
+        Mono<Void> noExistsByIdAssured = this.noExistsByIdAssured(code);
+        if(tagCreationDto.getArticleList().contains(null))
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
         tag.setArticleList(articles);
