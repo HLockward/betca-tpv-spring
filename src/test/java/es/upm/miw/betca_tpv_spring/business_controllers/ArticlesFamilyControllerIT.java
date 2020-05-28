@@ -24,7 +24,7 @@ class ArticlesFamilyControllerIT {
 
     private FamilyType familyType;
 
-    private ArticlesFamily familyComposite = new FamilyComposite(FamilyType.ARTICLES,
+    private final ArticlesFamily familyComposite = new FamilyComposite(FamilyType.ARTICLES,
             "reference",
             "description");
 
@@ -89,7 +89,7 @@ class ArticlesFamilyControllerIT {
         ArticlesFamilySearchDto articlesFamilySearchDto =
                 new ArticlesFamilySearchDto("", "ARTICLES");
         StepVerifier
-                .create(this.articlesFamilyController.searchArticlesFamilyByReferenceOrFamilyType(articlesFamilySearchDto))
+                .create(this.articlesFamilyController.searchArticlesFamilyByReference(articlesFamilySearchDto))
                 .expectNextCount(3)
                 .thenCancel()
                 .verify();

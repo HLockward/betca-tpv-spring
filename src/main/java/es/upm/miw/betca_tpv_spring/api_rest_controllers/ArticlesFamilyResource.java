@@ -56,7 +56,7 @@ public class ArticlesFamilyResource {
             return this.articlesFamilyController.readAllArticlesFamily()
                     .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
         }else{
-            return this.articlesFamilyController.searchArticlesFamilyByReferenceOrFamilyType(articlesFamilySearchDto)
+            return this.articlesFamilyController.searchArticlesFamilyByReference(articlesFamilySearchDto)
                     .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
         }
 

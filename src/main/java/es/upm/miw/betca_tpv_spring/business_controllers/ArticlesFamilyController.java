@@ -132,11 +132,10 @@ public class ArticlesFamilyController {
                 .map(ArticlesFamilyCrudDto::new);
     }
 
-    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReferenceOrFamilyType(ArticlesFamilySearchDto articlesFamilySearchDto) {
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReference(ArticlesFamilySearchDto articlesFamilySearchDto) {
         return this.articlesFamilyReactRepository
                 .findByReferenceLikeOrFamilyType(
                         articlesFamilySearchDto.getReference(),
-                        articlesFamilySearchDto.getArticleFamily())
                 .map(ArticlesFamilyCrudDto::new);
 
     }
