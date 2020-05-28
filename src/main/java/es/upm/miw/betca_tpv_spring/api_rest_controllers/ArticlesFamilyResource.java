@@ -80,5 +80,4 @@ public class ArticlesFamilyResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-
 }
