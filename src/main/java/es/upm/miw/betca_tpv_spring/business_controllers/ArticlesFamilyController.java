@@ -138,6 +138,7 @@ public class ArticlesFamilyController {
                         articlesFamilySearchDto.getReference(),
                         articlesFamilySearchDto.getArticleFamily())
                 .map(ArticlesFamilyCrudDto::new);
+
     }
 
     public Mono<ArticlesFamilyCrudDto> createArticlesFamily(ArticlesFamilyCreationDto articlesFamilyCreationDto) {
