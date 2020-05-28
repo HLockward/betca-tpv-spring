@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.TestConfig;
+import es.upm.miw.betca_tpv_spring.documents.Article;
 import es.upm.miw.betca_tpv_spring.documents.StockAlarm;
 import es.upm.miw.betca_tpv_spring.documents.StockAlarmArticle;
 import es.upm.miw.betca_tpv_spring.dtos.*;
@@ -108,6 +109,16 @@ class StockAlarmControllerIT {
     void testStockAlarmGetAllArticlesByState() {
         StepVerifier
                 .create(this.stockAlarmController.getAllArticlesInStockAlarm("warning"))
+                .expectNextCount(1)
+                .thenCancel()
+                .verify();
+    }
+
+    @Test
+    void testReadStockAlarmByArticle() {
+        Article article = this.articleRepository.findAll().get(0);
+        StepVerifier
+                .create(this.stockAlarmController.readStockAlarmWithArticle(article))
                 .expectNextCount(1)
                 .thenCancel()
                 .verify();
