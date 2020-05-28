@@ -40,10 +40,12 @@ public class TagController {
     }
 
     public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
+        // TODO
         Article[] articles;
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
+
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
         tag.setArticleList(articles);
