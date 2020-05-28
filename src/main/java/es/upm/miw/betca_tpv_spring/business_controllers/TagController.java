@@ -56,15 +56,15 @@ public class TagController {
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
-        Mono<Article>  notExist;
-                Arrays.stream(articles).forEach(article -> {
-          notExist =  this.noExistsByIdAssured(article.getCode());
+
+        Arrays.stream(articles).forEach(article -> {
+            Mono<Article> notExist = this.noExistsByIdAssured(article.getCode());
         });
-if(notExist)
+
         Tag tag = new Tag();
         tag.setDescription(tagCreationDto.getDescription());
         tag.setArticleList(articles);
-        return tagReactRepository.save(tag);
+        return this.tagReactRepository.save(tag);
     }
 
     public Mono<TagDto> updateTag(String description, TagCreationDto tagCreationDto) {
