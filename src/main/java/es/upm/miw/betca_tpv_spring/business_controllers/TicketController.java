@@ -123,7 +123,7 @@ public class TicketController {
         return this.ticketReactRepository.findAllTickets();
     }
 
-    public Mono<byte[]> getTicketPdf(String ticketId) throws IOException {
+    public Mono<byte[]> getTicketPdf(String ticketId) {
         Mono<Ticket> ticket = this.ticketReactRepository.findById(ticketId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + ticketId + " not found")));
         return pdfService.generateTicket(ticket);
