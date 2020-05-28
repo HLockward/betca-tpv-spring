@@ -128,4 +128,6 @@ public class StockAlarmController {
                 .flatMap(stockAlarm -> Flux.just(stockAlarm.getStockAlarmArticle()))
                 .map(StockAlarmArticle::new);
     }
+
+
 }
