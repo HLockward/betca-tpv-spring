@@ -55,7 +55,6 @@ public class TagController {
     }
 
     public Mono<Tag> createTag(TagCreationDto tagCreationDto) {
-
         Article[] articles;
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
