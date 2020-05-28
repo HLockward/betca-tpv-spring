@@ -32,9 +32,4 @@ class StockAlarmReactRepositoryIT {
                 .verify();
     }
 
-    @Test
-    void readStockAlarmWithArticle() {
-
-
-    }
 }

@@ -135,7 +135,10 @@ public class StockAlarmController {
                 .map(stockAlarm -> {
                     StockAlarmSearchDto stockAlarmSearchDto = new StockAlarmSearchDto();
                     stockAlarmSearchDto.setCode(article.getCode());
+                    stockAlarmSearchDto.setStock(article.getStock());
                     stockAlarmSearchDto.setDescription(stockAlarm.getDescription());
+                    stockAlarmSearchDto.setWarning(stockAlarm.getWarning());
+                    stockAlarmSearchDto.setCritical(stockAlarm.getCritical());
                     return stockAlarmSearchDto;
                 });
     }
