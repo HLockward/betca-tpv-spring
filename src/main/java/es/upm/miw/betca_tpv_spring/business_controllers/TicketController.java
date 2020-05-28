@@ -124,9 +124,9 @@ public class TicketController {
     }
 
     public Mono<byte[]> getTicketPdf(String ticketId) {
-        Mono<Ticket> ticket = this.ticketReactRepository.findById(ticketId)
+        Mono<Ticket> ticketReact = this.ticketReactRepository.findById(ticketId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Ticket " + ticketId + " not found")));
-        return pdfService.generateTicket(ticket);
+        return pdfService.generateTicket(ticketReact);
     }
 
     public Mono<TicketOutputDto> getTicket(String id) {
