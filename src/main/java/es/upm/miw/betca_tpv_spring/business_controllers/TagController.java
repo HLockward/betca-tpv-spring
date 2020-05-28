@@ -50,7 +50,7 @@ public class TagController {
                     if (Boolean.TRUE.equals(result)) {
                         sink.error(new ConflictException("Article code (" + id + ")"));
                     } else {
-                        sink.complete();
+                        sink.complete()
                     }
                 });
     }
@@ -60,6 +60,10 @@ public class TagController {
         articles = tagCreationDto.getArticleList().stream().map(articleDto -> Article.builder(articleDto.getCode())
                 .description(articleDto.getDescription())
                 .build()).toArray(Article[]::new);
+        Arrays.stream(article).for-> {
+
+            this.noExistsByIdAssured(article)
+        })
         Mono<Void> noExistsByIdAssured = this.noExistsByIdAssured(code);
         if(tagCreationDto.getArticleList().contains(null))
         Tag tag = new Tag();
