@@ -49,10 +49,9 @@ public class ArticlesFamilyResource {
     }
 
     @GetMapping
-    public Flux<ArticlesFamilyCrudDto> searchArticlesFamily(@RequestParam(required = false) String reference,
-                                                        @RequestParam(required = false) String familyType){
-        ArticlesFamilySearchDto articlesFamilySearchDto = new ArticlesFamilySearchDto(reference,familyType);
-        if(reference == null && familyType == null){
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamily(@RequestParam(required = false) String reference){
+        ArticlesFamilySearchDto articlesFamilySearchDto = new ArticlesFamilySearchDto(reference);
+        if(reference == null){
             return this.articlesFamilyController.readAllArticlesFamily()
                     .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
         }else{

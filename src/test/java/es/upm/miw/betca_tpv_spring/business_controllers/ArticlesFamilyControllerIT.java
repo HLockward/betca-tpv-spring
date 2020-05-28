@@ -89,7 +89,7 @@ class ArticlesFamilyControllerIT {
         ArticlesFamilySearchDto articlesFamilySearchDto =
                 new ArticlesFamilySearchDto("", "ARTICLES");
         StepVerifier
-                .create(this.articlesFamilyController.searchArticlesFamilyByReference(articlesFamilySearchDto))
+                .create(this.articlesFamilyController.searchArticlesFamilyByReferenceOrFamilyType(articlesFamilySearchDto))
                 .expectNextCount(3)
                 .thenCancel()
                 .verify();

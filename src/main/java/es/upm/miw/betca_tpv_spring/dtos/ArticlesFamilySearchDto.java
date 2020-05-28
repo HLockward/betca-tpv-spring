@@ -15,9 +15,8 @@ public class ArticlesFamilySearchDto {
         // Empty for framework
     }
 
-    public ArticlesFamilySearchDto(String reference, String articleFamily) {
+    public ArticlesFamilySearchDto(String reference) {
         this.reference = reference;
-        this.articleFamily = articleFamily;
     }
 
     public String getReference() {
