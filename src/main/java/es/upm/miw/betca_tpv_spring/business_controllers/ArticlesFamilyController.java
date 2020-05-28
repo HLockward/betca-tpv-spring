@@ -144,12 +144,12 @@ public class ArticlesFamilyController {
         ArticlesFamily articlesFamily;
 
         if (articlesFamilyCreationDto.getFamilyType() == FamilyType.ARTICLE) {
-
+            ///FamilyArticle  articlesFamily = null;
             Mono<Article> article = this.articleReactRepository
-                    .findById(articlesFamilyCreationDto.getArticle())
-                    .switchIfEmpty(Mono.error(new Exception("Article)")))
-                    .doOnNext(FamilyArticle::new).then();
-            articlesFamily = new  FamilyArticle(article);
+                    .findById(articlesFamilyCreationDto.getArticle());
+            return Mono
+                    .when(article)
+                    .map( x -> new  FamilyArticle(article));
 
         } else {
             FamilyComposite familyComposite = new FamilyComposite(articlesFamilyCreationDto.getFamilyType(),
