@@ -23,16 +23,11 @@ public class ArticlesFamilySearchDto {
         return reference;
     }
 
-    public String getArticleFamily() {
-        return articleFamily;
-    }
-
 
     @Override
     public String toString() {
         return "ArticlesFamilySearchDto{" +
                 "reference=" + this.reference +
-                ", articleFamily='" + this.articleFamily + '\'' +
                 '}';
     }
 }

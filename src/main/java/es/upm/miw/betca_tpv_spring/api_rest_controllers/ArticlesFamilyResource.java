@@ -49,7 +49,7 @@ public class ArticlesFamilyResource {
     }
 
     @GetMapping
-    public Flux<ArticlesFamilyCrudDto> searchArticlesFamily(@RequestParam(required = false) String reference){
+    public Flux<ArticlesFamilyCrudDto> searchArticlesFamilyByReference(@RequestParam(required = false) String reference){
         ArticlesFamilySearchDto articlesFamilySearchDto = new ArticlesFamilySearchDto(reference);
         if(reference == null){
             return this.articlesFamilyController.readAllArticlesFamily()

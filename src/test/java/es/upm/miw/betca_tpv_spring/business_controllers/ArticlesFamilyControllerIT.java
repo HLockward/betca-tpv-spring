@@ -85,11 +85,11 @@ class ArticlesFamilyControllerIT {
     }
 
     @Test
-    void testSearchArticlesFamilyByReferencesOrFamilyType() {
+    void testSearchArticlesFamilyByReferences() {
         ArticlesFamilySearchDto articlesFamilySearchDto =
-                new ArticlesFamilySearchDto("", "ARTICLES");
+                new ArticlesFamilySearchDto("");
         StepVerifier
-                .create(this.articlesFamilyController.searchArticlesFamilyByReferenceOrFamilyType(articlesFamilySearchDto))
+                .create(this.articlesFamilyController.searchArticlesFamilyByReference(articlesFamilySearchDto))
                 .expectNextCount(3)
                 .thenCancel()
                 .verify();
