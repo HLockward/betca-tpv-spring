@@ -39,7 +39,7 @@ public class CustomerDiscountControllerIT {
     @Test
     void testCreateCustomerDiscount() {
         CustomerDiscountDto customerDiscountDto = new CustomerDiscountDto("desc5", LocalDateTime.now(),
-                new BigDecimal(15), new BigDecimal(5), User.builder().build(), "555550147");
+                new BigDecimal(15), new BigDecimal(5), User.builder().build());
         StepVerifier
                 .create(this.customerDiscountController.createCustomerDiscount(customerDiscountDto))
                 .expectNextCount(1)

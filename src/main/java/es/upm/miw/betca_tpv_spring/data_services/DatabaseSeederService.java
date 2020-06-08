@@ -159,6 +159,7 @@ public class DatabaseSeederService {
         this.staffRepository.deleteAll();
         this.stockAlarmRepository.deleteAll();
         this.customerPointsRepository.deleteAll();
+        this.customerDiscountRepository.deleteAll();
         // -------------------------------------------------------------------------
         this.initialize();
     }
@@ -235,9 +236,9 @@ public class DatabaseSeederService {
         };
         this.articleRepository.saveAll(Arrays.asList(articles));
         LogManager.getLogger(this.getClass()).warn("        ------- articles");
-        Article[] articles1 = {articles[0], articles[1],articles[4]};
-        Article[] articles2 = {articles[0], articles[3],articles[4]};
-        Article[] articles3 = {articles[0], articles[4],articles[5]};
+        Article[] articles1 = {articles[0], articles[1], articles[4]};
+        Article[] articles2 = {articles[0], articles[3], articles[4]};
+        Article[] articles3 = {articles[0], articles[4], articles[5]};
         Tag[] tags = {
                 new Tag("tag1", articles1),
                 new Tag("tag2", articles2),
@@ -362,7 +363,11 @@ public class DatabaseSeederService {
         this.orderRepository.saveAll(Arrays.asList(orders));
         LogManager.getLogger(this.getClass()).warn("        ------- orders");
         CustomerDiscount[] customerDiscounts = {
-                new CustomerDiscount("discount1", BigDecimal.TEN, BigDecimal.TEN, users[4])
+                new CustomerDiscount("discount0", new BigDecimal(10), new BigDecimal(5), users[0]),
+                new CustomerDiscount("discount1", new BigDecimal(20), new BigDecimal(10), users[1]),
+                new CustomerDiscount("discount2", new BigDecimal(30), new BigDecimal(15), users[2]),
+                new CustomerDiscount("discount3", new BigDecimal(40), new BigDecimal(20), users[3]),
+                new CustomerDiscount("discount4", new BigDecimal(50), new BigDecimal(25), users[4])
         };
         this.customerDiscountRepository.saveAll(Arrays.asList(customerDiscounts));
         LogManager.getLogger(this.getClass()).warn("        ------- customerDiscounts");

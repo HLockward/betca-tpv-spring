@@ -3,7 +3,6 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 import es.upm.miw.betca_tpv_spring.documents.CustomerDiscount;
 import es.upm.miw.betca_tpv_spring.documents.User;
 import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountDto;
-import es.upm.miw.betca_tpv_spring.dtos.UserMinimumDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.CustomerDiscountReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.CustomerDiscountRepository;
@@ -36,12 +35,12 @@ public class CustomerDiscountController {
         Mono<User> user = this.findUserByMobile(mobile);
         return this.customerDiscountReactRepository.findByUser(user)
                 .switchIfEmpty(Mono.error(new NotFoundException(USER_NOT_FOUND)))
-                        .map(CustomerDiscountDto::new);
+                .map(CustomerDiscountDto::new);
     }
 
     public Mono<CustomerDiscountDto> createCustomerDiscount(CustomerDiscountDto customerDiscountDto) {
         CustomerDiscount customerDiscount = new CustomerDiscount();
-        return this.findUserByMobile(customerDiscountDto.getMobile()).doOnNext(user -> {
+        return this.findUserByMobile(customerDiscountDto.getUser().getMobile()).doOnNext(user -> {
             customerDiscount.setDiscount(customerDiscountDto.getDiscount());
             customerDiscount.setUser(user);
         })
@@ -72,7 +71,7 @@ public class CustomerDiscountController {
     }
 
     public Flux<CustomerDiscountDto> readAll() {
-        return this.customerDiscountReactRepository.findAllCustomerDiscounts();
+        return this.customerDiscountReactRepository.findAll().map(CustomerDiscountDto::new);
     }
 
 }

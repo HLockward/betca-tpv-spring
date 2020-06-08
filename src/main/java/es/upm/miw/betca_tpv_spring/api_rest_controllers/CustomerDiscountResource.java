@@ -24,14 +24,14 @@ public class CustomerDiscountResource {
     private CustomerDiscountController customerDiscountController;
 
     @Autowired
-    CustomerDiscountResource(CustomerDiscountController customerDiscountController) {
+    public CustomerDiscountResource(CustomerDiscountController customerDiscountController) {
         this.customerDiscountController = customerDiscountController;
     }
 
     @GetMapping
     public Flux<CustomerDiscountDto> readAll() {
         return this.customerDiscountController.readAll()
-                .doOnEach(log -> LogManager.getLogger(this.getClass()).debug(log));
+                .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
     @PostMapping
