@@ -7,7 +7,7 @@ import es.upm.miw.betca_tpv_spring.documents.User;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class CustomerDiscountDto {
+public class CustomerDiscountCreationDto {
 
     private String id;
 
@@ -21,35 +21,37 @@ public class CustomerDiscountDto {
     private BigDecimal minimumPurchase;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private User user;
+    private String mobile;
 
-    public CustomerDiscountDto() {
+    public CustomerDiscountCreationDto() {
         // Empty for framework
     }
 
-    public CustomerDiscountDto(String id, String description, LocalDateTime registrationDate, BigDecimal discount,
-                               BigDecimal minimumPurchase, User user) {
+    public CustomerDiscountCreationDto(String id, String description, LocalDateTime registrationDate, BigDecimal discount,
+                                       BigDecimal minimumPurchase, User user) {
         this.id = id;
         this.description = description;
         this.registrationDate = LocalDateTime.now();
         this.discount = discount;
         this.minimumPurchase = minimumPurchase;
-        this.user = user;
+        this.mobile = mobile;
     }
 
-    public CustomerDiscountDto(CustomerDiscount customerDiscount) {
-        this(
-                customerDiscount.getId(),
-                customerDiscount.getDescription(),
-                customerDiscount.getRegistrationDate(),
-                customerDiscount.getDiscount(),
-                customerDiscount.getMinimumPurchase(),
-                customerDiscount.getUser()
-        );
+    public CustomerDiscountCreationDto(CustomerDiscount customerDiscount) {
+        this.id = customerDiscount.getId();
+        this.description = customerDiscount.getDescription();
+        this.registrationDate = customerDiscount.getRegistrationDate();
+        this.discount = customerDiscount.getDiscount();
+        this.minimumPurchase = customerDiscount.getMinimumPurchase();
+        this.mobile = customerDiscount.getUser().getMobile();
     }
 
     public String getId() {
-        return this.id;
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -80,24 +82,24 @@ public class CustomerDiscountDto {
         this.minimumPurchase = minimumPurchase;
     }
 
-    public User getUser() {
-        return this.user;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
 
     @Override
     public String toString() {
-        return "CustomerDiscountDto{" +
-                "id='" + this.id + '\'' +
-                ", description='" + this.description + '\'' +
+        return "CustomerDiscountCreationDto{" +
+                "description='" + this.description + '\'' +
                 ", registrationDate='" + this.registrationDate + '\'' +
                 ", discount='" + this.discount + '\'' +
                 ", minimumPurchase='" + this.minimumPurchase + '\'' +
-                ", user=" + this.user +
+                ", mobile=" + this.mobile +
                 '}';
     }
 }
+

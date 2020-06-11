@@ -1,6 +1,7 @@
 package es.upm.miw.betca_tpv_spring.api_rest_controllers;
 
 import es.upm.miw.betca_tpv_spring.business_controllers.CustomerDiscountController;
+import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountDto;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class CustomerDiscountResource {
 
     public static final String CUSTOMER_DISCOUNTS = "/customer-discounts";
     public static final String MOBILE_ID = "/{mobile}";
-    public static final String CUSTOMER_DISCOUNTS_ID = "/{customerDiscountId}";
+    public static final String ID = "/{id}";
 
     private CustomerDiscountController customerDiscountController;
 
@@ -35,8 +36,8 @@ public class CustomerDiscountResource {
     }
 
     @PostMapping
-    public Mono<CustomerDiscountDto> createCustomerDiscount(@Valid @RequestBody CustomerDiscountDto customerDiscountDto) {
-        return this.customerDiscountController.createCustomerDiscount(customerDiscountDto)
+    public Mono<CustomerDiscountDto> createCustomerDiscount(@Valid @RequestBody CustomerDiscountCreationDto customerDiscountCreationDto) {
+        return this.customerDiscountController.createCustomerDiscount(customerDiscountCreationDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
@@ -52,9 +53,9 @@ public class CustomerDiscountResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @DeleteMapping(value = CUSTOMER_DISCOUNTS_ID)
-    public Mono<Void> deleteCustomerDiscount(@PathVariable String customerDiscountId) {
-        return this.customerDiscountController.deleteCustomerDiscount(customerDiscountId)
+    @DeleteMapping(value = ID)
+    public Mono<Void> deleteCustomerDiscount(@PathVariable String id) {
+        return this.customerDiscountController.deleteCustomerDiscount(id)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
