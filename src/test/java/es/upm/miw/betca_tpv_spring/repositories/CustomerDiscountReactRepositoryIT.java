@@ -24,10 +24,10 @@ public class CustomerDiscountReactRepositoryIT {
                 .create(this.customerDiscountReactRepository.findAll())
                 .expectNextMatches(customerDiscount -> {
                     assertNotNull(customerDiscount.getId());
-                    assertEquals("discount1", customerDiscount.getDescription());
+                    assertEquals("discount0", customerDiscount.getDescription());
                     assertNotNull(customerDiscount.getRegistrationDate());
                     assertEquals(BigDecimal.TEN, customerDiscount.getDiscount());
-                    assertEquals(BigDecimal.TEN, customerDiscount.getMinimumPurchase());
+                    assertEquals(new BigDecimal(5), customerDiscount.getMinimumPurchase());
                     assertNotNull(customerDiscount.getUser());
                     assertFalse(customerDiscount.toString().matches("@"));
                     return true;
@@ -43,10 +43,10 @@ public class CustomerDiscountReactRepositoryIT {
                 .create(this.customerDiscountReactRepository.findByUser(this.userReactRepository.findByMobile("666666004")))
                 .expectNextMatches(customerDiscount -> {
                     assertNotNull(customerDiscount.getId());
-                    assertEquals("discount1", customerDiscount.getDescription());
+                    assertEquals("discount4", customerDiscount.getDescription());
                     assertNotNull(customerDiscount.getRegistrationDate());
-                    assertEquals(BigDecimal.TEN, customerDiscount.getDiscount());
-                    assertEquals(BigDecimal.TEN, customerDiscount.getMinimumPurchase());
+                    assertEquals(new BigDecimal(50), customerDiscount.getDiscount());
+                    assertEquals(new BigDecimal(25), customerDiscount.getMinimumPurchase());
                     assertNotNull(customerDiscount.getUser());
                     assertFalse(customerDiscount.toString().matches("@"));
                     return true;

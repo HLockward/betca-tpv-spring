@@ -71,7 +71,7 @@ public class CustomerDiscountResourceIT {
     @Test
     void testDeleteCustomerDiscount() {
         this.restService.loginAdmin(webTestClient)
-                .delete().uri(contextPath + CUSTOMER_DISCOUNTS + CUSTOMER_DISCOUNTS_ID, 555)
+                .delete().uri(contextPath + CUSTOMER_DISCOUNTS + ID, 555)
                 .exchange()
                 .expectStatus().isOk();
     }

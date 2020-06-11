@@ -24,7 +24,6 @@ public class CustomerDiscount {
     }
 
     public CustomerDiscount(String description, BigDecimal discount, BigDecimal minimumPurchase, User user) {
-        this();
         this.description = description;
         this.discount = discount;
         this.minimumPurchase = minimumPurchase;
@@ -67,7 +66,9 @@ public class CustomerDiscount {
         return user;
     }
 
-    public void setUser(User user) { this.user = user; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     @Override
     public int hashCode() {

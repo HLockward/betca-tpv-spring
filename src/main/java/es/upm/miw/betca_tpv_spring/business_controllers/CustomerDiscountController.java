@@ -2,8 +2,8 @@ package es.upm.miw.betca_tpv_spring.business_controllers;
 
 import es.upm.miw.betca_tpv_spring.documents.CustomerDiscount;
 import es.upm.miw.betca_tpv_spring.documents.User;
+import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountCreationDto;
 import es.upm.miw.betca_tpv_spring.dtos.CustomerDiscountDto;
-import es.upm.miw.betca_tpv_spring.dtos.UserMinimumDto;
 import es.upm.miw.betca_tpv_spring.exceptions.NotFoundException;
 import es.upm.miw.betca_tpv_spring.repositories.CustomerDiscountReactRepository;
 import es.upm.miw.betca_tpv_spring.repositories.CustomerDiscountRepository;
@@ -22,8 +22,8 @@ public class CustomerDiscountController {
     private UserReactRepository userReactRepository;
 
     @Autowired
-    CustomerDiscountController(CustomerDiscountReactRepository customerDiscountReactRepository, UserReactRepository userReactRepository,
-                               CustomerDiscountRepository customerDiscountRepository, UserRepository userRepository) {
+    public CustomerDiscountController(CustomerDiscountReactRepository customerDiscountReactRepository, UserReactRepository userReactRepository,
+                                      CustomerDiscountRepository customerDiscountRepository, UserRepository userRepository) {
         this.customerDiscountReactRepository = customerDiscountReactRepository;
         this.userReactRepository = userReactRepository;
     }
@@ -36,16 +36,18 @@ public class CustomerDiscountController {
         Mono<User> user = this.findUserByMobile(mobile);
         return this.customerDiscountReactRepository.findByUser(user)
                 .switchIfEmpty(Mono.error(new NotFoundException(USER_NOT_FOUND)))
-                        .map(CustomerDiscountDto::new);
+                .map(CustomerDiscountDto::new);
     }
 
-    public Mono<CustomerDiscountDto> createCustomerDiscount(CustomerDiscountDto customerDiscountDto) {
+    public Mono<CustomerDiscountDto> createCustomerDiscount(CustomerDiscountCreationDto customerDiscountCreationDto) {
         CustomerDiscount customerDiscount = new CustomerDiscount();
-        return this.findUserByMobile(customerDiscountDto.getMobile()).doOnNext(user -> {
-            customerDiscount.setDiscount(customerDiscountDto.getDiscount());
-            customerDiscount.setUser(user);
-        })
-                .then(this.customerDiscountReactRepository.save(customerDiscount)).map(CustomerDiscountDto::new);
+        return this.findUserByMobile(customerDiscountCreationDto.getMobile()).doOnNext(
+                user -> {
+                    customerDiscount.setDiscount(customerDiscountCreationDto.getDiscount());
+                    customerDiscount.setUser(user);
+                })
+                .then(this.customerDiscountReactRepository.save(customerDiscount))
+                .map(CustomerDiscountDto::new);
 
     }
 
@@ -72,7 +74,7 @@ public class CustomerDiscountController {
     }
 
     public Flux<CustomerDiscountDto> readAll() {
-        return this.customerDiscountReactRepository.findAllCustomerDiscounts();
+        return this.customerDiscountReactRepository.findAll().map(CustomerDiscountDto::new);
     }
 
 }
