@@ -47,9 +47,9 @@ public class CustomerDiscountResource {
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
-    @PutMapping(value = MOBILE_ID)
-    public Mono<CustomerDiscountDto> updateCustomerDiscount(@PathVariable String mobile, @Valid @RequestBody CustomerDiscountDto customerDiscountDto) {
-        return this.customerDiscountController.updateCustomerDiscount(mobile, customerDiscountDto)
+    @PutMapping(value = ID)
+    public Mono<CustomerDiscountDto> updateCustomerDiscount(@PathVariable String id, @Valid @RequestBody CustomerDiscountCreationDto customerDiscountCreationDto) {
+        return this.customerDiscountController.updateCustomerDiscount(id, customerDiscountCreationDto)
                 .doOnNext(log -> LogManager.getLogger(this.getClass()).debug(log));
     }
 
