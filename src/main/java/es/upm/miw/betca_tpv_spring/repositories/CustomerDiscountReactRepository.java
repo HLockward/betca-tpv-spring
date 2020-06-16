@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 public interface CustomerDiscountReactRepository extends ReactiveSortingRepository<CustomerDiscount, String> {
     Mono<CustomerDiscount> findByUser(Mono<User> user);
 
+    Mono<CustomerDiscount> findById(Mono<CustomerDiscount> customerDiscount);
+
    @Query(value = "{}", fields = "{ '_id': 0, 'user' : 1, 'discount' : 1}")
    Flux<CustomerDiscountDto> findAllCustomerDiscounts();
 }

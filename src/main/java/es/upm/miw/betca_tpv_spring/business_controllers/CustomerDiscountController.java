@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 @Controller
 public class CustomerDiscountController {
 
@@ -51,9 +53,9 @@ public class CustomerDiscountController {
 
     }
 
-    public Mono<CustomerDiscountDto> updateCustomerDiscount(String customerDiscountId, CustomerDiscountDto customerDiscountDto) {
-        Mono<CustomerDiscount> customerDiscountMono = this.customerDiscountReactRepository.findById(customerDiscountId)
-                .switchIfEmpty(Mono.error(new NotFoundException("CustomerDiscount Id " + customerDiscountId)))
+    public Mono<CustomerDiscountDto> updateCustomerDiscount(String id, @Valid CustomerDiscountCreationDto customerDiscountDto) {
+        Mono<CustomerDiscount> customerDiscountMono = this.customerDiscountReactRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("CustomerDiscount Id " + id)))
                 .map(customerDiscount1 -> {
                     customerDiscount1.setDescription(customerDiscountDto.getDescription());
                     customerDiscount1.setDiscount(customerDiscountDto.getDiscount());
