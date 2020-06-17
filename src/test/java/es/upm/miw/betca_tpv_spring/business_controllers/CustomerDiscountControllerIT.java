@@ -20,19 +20,6 @@ public class CustomerDiscountControllerIT {
     @Autowired
     private CustomerDiscountRepository customerDiscountRepository;
 
-    @Test
-    void testFindCustomerDiscountByUserMobile() {
-        StepVerifier
-                .create(this.customerDiscountController.findByUserMobile("666666004"))
-                .expectNextMatches(cd -> {
-                    assertNotNull(cd);
-                    assertEquals(new BigDecimal(50), cd.getDiscount());
-                    return true;
-                })
-                .expectComplete()
-                .verify();
-    }
-
     /*@Test
     void testCreateCustomerDiscount() {
         CustomerDiscountDto customerDiscountDto = new CustomerDiscountDto("desc5", LocalDateTime.now(),

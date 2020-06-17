@@ -20,8 +20,8 @@ import javax.validation.Valid;
 public class CustomerDiscountController {
 
     private static final String USER_NOT_FOUND = "User not found";
-    private CustomerDiscountReactRepository customerDiscountReactRepository;
-    private UserReactRepository userReactRepository;
+    private final CustomerDiscountReactRepository customerDiscountReactRepository;
+    private final UserReactRepository userReactRepository;
 
     @Autowired
     public CustomerDiscountController(CustomerDiscountReactRepository customerDiscountReactRepository, UserReactRepository userReactRepository,
@@ -46,6 +46,8 @@ public class CustomerDiscountController {
         return this.findUserByMobile(customerDiscountCreationDto.getMobile()).doOnNext(
                 user -> {
                     customerDiscount.setDiscount(customerDiscountCreationDto.getDiscount());
+                    customerDiscount.setMinimumPurchase(customerDiscountCreationDto.getMinimumPurchase());
+                    customerDiscount.setDescription(customerDiscountCreationDto.getDescription());
                     customerDiscount.setUser(user);
                 })
                 .then(this.customerDiscountReactRepository.save(customerDiscount))

@@ -22,7 +22,7 @@ public class CustomerDiscountResource {
     public static final String MOBILE_ID = "/{mobile}";
     public static final String ID = "/{id}";
 
-    private CustomerDiscountController customerDiscountController;
+    private final CustomerDiscountController customerDiscountController;
 
     @Autowired
     public CustomerDiscountResource(CustomerDiscountController customerDiscountController) {

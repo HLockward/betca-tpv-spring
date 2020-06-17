@@ -2,7 +2,6 @@ package es.upm.miw.betca_tpv_spring.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import es.upm.miw.betca_tpv_spring.documents.CustomerDiscount;
-import es.upm.miw.betca_tpv_spring.documents.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,13 +27,13 @@ public class CustomerDiscountCreationDto {
     }
 
     public CustomerDiscountCreationDto(String id, String description, LocalDateTime registrationDate, BigDecimal discount,
-                                       BigDecimal minimumPurchase, User user) {
+                                       BigDecimal minimumPurchase) {
         this.id = id;
         this.description = description;
         this.registrationDate = LocalDateTime.now();
         this.discount = discount;
         this.minimumPurchase = minimumPurchase;
-        this.mobile = mobile;
+
     }
 
     public CustomerDiscountCreationDto(CustomerDiscount customerDiscount) {
