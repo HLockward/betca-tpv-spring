@@ -15,7 +15,7 @@ import java.util.List;
 import static es.upm.miw.betca_tpv_spring.api_rest_controllers.CustomerDiscountResource.*;
 
 @ApiTestConfig
-public class CustomerDiscountResourceIT {
+class CustomerDiscountResourceIT {
 
     private List<CustomerDiscountDto> customerDiscounts;
 
